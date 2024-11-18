@@ -35,7 +35,7 @@ export default function Home() {
             {/* <Link to="/signin" className="btn watch-video"> */}
             <button className="btn btn-primary"
               onClick={() => {
-                router.push(`/user`);
+                router.push(`/userRegistration`);
               }}
             >
               SignIn

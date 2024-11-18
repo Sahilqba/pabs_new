@@ -6,23 +6,23 @@ const userSchema = new mongoose.Schema({
   password: String,
 });
 
-const appointmentSchema = new mongoose.Schema({
-  nameUser: String,
-  nameEmail: String,
-  disease: String,
-  contact: String,
-  bloodGroup: String,
-  date: Date,
-});
+// const appointmentSchema = new mongoose.Schema({
+//   nameUser: String,
+//   nameEmail: String,
+//   disease: String,
+//   contact: String,
+//   bloodGroup: String,
+//   date: Date,
+// });
 
 const userLoginSchema = new mongoose.Schema({
   email: String,
   password: String,
 });
 
-const User = mongoose.model("User", userSchema, "regCollection");
-const NewAppointment = mongoose.model("NewAppointment", appointmentSchema, "appointmentCollection");
-const LoginUser = mongoose.model("LoginUser", userLoginSchema, "regCollection");
+const User = mongoose.model("User", userSchema);
+// const NewAppointment = mongoose.model("NewAppointment", appointmentSchema, "appointmentCollection");
+const LoginUser = mongoose.model("LoginUser", userLoginSchema, "users");
 
 
-module.exports = {User, NewAppointment, LoginUser};
+module.exports = {User, LoginUser};

@@ -30,8 +30,7 @@ function page() {
       if (response.ok) {
         const result = await response.json();
         console.log("User created:", result);
-        sessionStorage.setItem("userId", result._id);
-        router.push(`/user/appointment/${result._id}`);
+        router.push(`/userProfile`);
       } else {
         console.error("Failed to create user:", response.statusText);
       }
@@ -43,7 +42,7 @@ function page() {
   };
   return (
     <>
-        <Header />
+        {/* <Header /> */}
       <div className="flex-container">
         <div className="flex-item">
           <h1>User reg</h1>
@@ -104,7 +103,7 @@ function page() {
           </div>
         </div>
       </div>
-    <Footer />
+    {/* <Footer /> */}
     </>
   );
 }

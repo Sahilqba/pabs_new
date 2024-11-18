@@ -15,7 +15,7 @@ function page() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:8080/userLogin", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/userLogin`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -26,7 +26,7 @@ function page() {
       if (response.ok) {
         console.log("Login successful");
         console.log("Data:", data);
-        router.push(`/userlogin/profile/${data._id}`);
+        router.push(`/userProfile`);
       } else {
         console.error("Login failed:", data.message);
       }
@@ -36,7 +36,7 @@ function page() {
   };
   return (
     <>
-        <Header />
+        {/* <Header /> */}
       <div className="flex-container">
         <div className="flex-item-login">
           <h1>User login</h1>
@@ -87,7 +87,7 @@ function page() {
           </div>
         </div>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }
