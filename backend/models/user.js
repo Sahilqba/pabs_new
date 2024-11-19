@@ -6,14 +6,12 @@ const userSchema = new mongoose.Schema({
   password: String,
 });
 
-// const appointmentSchema = new mongoose.Schema({
-//   nameUser: String,
-//   nameEmail: String,
-//   disease: String,
-//   contact: String,
-//   bloodGroup: String,
-//   date: Date,
-// });
+const appointmentSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  disease: String,
+  allergies: String,
+  appointmentDate: String,
+});
 
 const userLoginSchema = new mongoose.Schema({
   email: String,
@@ -21,8 +19,8 @@ const userLoginSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model("User", userSchema);
-// const NewAppointment = mongoose.model("NewAppointment", appointmentSchema, "appointmentCollection");
+const Appointment = mongoose.model("Appointment", appointmentSchema);
 const LoginUser = mongoose.model("LoginUser", userLoginSchema, "users");
 
 
-module.exports = {User, LoginUser};
+module.exports = {User, LoginUser, Appointment};

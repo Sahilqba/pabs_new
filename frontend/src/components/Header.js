@@ -3,22 +3,28 @@ import React from "react";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { useEffect } from "react";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 function Header() {
-    const router = useRouter();
+
+  const router = useRouter();
+  const handleLogout = () => {
+    localStorage.removeItem('jwtToken');
+    sessionStorage.clear();
+    router.push(`/userlogin`);
+  };
   useEffect(() => {
     require("bootstrap/dist/js/bootstrap.js");
   });
-  const handleProfileClick = (e) => {
-    e.preventDefault();
-    router.push('/user/profile');
-  };
+  // const handleProfileClick = (e) => {
+  //   e.preventDefault();
+  //   router.push("/user/profile");
+  // };
   return (
     <>
       <nav className="navbar navbar-expand-lg navbar-dark bg-secondary">
         <div className="container-fluid">
           <a className="navbar-brand">
-          <i className="bi bi-superscript"></i>
+            <i className="bi bi-superscript"></i>
           </a>
           <button
             className="navbar-toggler"
@@ -45,14 +51,18 @@ function Header() {
                 </a>
                 <ul className="dropdown-menu drpdwn-sec">
                   <li>
-                    <a className="dropdown-item" href="#" 
+                    {/* <a className="dropdown-item" href="#" 
                     // onClick = {handleProfileClick}
                     >
                       Profile
-                    </a>
+                    </a> */}
                   </li>
                   <li>
-                    <a className="dropdown-item" href="#" onClick = {()=>{router.push(`/`)}}>
+                    <a
+                      className="dropdown-item"
+                      href="#"
+                      onClick={handleLogout}
+                    >
                       <i className="bi bi-box-arrow-right"></i>
                     </a>
                   </li>

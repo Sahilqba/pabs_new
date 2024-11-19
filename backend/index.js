@@ -7,14 +7,10 @@ require('dotenv').config(); // Load environment variables
 const port = process.env.PORT;
 const mongoPassword = process.env.MONGODB_PASSWORD;
 const appName = process.env.APP_NAME;
-//
-const cookieParser = require('cookie-parser');
-//
+
 // Enable CORS
 app.use(cors());
-//
-app.use(cookieParser());
-//
+
 
 // Body parser middleware
 app.use(express.json());

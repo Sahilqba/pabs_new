@@ -1,23 +1,26 @@
 // const User = require("../models/user");
 const bcrypt = require("bcrypt");
-const { User, NewAppointment, LoginUser } = require("../models/user");
+const { User, Appointment, LoginUser } = require("../models/user");
 const jwt = require("jsonwebtoken");
 const secretKey = "your_secret_key";
 
 exports.createUser = async (req, res) => {
   try {
+    const existingUser = await User.findOne({ email: req.body.email });
+    if (existingUser) {
+      return res.status(400).json({ error: "Email already exists" });
+    }
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
     console.log(`Hashed password: ${hashedPassword}`);
     const user = new User({
       ...req.body,
-      password: hashedPassword
+      password: hashedPassword,
     });
     console.log(`User: ${user}`);
     await user.save();
-    const token = jwt.sign({ id: user._id, email: user.email }, secretKey, { expiresIn: '1h' });
-    res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'strict' });
-    res.status(201).json({ user, token });
+    // const token = jwt.sign({ id: user._id, email: user.email }, secretKey, { expiresIn: '1h' });
+    res.status(201).json(user);
   } catch (error) {
     res.status(400).send(error);
   }
@@ -36,33 +39,66 @@ exports.createUser = async (req, res) => {
 //   }
 // };
 
-// exports.createAppointment = async (req, res) => {
-//   try {
-//     const user = new NewAppointment(req.body);
-//     await user.save();
-//     res.status(201).json(user);
-//   } catch (error) {
-//     res.status(400).send(error);
-//   }
-// };
+exports.createAppointment = async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).send("Unauthorized");
+  }
 
+  const token = authHeader.split(" ")[1];
+  if (!token) {
+    return res.status(401).send("Unauthorized");
+  }
+
+  try {
+    const decoded = jwt.verify(token, secretKey);
+    const { disease, allergies, appointmentDate } = req.body;
+
+    // Check if an appointment with the same userId and appointmentDate already exists
+    const existingAppointment = await Appointment.findOne({
+      userId: decoded.id,
+      appointmentDate,
+    });
+
+    if (existingAppointment) {
+      return res
+        .status(400)
+        .send("An appointment with the same date already exists for this user");
+    }
+
+    const appointment = new Appointment({
+      userId: decoded.id,
+      disease,
+      allergies,
+      appointmentDate,
+    });
+
+    await appointment.save();
+    // res.status(201).json({ message: "Appointment booked successfully" });
+    res.status(201).send(appointment);
+  } catch (err) 
+  // {
+  //   res.status(500).send(err.message);
+  // }
+  {
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).send("Token has expired");
+    }
+    res.status(400).send(error.message);
+  }
+};
 
 exports.userLogin = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await LoginUser.findOne({ email });
-    if (user && await bcrypt.compare(password, user.password)) {
+    if (user && (await bcrypt.compare(password, user.password))) {
       const token = jwt.sign({ id: user._id, email: user.email }, secretKey, {
-        expiresIn: "1h",
-      });
-      res.cookie("token", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "strict",
+        expiresIn: "1m",
       });
       res.status(200).json({ user, token });
     } else {
-      res.status(401).send('Unauthorized');
+      res.status(401).send("Invalid email or password");
     }
   } catch (error) {
     res.status(400).send(error);

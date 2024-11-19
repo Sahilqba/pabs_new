@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.css";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 function page() {
@@ -19,20 +19,32 @@ function page() {
     const user = { name, email, password };
     console.log("User:", user);
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/newUser`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(user),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/newUser`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(user),
+        }
+      );
 
       if (response.ok) {
         const result = await response.json();
         console.log("User created:", result);
-        router.push(`/userProfile`);
+        alert("User created successfully. Please login to continue.");
+        router.push(`/userlogin`);
       } else {
-        console.error("Failed to create user:", response.statusText);
+        const errorResult = await response.json();
+        console.log(errorResult.error)
+        console.error(
+          "Failed to create user:",
+          errorResult.error
+        );
+        alert(
+          `Failed to create user: ${errorResult.error}`
+        );
       }
     } catch (error) {
       console.error("Error:", error);
@@ -42,7 +54,7 @@ function page() {
   };
   return (
     <>
-        {/* <Header /> */}
+      {/* <Header /> */}
       <div className="flex-container">
         <div className="flex-item">
           <h1>User reg</h1>
@@ -103,7 +115,7 @@ function page() {
           </div>
         </div>
       </div>
-    {/* <Footer /> */}
+      {/* <Footer /> */}
     </>
   );
 }

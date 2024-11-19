@@ -15,28 +15,34 @@ function page() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/userLogin`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: email, password: password }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/userLogin`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: email, password: password }),
+        }
+      );
       const data = await response.json();
       if (response.ok) {
         console.log("Login successful");
         console.log("Data:", data);
+        localStorage.setItem("jwtToken", data.token);
         router.push(`/userProfile`);
       } else {
-        console.error("Login failed:", data.message);
+        const errorResult = await response.json();
+        console.log(errorResult.error);
       }
     } catch (error) {
       console.error("Error during login:", error);
+      alert("Incorrect email or password");
     }
   };
   return (
     <>
-        {/* <Header /> */}
+      {/* <Header /> */}
       <div className="flex-container">
         <div className="flex-item-login">
           <h1>User login</h1>
@@ -46,9 +52,7 @@ function page() {
                 <span className="sr-only"></span>
               </div>
             ) : (
-              <form
-                onSubmit={handleSubmit}
-              >
+              <form onSubmit={handleSubmit}>
                 <div>
                   <input
                     type="email"
@@ -84,6 +88,13 @@ function page() {
                 </button>
               </form>
             )}
+            <button
+              // type="submit"
+              className="btn btn-primary w-100 mt-3"
+              onClick={() => router.push("/userRegistration")}
+            >
+              Click here to register
+            </button>
           </div>
         </div>
       </div>
