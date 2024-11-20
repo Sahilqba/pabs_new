@@ -2,11 +2,14 @@
 const bcrypt = require("bcrypt");
 const { User, Appointment, LoginUser } = require("../models/user");
 const jwt = require("jsonwebtoken");
-const secretKey = "your_secret_key";
+// const secretKey = "your_secret_key";
+require('dotenv').config(); // Load environment variables
+const secretKey = process.env.SECRET_KEY;
 
 exports.createUser = async (req, res) => {
   try {
     const existingUser = await User.findOne({ email: req.body.email });
+    console.log(`Request body: ${req.body.email}`);
     if (existingUser) {
       return res.status(400).json({ error: "Email already exists" });
     }
@@ -29,7 +32,7 @@ exports.createUser = async (req, res) => {
 // exports.getUserById = async (req, res) => {
 //   try {
 //     console.log(`Fetching user with ID: ${req.params.id}`);
-//     const user = await User.findById(req.params.id);
+//     const user = await Appointment.findById(req.params.id);
 //     if (!user) {
 //       return res.status(404).send("User not found");
 //     }
@@ -76,12 +79,13 @@ exports.createAppointment = async (req, res) => {
     await appointment.save();
     // res.status(201).json({ message: "Appointment booked successfully" });
     res.status(201).send(appointment);
-  } catch (err) 
-  // {
-  //   res.status(500).send(err.message);
-  // }
-  {
-    if (err.name === 'TokenExpiredError') {
+  } catch (
+    err
+    // {
+    //   res.status(500).send(err.message);
+    // }
+  ) {
+    if (err.name === "TokenExpiredError") {
       return res.status(401).send("Token has expired");
     }
     res.status(400).send(error.message);
@@ -91,10 +95,11 @@ exports.createAppointment = async (req, res) => {
 exports.userLogin = async (req, res) => {
   const { email, password } = req.body;
   try {
+    console.log(`Secret key: ${secretKey}`);
     const user = await LoginUser.findOne({ email });
     if (user && (await bcrypt.compare(password, user.password))) {
       const token = jwt.sign({ id: user._id, email: user.email }, secretKey, {
-        expiresIn: "1m",
+        expiresIn: "30m",
       });
       res.status(200).json({ user, token });
     } else {
@@ -105,38 +110,84 @@ exports.userLogin = async (req, res) => {
   }
 };
 
-// exports.deleteAppointment = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const result = await NewAppointment.findByIdAndDelete(id);
-//     if (result) {
-//       res.status(200).json({ message: "Appointment deleted successfully" });
-//     } else {
-//       res.status(404).json({ message: "Appointment not found" });
-//     }
-//   } catch (error) {
-//     res.status(500).send(error.message);
-//   }
-// };
+exports.deleteAppointment = async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).send("Unauthorized");
+  }
 
-// exports.getAppointments = async (req, res) => {
-//   try {
-//     const users = await User.find();
-//     res.json(users);
-//   } catch (err) {
-//     res.status(500).send(err.message);
-//   }
-// }
+  const token = authHeader.split(" ")[1];
+  if (!token) {
+    return res.status(401).send("Unauthorized");
+  }
 
-// exports.getAppointmentById = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const appointment = await NewAppointment.findById(id);
-//     if (!appointment) {
-//       return res.status(404).json({ message: "Appointment not found" });
-//     }
-//     res.status(200).json(appointment);
-//   } catch (error) {
-//     res.status(500).send(error.message);
-//   }
-// };
+  try {
+    const decoded = jwt.verify(token, secretKey);
+    const { id } = req.params;
+    const result = await Appointment.findByIdAndDelete(id);
+    if (result) {
+      res.status(200).json({ message: "Appointment deleted successfully" });
+    } else {
+      res.status(404).json({ message: "Appointment not found" });
+    }
+  } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).send("Token has expired");
+    }
+    res.status(500).send(err.message);
+  }
+};
+
+exports.getAppointmentsByUserId = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const appointments = await Appointment.find({ userId: userId });
+    if (!appointments) {
+      return res.status(404).send("No appointments found for this user");
+    }
+    res.status(200).json(appointments);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};
+
+//
+exports.updateAppointmentDate = async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).send("Unauthorized");
+  }
+
+  const token = authHeader.split(" ")[1];
+  if (!token) {
+    return res.status(401).send("Unauthorized");
+  }
+
+  try {
+    const decoded = jwt.verify(token, secretKey);
+    const { id } = req.params;
+    const { appointmentDate } = req.body;
+
+    const result = await Appointment.findByIdAndUpdate(
+      id,
+      { appointmentDate: appointmentDate },
+      { new: true }
+    );
+    if (result) {
+      res
+        .status(200)
+        .json({
+          message: "Appointment date updated successfully",
+          appointment: result,
+        });
+    } else {
+      res.status(404).json({ message: "Appointment not found" });
+    }
+  } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).send("Token has expired");
+    }
+    res.status(400).send(err);
+  }
+};
+//

@@ -13,6 +13,7 @@ function page() {
   const [password, setPassword] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const handleSubmit = async (e) => {
+    setLoading(true);
     e.preventDefault();
     try {
       const response = await fetch(
@@ -29,7 +30,11 @@ function page() {
       if (response.ok) {
         console.log("Login successful");
         console.log("Data:", data);
+        console.log("user:", data.user);
+        console.log("useriD:", data.user._id);
+        localStorage.setItem("userId", data.user._id);
         localStorage.setItem("jwtToken", data.token);
+        localStorage.setItem("userName", data.user.name);
         router.push(`/userProfile`);
       } else {
         const errorResult = await response.json();
@@ -38,6 +43,9 @@ function page() {
     } catch (error) {
       console.error("Error during login:", error);
       alert("Incorrect email or password");
+    }
+    finally{
+      setLoading(false);
     }
   };
   return (
@@ -91,7 +99,8 @@ function page() {
             <button
               // type="submit"
               className="btn btn-primary w-100 mt-3"
-              onClick={() => router.push("/userRegistration")}
+              onClick={() => 
+                router.push("/userRegistration")}
             >
               Click here to register
             </button>
