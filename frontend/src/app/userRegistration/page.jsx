@@ -4,17 +4,43 @@ import "bootstrap/dist/css/bootstrap.css";
 import { useRouter } from "next/navigation";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 function page() {
   useEffect(() => {
     require("bootstrap/dist/js/bootstrap.js");
   });
+  
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  const validatePassword = (value) => {
+    const pattern = /^(?=.*[a-zA-Z])(?=.*\d)[A-Za-z\d]{5,10}$/;
+    if (value.length < 5 || value.length > 10) {
+      setPasswordError("Password must be 5-10 characters long.");
+    } else if (!pattern.test(value)) {
+      setPasswordError("Password must include letters and numbers.");
+    } else {
+      setPasswordError(""); // No error
+    }
+  };
+  const handlePasswordChange = (e) => {
+    const value = e.target.value;
+    setPassword(value);
+    validatePassword(value);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (passwordError) {
+      toast.error("Please fix the password errors before submitting.");
+      return;
+    }
     setLoading(true);
     const user = { name, email, password };
     console.log("User:", user);
@@ -32,9 +58,11 @@ function page() {
 
       if (response.ok) {
         const result = await response.json();
+        toast.success("User created successfully. Please login to continue.");
         console.log("User created:", result);
-        alert("User created successfully. Please login to continue.");
-        router.push(`/userlogin`);
+        setTimeout(() => {
+          router.push(`/userlogin`);
+        }, 3000)
       } else {
         const errorResult = await response.json();
         console.log(errorResult.error)
@@ -42,12 +70,13 @@ function page() {
           "Failed to create user:",
           errorResult.error
         );
-        alert(
+        toast.error(
           `Failed to create user: ${errorResult.error}`
         );
       }
     } catch (error) {
       console.error("Error:", error);
+      toast.error("An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -92,16 +121,17 @@ function page() {
                 <div className="mb-3">
                   <input
                     type="password"
-                    className="form-control"
+                    className={`form-control ${passwordError ? "is-invalid" : ""}`}
                     id="exampleInputPassword1"
                     placeholder="Enter password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={handlePasswordChange}
                     required
-                    minLength="5"
-                    maxLength="10"
-                    pattern="^(?=.*[a-zA-Z])(?=.*\d)[A-Za-z\d]{5,10}$"
+                    // minLength="5"
+                    // maxLength="10"
+                    // pattern="^(?=.*[a-zA-Z])(?=.*\d)[A-Za-z\d]{5,10}$"
                   />
+                   {passwordError && <div className="invalid-feedback">{passwordError}</div>}
                 </div>
                 <button
                   type="submit"
@@ -115,6 +145,7 @@ function page() {
           </div>
         </div>
       </div>
+      <ToastContainer />
       {/* <Footer /> */}
     </>
   );

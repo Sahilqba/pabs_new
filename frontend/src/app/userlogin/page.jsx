@@ -4,6 +4,8 @@ import "bootstrap/dist/css/bootstrap.css";
 import Header from "../../components/Header";
 import Footer from "@/components/Footer";
 import { useRouter } from "next/navigation";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 function page() {
   useEffect(() => {
     require("bootstrap/dist/js/bootstrap.js");
@@ -14,6 +16,8 @@ function page() {
   const [loading, setLoading] = React.useState(false);
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/userLogin`,
@@ -28,24 +32,34 @@ function page() {
       const data = await response.json();
       if (response.ok) {
         console.log("Login successful");
-        console.log("Data:", data);
+        // console.log("Data:", data);
+        toast.success("Login successful !");
         localStorage.setItem("jwtToken", data.token);
-        router.push(`/userProfile`);
+        setTimeout(() => {
+          router.push(`/userProfile`);
+        }, 2000);
       } else {
-        const errorResult = await response.json();
-        console.log(errorResult.error);
+        // const errorResult = await response.json();
+        // console.log(errorResult.error);
+        const errorMessage = data?.error || "Invalid credentials";
+        console.error("Login failed:", errorMessage);
+        toast.error(errorMessage);
       }
     } catch (error) {
       console.error("Error during login:", error);
-      alert("Incorrect email or password");
+      toast.error("Incorrect email or password.");
     }
+    finally {
+      setLoading(false); // Reset loading state
+    }
+
   };
   return (
     <>
       {/* <Header /> */}
       <div className="flex-container">
-        <div className="flex-item-login">
-          <h1>User login</h1>
+        <div className="flex-item-login login-form">
+          <h2>Login with Email</h2>
           <div>
             {loading ? (
               <div className="spinner-border" role="status">
@@ -79,25 +93,29 @@ function page() {
                     pattern="^(?=.*[a-zA-Z])(?=.*\d)[A-Za-z\d]{5,10}$"
                   />
                 </div>
+                <div className="btn-grp">
                 <button
                   type="submit"
-                  className="btn btn-primary w-100"
+                  className="btn btn-primary"
                   // onClick={handleSubmit}
                 >
                   Submit
                 </button>
-              </form>
-            )}
-            <button
+                <button
               // type="submit"
-              className="btn btn-primary w-100 mt-3"
+              className="btn btn-primary"
               onClick={() => router.push("/userRegistration")}
             >
-              Click here to register
+              Register
             </button>
+            </div>
+              </form>
+            )}
+           
           </div>
         </div>
       </div>
+      <ToastContainer />
       {/* <Footer /> */}
     </>
   );
