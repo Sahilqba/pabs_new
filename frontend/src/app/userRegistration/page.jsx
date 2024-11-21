@@ -91,7 +91,7 @@ function page() {
     <>
       {/* <Header /> */}
       <div className="flex-container">
-        <div className="flex-item">
+        <div className="flex-item reg-form">
           <h2>Sign Up</h2>
           <div>
             {loading ? (
@@ -114,7 +114,7 @@ function page() {
                     type="text"
                     className="form-control"
                     id="name"
-                    placeholder="Name"
+                    placeholder="Name*"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
@@ -132,7 +132,7 @@ function page() {
                     type="email"
                     className="form-control"
                     id="email"
-                    placeholder="Email"
+                    placeholder="Email*"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -150,7 +150,7 @@ function page() {
                     type="password"
                     className={`form-control ${passwordError ? "is-invalid" : password && !passwordError ? "is-valid" : ""}`}
                     id="password"
-                    placeholder="Password"
+                    placeholder="Password*"
                     value={password}
                     onChange={handlePasswordChange}
                     required

@@ -10,10 +10,12 @@ router.post("/createAppointment", userController.createAppointment);
 
 router.post("/userLogin", userController.userLogin);
 
-// router.delete('/deleteAppointment/:id', userController.deleteAppointment);
+router.delete('/deleteAppointment/:id', userController.deleteAppointment);
 
 // router.get('/getAppointments', userController.getAppointments);
 
-// router.get('/getAppointmentById/:id', userController.getAppointmentById);
+router.get('/appointments/:userId', userController.getAppointmentsByUserId);
+
+router.patch('/updateAppointment/:id', userController.updateAppointmentDate);
 
 module.exports = router;

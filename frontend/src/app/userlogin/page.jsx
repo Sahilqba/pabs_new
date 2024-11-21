@@ -117,7 +117,7 @@ function page() {
                     type="email"
                     className="form-control"
                     id="email"
-                    placeholder="Email"
+                    placeholder="Email*"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -132,7 +132,7 @@ function page() {
                     type="password"
                     className={`form-control ${passwordError ? "is-invalid" : password && !passwordError ? "is-valid" : ""}`}
                     id="Password"
-                    placeholder="Password"
+                    placeholder="Password*"
                     value={password}
                     onChange={handlePasswordChange}
                     required
