@@ -44,6 +44,7 @@ exports.createUser = async (req, res) => {
 
 exports.createAppointment = async (req, res) => {
   const authHeader = req.headers.authorization;
+  console.log(`Auth header: ${authHeader}`);
   if (!authHeader) {
     return res.status(401).send("Unauthorized");
   }
@@ -141,6 +142,7 @@ exports.deleteAppointment = async (req, res) => {
 exports.getAppointmentsByUserId = async (req, res) => {
   try {
     const userId = req.params.userId;
+    // console.log(`Fetching appointments for user with ID: ${userId}`);
     const appointments = await Appointment.find({ userId: userId });
     if (!appointments) {
       return res.status(404).send("No appointments found for this user");
