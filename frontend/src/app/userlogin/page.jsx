@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import { useRouter } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Link from "next/link";
 function page() {
   useEffect(() => {
     require("bootstrap/dist/js/bootstrap.js");
@@ -73,6 +74,8 @@ function page() {
         // console.log("Data:", data);
         toast.success("Login successful !");
         localStorage.setItem("jwtToken", data.token);
+        localStorage.setItem("userId", data.user._id);
+        localStorage.setItem("userName", data.user.name);
         setTimeout(() => {
           router.push(`/userProfile`);
         }, 2000);
@@ -146,7 +149,7 @@ function page() {
                 <div className="btn-grp">
                   <button
                     type="submit"
-                    className="btn btn-outline-primary"
+                    className="btn btn-primary"
                     // onClick={handleSubmit}
                   >
                     Submit
@@ -169,9 +172,9 @@ function page() {
       {loading ? (
         <span className="loader">Loading...</span> // Replace with your loader component
       ) : (
-        <a href="/userRegistration" className="sign-up-link" onClick={handleSignUpClick}>
+        <Link href="/userRegistration" className="sign-up-link" onClick={handleSignUpClick}>
           Sign Up
-        </a>
+        </Link>
       )}
     </div>
                 </div>

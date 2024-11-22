@@ -5,6 +5,7 @@
   --color2: #B4D4FF;
   --color3: #86B6F6;
   --color4: #176B87;
+  --black: #000000;
 }
 
 nextjs-portal {
@@ -13,9 +14,38 @@ nextjs-portal {
 
 body{
   overflow-x: hidden;
+  /* padding: 10px; */
   /* background-color: var(--color1) !important; */
 }
+h1 {
+  font-size: 70px !important;
+  line-height: 90px !important;
+  color: var(--black) !important;
+  margin: 0 !important;
+}
+p {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 23px;
+  line-height: 32px;
+  color: var(--black);
+}
+.main{
+  padding: 15px;
+}
 
+nav.navbar.navbar-expand-lg.navbar-dark {
+  background: black;
+}
+i.bi.bi-person-fill {
+  color: white;
+}
+
+.form-control {
+  height: 50px;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
 .flex-container {
   display: flex;
   flex-wrap: wrap;
@@ -67,7 +97,8 @@ body{
 
 .hero-image img {
   width: 100%;
-  height: auto;
+  min-height: 700px ;
+  max-height: 100%;
 }
 .hero-content {
   height: 100%;
@@ -119,7 +150,7 @@ body{
 } */
 
 footer {
-  background-color: #343a40;
+  background-color: black;
   color: white;
   margin-top: 2rem;
   position: fixed;
@@ -129,7 +160,13 @@ footer {
   text-align: center;
   padding: 15px;
 }
-
+.ftr-sec p {
+  margin: 0;
+}
+/* validation alignment */
+.invalid-feedback, .valid-feedback  {
+  text-align: left;
+}
 /* button */
 .btn-grp {
   /* display: flex; */
@@ -138,11 +175,22 @@ footer {
   margin-top: 30px;
 }
 
-.btn-outline-primary {
+.btn-grp .btn , .app-sub  {
   width: 100%;
-  height: 3rem;
-  /* background-color: var(--color4); */
+  height: 50px;
+  border-radius: 0 !important;
 }
+.modal-footer .btn {
+  width: 48%;
+  height: 50px;
+  border-radius: 0;
+}
+.appnt-btn .btn.btn-primary {
+  height: 50px;
+  margin: 6px 0 30px 0px;
+  border-radius: 0 !important;
+}
+
 .register-link {
   margin: 10px  0 0 0;
 }
@@ -154,4 +202,117 @@ footer {
 .spinner-border {
   --bs-spinner-width: 120px;
   --bs-spinner-height: 120px;
+}
+
+/* css appoinment table */
+.input-row {
+  display: flex;
+  gap: 10px; /* Adjust the gap between inputs as needed */
+}
+
+.input-row input {
+  flex: 1; /* Make inputs take equal space */
+}
+
+.appointments-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 18px;
+  text-align: left;
+}
+
+.appointments-table th, .appointments-table td {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+}
+
+.appointments-table th {
+  background-color: #f4f4f4;
+}
+
+.appointments-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.appointment-button {
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 15px;
+  width: 15%;
+}
+
+.appointment-button:hover {
+  background-color: #0056b3;
+}
+.prof-hdng {
+  margin: 0 0px 15px 5px;
+}
+
+.prof-hdng h3 {
+  margin: 0;
+  line-height: 40px;
+  font-size: 30px;
+}
+
+/* icon */
+.action-symbol {display: flex;gap: 7px;}
+
+.action-symbol button {
+  width: 50px;
+  height: 50px;
+  border-radius: 0;
+}
+.appointments-table th:last-child {
+  width: 140px;
+}
+.appointments-table.app-hist th:last-child {
+  width: auto;
+}
+
+.accordion-button {
+  font-size: 25px !important; 
+  color: var(--black) !important;
+  line-height: 30px !important;
+}
+
+th {
+  color: var(--black);
+  font-size: 18px;
+}
+
+.modal-header {
+  font-size: 20px;
+  line-height: 30px;
+}
+.dropdown-item span {
+  margin-left: 10px;
+}
+.no-booking p {
+  font-size: 18px;
+  line-height: 25px;
+}
+
+.hero-buttons a {
+  height: 50px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0 !important;
+}
+/* .hero-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+} */
+ 
+.hero-subtext {
+  margin: 15px 0 30px 0;
 }

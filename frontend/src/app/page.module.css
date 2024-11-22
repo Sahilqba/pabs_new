@@ -26,6 +26,9 @@
     --button-secondary-hover: #1a1a1a;
   }
 }
+.overflow{
+  overflow-x: hidden !important;
+}
 
 .main {
   display: flex;

@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 function Header() {
 
   const router = useRouter();
@@ -21,7 +22,7 @@ function Header() {
   // };
   return (
     <>
-      <nav className="navbar navbar-expand-lg navbar-dark bg-secondary">
+      <nav className="navbar navbar-expand-lg navbar-dark">
         <div className="container-fluid">
           <a className="navbar-brand">
             <i className="bi bi-superscript"></i>
@@ -40,7 +41,7 @@ function Header() {
           <div className="collapse navbar-collapse" id="navbarNavDropdown">
             <ul className="navbar-nav ms-auto">
               <li className="nav-item dropdown">
-                <a
+                <Link
                   className="nav-link "
                   href="#"
                   role="button"
@@ -48,7 +49,7 @@ function Header() {
                   aria-expanded="false"
                 >
                   <i className="bi bi-person-fill"></i>
-                </a>
+                </Link>
                 <ul className="dropdown-menu drpdwn-sec">
                   <li>
                     {/* <a className="dropdown-item" href="#" 
@@ -64,6 +65,7 @@ function Header() {
                       onClick={handleLogout}
                     >
                       <i className="bi bi-box-arrow-right"></i>
+                      <span>Logout</span>
                     </a>
                   </li>
                 </ul>

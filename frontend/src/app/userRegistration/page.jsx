@@ -161,13 +161,15 @@ function page() {
                     <div className="valid-feedback">Password looks good!</div>
                   ) : null}
                 </div>
+                <div className="btn-grp">
                 <button
                   type="submit"
-                  className="btn btn-outline-primary"
+                  className="btn btn-primary"
                   // onClick={handleSubmit}
                 >
                   Submit
                 </button>
+                </div>
               </form>
             )}
           </div>
