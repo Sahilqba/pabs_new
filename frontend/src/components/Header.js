@@ -4,12 +4,15 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Cookies from 'js-cookie';
+
 function Header() {
 
   const router = useRouter();
   const handleLogout = () => {
     localStorage.removeItem('jwtToken');
     sessionStorage.clear();
+    Cookies.remove('jwtCookie', { path: '/' });
     router.push(`/userlogin`);
   };
   useEffect(() => {

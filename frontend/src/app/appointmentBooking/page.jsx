@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import React from "react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Cookies from 'js-cookie';
 function page() {
   // const [disease, setDisease] = React.useState("");
   // const [allergies, setAllergies] = React.useState("");
@@ -60,8 +61,7 @@ function page() {
       setAppointments(data);
     } catch (error) {
       console.error("Failed to fetch appointments:", error);
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -74,6 +74,13 @@ function page() {
 
   const handleDelete = async (appointmentId) => {
     console.log("Delete appointment with id:", appointmentId);
+    // const jwtToken = localStorage.getItem("jwtToken");
+
+    // if (!jwtToken) {
+    //   alert("Please log in again and try deleting.");
+    //   router.push(`/userlogin`);
+    //   return;
+    // }
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/deleteAppointment/${appointmentId}`,
@@ -98,6 +105,9 @@ function page() {
         alert("Appointment not found");
       } else if (response.status === 401) {
         alert("Token has expired. Please log in again and try deleting.");
+        Cookies.remove('jwtCookie', { path: '/' });
+        sessionStorage.clear();
+        localStorage.clear();
         router.push(`/userlogin`);
       } else {
         const errorMessage = await response.text();
@@ -115,7 +125,9 @@ function page() {
     console.log("Modal with id:", appointmentIdmodal);
     setIsModalOpen(true);
     setModalAppointmentId(appointmentIdmodal);
-    const appointment = appointments.find(app => app._id === appointmentIdmodal);
+    const appointment = appointments.find(
+      (app) => app._id === appointmentIdmodal
+    );
     setModalAppointmentDate(appointment.appointmentDate);
     return appointmentIdmodal;
   };
@@ -131,18 +143,25 @@ function page() {
   // };
 
   const handleEdit = async (appointmentDate) => {
+    if (!modalAppointmentDate) {
+      alert("Please select a valid appointment date.");
+      return;
+    }
     // const appointmentDate = // get the new date value from your form or state
-   console.log("New date:", appointmentDate);
+    console.log("New date:", appointmentDate);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/updateAppointment/${modalAppointmentId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${jwtToken}` // replace with your actual token
-        },
-        body: JSON.stringify({ appointmentDate: modalAppointmentDate })
-      });
-  
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/updateAppointment/${modalAppointmentId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwtToken}`, // replace with your actual token
+          },
+          body: JSON.stringify({ appointmentDate: modalAppointmentDate }),
+        }
+      );
+
       if (response.ok) {
         const data = await response.json();
         console.log("Appointment date updated successfully", data);
@@ -155,12 +174,16 @@ function page() {
         );
         setIsModalOpen(false);
         // handle success (e.g., update state, close modal, show notification)
-      } 
-      else if (response.status === 401) {
+      } else if (response.status === 401) {
         alert("Token has expired. Please log in again and try rescheduling.");
+        Cookies.remove('jwtCookie', { path: '/' });
+        sessionStorage.clear();
+        localStorage.clear();
         router.push(`/userlogin`);
-      }
-      else {
+      } else if (response.status === 400) {
+        alert("Please log in again and try rescheduling.");
+        router.push(`/userlogin`);
+      } else {
         const errorData = await response.json();
         console.error("Error updating appointment date", errorData);
         // handle error (e.g., show error message)
@@ -173,39 +196,52 @@ function page() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/createAppointment`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwtToken}`,
-        },
-        body: JSON.stringify({
-          disease,
-          allergies,
-          appointmentDate,
-        }),
-      }
-    );
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/createAppointment`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwtToken}`,
+          },
+          body: JSON.stringify({
+            disease,
+            allergies,
+            appointmentDate,
+          }),
+        }
+      );
 
-    if (response.ok) {
-      const appointment = await response.json();
-      setAppointments((prevAppointments) => [...prevAppointments, appointment]);
-      console.log("Appointment booked:", appointment);
-      alert("Appointment booked successfully");
-      // router.push(`/userProfile`);
-    } else if (response.status === 401) {
-      alert("Token has expired. Please log in again.");
-      sessionStorage.clear();
-      router.push(`/userlogin`);
-    } else {
+      if (response.ok) {
+        const appointment = await response.json();
+        setAppointments((prevAppointments) => [
+          ...prevAppointments,
+          appointment,
+        ]);
+        console.log("Appointment booked:", appointment);
+        alert("Appointment booked successfully");
+        // router.push(`/userProfile`);
+      } else if (response.status === 401) {
+        alert("Token has expired. Please log in again.");
+        Cookies.remove("jwtCookie", { path: "/" });
+        sessionStorage.clear();
+        localStorage.clear();
+        router.push(`/userlogin`);
+      } else {
       const errorMessage = await response.text();
       console.error("Failed to book appointment:", errorMessage);
       alert(errorMessage);
     }
-    
+    } catch (error) {
+      console.error("Error booking appointment:", error);
+      alert(
+        "An error occurred while booking the appointment. Please try again."
+      );
+      router.push(`/userlogin`);
+    }
   };
+
   return (
     <>
       <Header />
@@ -258,6 +294,7 @@ function page() {
           onChange={(e) => {
             setAppointmentDate(e.target.value);
           }}
+          min={new Date().toISOString().split("T")[0]}
           required
         />
 
@@ -273,44 +310,50 @@ function page() {
           </li>
         ))}
       </ul> */}
-                  {loading ? (
-              <div className="spinner-border" role="status">
-                <span className="sr-only"></span>
-              </div>
-            ) : (
-      <table className="appointments-table">
-        <thead>
-          <tr>
-            <th>Disease</th>
-            <th>Allergies</th>
-            <th>Appointment Date</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {appointments.map((appointment) => (
-            <tr key={appointment._id}>
-              <td>{appointment.disease}</td>
-              <td>{appointment.allergies}</td>
-              <td>{appointment.appointmentDate}</td>
-              <td>
-                <button onClick={() => handleDelete(appointment._id)} className="appointment-button">
-                  Delete
-                </button>
-                <button onClick={() => handleModal(appointment._id)} className="appointment-button">
-                  Edit appointment date
-                </button>
-              </td>
-              {/* <td>
+      {loading ? (
+        <div className="spinner-border" role="status">
+          <span className="sr-only"></span>
+        </div>
+      ) : (
+        <table className="appointments-table">
+          <thead>
+            <tr>
+              <th>Disease</th>
+              <th>Allergies</th>
+              <th>Appointment Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {appointments.map((appointment) => (
+              <tr key={appointment._id}>
+                <td>{appointment.disease}</td>
+                <td>{appointment.allergies}</td>
+                <td>{appointment.appointmentDate}</td>
+                <td>
+                  <button
+                    onClick={() => handleDelete(appointment._id)}
+                    className="appointment-button"
+                  >
+                    Delete
+                  </button>
+                  <button
+                    onClick={() => handleModal(appointment._id)}
+                    className="appointment-button"
+                  >
+                    Edit appointment date
+                  </button>
+                </td>
+                {/* <td>
                 <button onClick={() => handleModal(appointment._id)} className="appointment-button">
                   Edit appointment date
                 </button>
               </td> */}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-            )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
       {isModalOpen && (
         <div
           className="modal fade show"
@@ -331,15 +374,11 @@ function page() {
                   type="date"
                   placeholder="Enter your updated appointment date"
                   value={modalAppointmentDate}
+                  min={new Date().toISOString().split("T")[0]}
                   onChange={(e) => {
                     setModalAppointmentDate(e.target.value);
                   }}
-                  // onChange={(e) => {
-                  //   const appointmentDate = e.target.value;
-                  //   setAppointmentDate(appointmentDate);
-                  //   // handleEdit(appointmentDate);
-                  // }}
-                  // required
+                  required
                 />
               </div>
               <div className="modal-footer">
@@ -350,7 +389,11 @@ function page() {
                 >
                   Close
                 </button>
-                <button type="button" className="btn btn-primary" onClick={handleEdit} >
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleEdit}
+                >
                   Save changes
                 </button>
               </div>

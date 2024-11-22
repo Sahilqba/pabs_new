@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import Header from "../../components/Header";
 import Footer from "@/components/Footer";
 import { useRouter } from "next/navigation";
+import Cookies from 'js-cookie';
 function page() {
   useEffect(() => {
     require("bootstrap/dist/js/bootstrap.js");
@@ -28,14 +29,18 @@ function page() {
       );
       const data = await response.json();
       if (response.ok) {
-        console.log("Login successful");
-        console.log("Data:", data);
-        console.log("user:", data.user);
-        console.log("useriD:", data.user._id);
+        // console.log("Login successful");
+        // console.log("Data:", data);
+        // console.log("user:", data.user);
+        // console.log("useriD:", data.user._id);
         localStorage.setItem("userId", data.user._id);
         localStorage.setItem("jwtToken", data.token);
         localStorage.setItem("userName", data.user.name);
+        console.log("Setting cookie...");
+        // Cookies.set('jwt', data.token, { expires: 1 });
+        Cookies.set('jwtCookie', data.token, { expires: 1, path: '/' });
         router.push(`/userProfile`);
+        console.log("Cookie set. Navigating to userProfile...");
       } else {
         const errorResult = await response.json();
         console.log(errorResult.error);
@@ -43,8 +48,7 @@ function page() {
     } catch (error) {
       console.error("Error during login:", error);
       alert("Incorrect email or password");
-    }
-    finally{
+    } finally {
       setLoading(false);
     }
   };
@@ -99,8 +103,7 @@ function page() {
             <button
               // type="submit"
               className="btn btn-primary w-100 mt-3"
-              onClick={() => 
-                router.push("/userRegistration")}
+              onClick={() => router.push("/userRegistration")}
             >
               Click here to register
             </button>

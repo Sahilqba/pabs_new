@@ -3,6 +3,8 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
+// import withAuth from "../../withAuth";
+// import withAuth from "@/withAuth";
 function page() {
   const router = useRouter();
   const [appointments, setAppointments] = useState([]);
@@ -48,7 +50,6 @@ function page() {
   return (
     <>
       <Header />
-      {/* <h1>Profile page</h1> */}
       <h1>
         <strong>
           Welcome {userName}. You can view your appointments here.
@@ -120,3 +121,4 @@ function page() {
 }
 
 export default page;
+// export default withAuth(Page);
