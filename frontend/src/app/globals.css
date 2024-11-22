@@ -162,6 +162,7 @@ footer {
 }
 .ftr-sec p {
   margin: 0;
+  color: var(--white);
 }
 /* validation alignment */
 .invalid-feedback, .valid-feedback  {

@@ -1,21 +1,21 @@
 "use client";
-import React from "react";
+import React, { useEffect }  from "react";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import Cookies from "js-cookie";
 function Header() {
 
   const router = useRouter();
   const handleLogout = () => {
     localStorage.removeItem('jwtToken');
     sessionStorage.clear();
+    Cookies.remove('jwtCookie', { path: '/' });
     router.push(`/userlogin`);
   };
   useEffect(() => {
-    require("bootstrap/dist/js/bootstrap.js");
-  });
+    import("bootstrap/dist/js/bootstrap.bundle").catch(console.error);
+  }, []);
   // const handleProfileClick = (e) => {
   //   e.preventDefault();
   //   router.push("/user/profile");
@@ -41,15 +41,15 @@ function Header() {
           <div className="collapse navbar-collapse" id="navbarNavDropdown">
             <ul className="navbar-nav ms-auto">
               <li className="nav-item dropdown">
-                <Link
-                  className="nav-link "
+                <a
+                  className="nav-link"
                   href="#"
                   role="button"
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
                   <i className="bi bi-person-fill"></i>
-                </Link>
+                </a>
                 <ul className="dropdown-menu drpdwn-sec">
                   <li>
                     {/* <a className="dropdown-item" href="#" 

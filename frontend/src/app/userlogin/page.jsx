@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
+import Cookies from "js-cookie";
 function page() {
   useEffect(() => {
     require("bootstrap/dist/js/bootstrap.js");
@@ -76,6 +77,7 @@ function page() {
         localStorage.setItem("jwtToken", data.token);
         localStorage.setItem("userId", data.user._id);
         localStorage.setItem("userName", data.user.name);
+        Cookies.set('jwtCookie', data.token, { expires: 1, path: '/' });
         setTimeout(() => {
           router.push(`/userProfile`);
         }, 2000);

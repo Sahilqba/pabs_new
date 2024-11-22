@@ -7,10 +7,18 @@ import Footer from "@/components/Footer";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Cookies from 'js-cookie';
+// import 'bootstrap/dist/css/bootstrap.min.css';
+import { Tooltip } from "bootstrap";
 function page() {
-  // const [disease, setDisease] = React.useState("");
-  // const [allergies, setAllergies] = React.useState("");
-  // const [appointmentDate, setAppointmentDate] = React.useState("");
+  // useEffect(() => {
+  //   require("bootstrap/dist/js/bootstrap.js");
+  // });
+  // useEffect(() => {
+  //   // Initialize Bootstrap tooltips
+  //   const tooltipTriggerList = Array.from(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  //   tooltipTriggerList.forEach((tooltipTriggerEl) => new Tooltip(tooltipTriggerEl));
+  // }, []);
   const [appointments, setAppointments] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAppointmentId, setModalAppointmentId] = useState(null);
@@ -77,7 +85,13 @@ function page() {
   }, [userIdfetched]);
 
   const handleDelete = async (appointmentId) => {
-    console.log("Delete appointment with id:", appointmentId);
+    const jwtToken = localStorage.getItem("jwtToken");
+ 
+    if (!jwtToken) {
+      alert("Please log in again and try deleting.");
+      router.push(`/userlogin`);
+      return;
+    }
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/deleteAppointment/${appointmentId}`,
@@ -102,6 +116,9 @@ function page() {
         toast.error("Appointment not found");
       } else if (response.status === 401) {
         toast.warning("Token has expired. Please log in again and try deleting.");
+        Cookies.remove('jwtCookie', { path: '/' });
+        sessionStorage.clear();
+        localStorage.clear();
         router.push(`/userlogin`);
       } else {
         const errorMessage = await response.text();
@@ -167,6 +184,9 @@ function page() {
       } 
       else if (response.status === 401) {
         toast.warning("Token has expired. Please log in again and try rescheduling.");
+        Cookies.remove('jwtCookie', { path: '/' });
+        sessionStorage.clear();
+        localStorage.clear();
         router.push(`/userlogin`);
       }
       else {
@@ -182,39 +202,52 @@ function page() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/createAppointment`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwtToken}`,
-        },
-        body: JSON.stringify({
-          disease,
-          allergies,
-          appointmentDate,
-        }),
-      }
-    );
-
-    if (response.ok) {
-      const appointment = await response.json();
-      setAppointments((prevAppointments) => [...prevAppointments, appointment]);
-      console.log("Appointment booked:", appointment);
-      toast.success("Appointment booked successfully");
-      // router.push(`/userProfile`);
-    } else if (response.status === 401) {
-      toast.warning("Token has expired. Please log in again.");
-      sessionStorage.clear();
-      router.push(`/userlogin`);
-    } else {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/createAppointment`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwtToken}`,
+          },
+          body: JSON.stringify({
+            disease,
+            allergies,
+            appointmentDate,
+          }),
+        }
+      );
+ 
+      if (response.ok) {
+        const appointment = await response.json();
+        setAppointments((prevAppointments) => [
+          ...prevAppointments,
+          appointment,
+        ]);
+        console.log("Appointment booked:", appointment);
+        toast.success("Appointment booked successfully");
+        // router.push(`/userProfile`);
+      } else if (response.status === 401) {
+        toast.warning("Token has expired. Please log in again.");
+        Cookies.remove("jwtCookie", { path: "/" });
+        sessionStorage.clear();
+        localStorage.clear();
+        router.push(`/userlogin`);
+      } else {
       const errorMessage = await response.text();
       console.error("Failed to book appointment:", errorMessage);
       toast.error(errorMessage);
     }
-    
+    } catch (error) {
+      console.error("Error booking appointment:", error);
+      toast.error(
+        "An error occurred while booking the appointment. Please try again."
+      );
+      router.push(`/userlogin`);
+    }
   };
+  
   return (
     <>
       <Header />
@@ -324,23 +357,14 @@ function page() {
               <td>{appointment.allergies}</td>
               <td>{appointment.appointmentDate}</td>
               <td className="action-symbol">
-                <button onClick={() => handleDelete(appointment._id)} className="btn btn-outline-danger" title="Delete Appointment">
+                <button onClick={() => handleDelete(appointment._id)} className="btn btn-outline-danger"  data-bs-toggle="tooltip"
+        data-bs-placement="bottom" title="Delete Appointment">
                 <i class="fa-solid fa-trash"></i> 
                 </button>
-                <button onClick={() => handleModal(appointment._id)} className="btn btn-outline-primary" title="Reschedule Appointment">
+                <button onClick={() => handleModal(appointment._id)} className="btn btn-outline-primary"  data-bs-toggle="tooltip"
+        data-bs-placement="bottom" title="Reschedule Appointment">
                 <i class="fa-solid fa-calendar-days"></i>
                 </button>
-                
-                 {/* <i
-            className="fas fa-times-circle"
-            onClick={() => handleDelete(appointment._id)}
-            title="Cancel Appointment"
-          ></i>
-           <i
-            className="fas fa-calendar-check "
-            onClick={() => handleModal(appointment._id)}
-            title="Reschedule Appointment"
-          ></i> */}
               </td>
               {/* <td>
                 <button onClick={() => handleModal(appointment._id)} className="appointment-button">

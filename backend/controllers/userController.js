@@ -100,7 +100,7 @@ exports.userLogin = async (req, res) => {
     const user = await LoginUser.findOne({ email });
     if (user && (await bcrypt.compare(password, user.password))) {
       const token = jwt.sign({ id: user._id, email: user.email }, secretKey, {
-        expiresIn: "30m",
+        expiresIn: "15m",
       });
       res.status(200).json({ user, token });
     } else {
