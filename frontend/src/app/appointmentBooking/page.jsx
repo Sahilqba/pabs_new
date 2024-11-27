@@ -3,7 +3,7 @@ import Header from "@/components/Header";
 import React from "react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 function page() {
   // const [disease, setDisease] = React.useState("");
   // const [allergies, setAllergies] = React.useState("");
@@ -12,6 +12,8 @@ function page() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAppointmentId, setModalAppointmentId] = useState(null);
   const [modalAppointmentDate, setModalAppointmentDate] = useState("");
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [appointmentToDelete, setAppointmentToDelete] = useState(null);
   const userIdfetched = localStorage.getItem("userId");
   const [loading, setLoading] = useState(false);
   const jwtToken = localStorage.getItem("jwtToken");
@@ -74,13 +76,13 @@ function page() {
 
   const handleDelete = async (appointmentId) => {
     console.log("Delete appointment with id:", appointmentId);
-    // const jwtToken = localStorage.getItem("jwtToken");
+    const jwtToken = localStorage.getItem("jwtToken");
 
-    // if (!jwtToken) {
-    //   alert("Please log in again and try deleting.");
-    //   router.push(`/userlogin`);
-    //   return;
-    // }
+    if (!jwtToken) {
+      alert("Please log in again and try deleting.");
+      router.push(`/userlogin`);
+      return;
+    }
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/deleteAppointment/${appointmentId}`,
@@ -105,7 +107,7 @@ function page() {
         alert("Appointment not found");
       } else if (response.status === 401) {
         alert("Token has expired. Please log in again and try deleting.");
-        Cookies.remove('jwtCookie', { path: '/' });
+        Cookies.remove("jwtCookie", { path: "/" });
         sessionStorage.clear();
         localStorage.clear();
         router.push(`/userlogin`);
@@ -137,10 +139,15 @@ function page() {
     setIsModalOpen(false);
   };
 
-  // const handleEdit = async () => {
-  //   console.log("Editing appointment with id:", modalAppointmentId);
-  //   setIsModalOpen(false);
-  // };
+  const openConfirmModal = (appointmentId) => {
+    setAppointmentToDelete(appointmentId);
+    setIsConfirmModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    handleDelete(appointmentToDelete);
+    setIsConfirmModalOpen(false);
+  };
 
   const handleEdit = async (appointmentDate) => {
     if (!modalAppointmentDate) {
@@ -176,7 +183,7 @@ function page() {
         // handle success (e.g., update state, close modal, show notification)
       } else if (response.status === 401) {
         alert("Token has expired. Please log in again and try rescheduling.");
-        Cookies.remove('jwtCookie', { path: '/' });
+        Cookies.remove("jwtCookie", { path: "/" });
         sessionStorage.clear();
         localStorage.clear();
         router.push(`/userlogin`);
@@ -229,10 +236,10 @@ function page() {
         localStorage.clear();
         router.push(`/userlogin`);
       } else {
-      const errorMessage = await response.text();
-      console.error("Failed to book appointment:", errorMessage);
-      alert(errorMessage);
-    }
+        const errorMessage = await response.text();
+        console.error("Failed to book appointment:", errorMessage);
+        alert(errorMessage);
+      }
     } catch (error) {
       console.error("Error booking appointment:", error);
       alert(
@@ -256,14 +263,6 @@ function page() {
           }}
           required
         />
-        {/* <input
-          type="text"
-          placeholder="Enter your allergies"
-          value={allergies}
-          onChange={(e) => {
-            setAllergies(e.target.value);
-          }}
-        /> */}
         <select
           type="text"
           placeholder="Enter your allergies"
@@ -279,14 +278,7 @@ function page() {
           <option value="Rash">Rash</option>
           <option value="Any other allergies">Any other allergies</option>
         </select>
-        {/* <input
-          type="text"
-          placeholder="Enter your appointment date"
-          value={appointmentDate}
-          onChange={(e) => {
-            setAppointmentDate(e.target.value);
-          }}
-        /> */}
+
         <input
           type="date"
           placeholder="Enter your appointment date"
@@ -331,8 +323,19 @@ function page() {
                 <td>{appointment.allergies}</td>
                 <td>{appointment.appointmentDate}</td>
                 <td>
-                  <button
+                  {/* <button
                     onClick={() => handleDelete(appointment._id)}
+                    // onClick={() => {
+                    //   if (window.confirm("Are you sure you want to delete this appointment?")) {
+                    //     handleDelete(appointment._id);
+                    //   }
+                    // }}
+                    className="appointment-button"
+                  >
+                    Delete
+                  </button> */}
+                  <button
+                    onClick={() => openConfirmModal(appointment._id)}
                     className="appointment-button"
                   >
                     Delete
@@ -344,11 +347,6 @@ function page() {
                     Edit appointment date
                   </button>
                 </td>
-                {/* <td>
-                <button onClick={() => handleModal(appointment._id)} className="appointment-button">
-                  Edit appointment date
-                </button>
-              </td> */}
               </tr>
             ))}
           </tbody>
@@ -395,6 +393,39 @@ function page() {
                   onClick={handleEdit}
                 >
                   Save changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isConfirmModalOpen && (
+        <div
+          className="modal fade show"
+          role="dialog"
+          style={{ display: "block" }}
+        >
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">Confirm Deletion</div>
+              <div className="modal-body">
+                Are you sure you want to delete this appointment?
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setIsConfirmModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={confirmDelete}
+                >
+                  Delete
                 </button>
               </div>
             </div>

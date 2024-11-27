@@ -11,6 +11,7 @@ const appointmentSchema = new mongoose.Schema({
   disease: String,
   allergies: String,
   appointmentDate: String,
+  appointmentTime: String
 });
 
 const userLoginSchema = new mongoose.Schema({

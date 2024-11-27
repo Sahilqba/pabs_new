@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server'
 export function middleware(request) {
     const token = request.cookies.get('jwtCookie')
 
-    if (request.nextUrl.pathname === '/userlogin' && token) {
+    if ((request.nextUrl.pathname === '/userlogin' || request.nextUrl.pathname === '/userRegistration') && token) {
         console.log("User already logged in, redirecting to /userProfile");
         return NextResponse.redirect(new URL("/userProfile", request.nextUrl));
     }
@@ -22,5 +22,5 @@ export function middleware(request) {
 }
 
 export const config = {
-  matcher: ["/userProfile", "/appointmentBooking", "/userlogin"]
+  matcher: ["/userProfile", "/appointmentBooking", "/userlogin", "/userRegistration"]
 }
