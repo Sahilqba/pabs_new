@@ -29,7 +29,6 @@ exports.createUser = async (req, res) => {
   }
 };
 
-
 exports.createAppointment = async (req, res) => {
   const authHeader = req.headers.authorization;
   console.log(`Auth header: ${authHeader}`);
@@ -51,13 +50,15 @@ exports.createAppointment = async (req, res) => {
     const existingAppointment = await Appointment.findOne({
       userId: decoded.id,
       appointmentDate,
-      appointmentTime
+      appointmentTime,
     });
 
     if (existingAppointment) {
       return res
         .status(400)
-        .send("An appointment with the same date already exists for this user");
+        .send(
+          "An appointment with the same date & time already exists for this user"
+        );
     }
 
     const appointment = new Appointment({
@@ -65,7 +66,7 @@ exports.createAppointment = async (req, res) => {
       disease,
       allergies,
       appointmentDate,
-      appointmentTime
+      appointmentTime,
     });
 
     await appointment.save();
@@ -91,7 +92,7 @@ exports.userLogin = async (req, res) => {
     const user = await LoginUser.findOne({ email });
     if (user && (await bcrypt.compare(password, user.password))) {
       const token = jwt.sign({ id: user._id, email: user.email }, secretKey, {
-        expiresIn: "5m",
+        expiresIn: "15m",
       });
       res.status(200).json({ user, token });
     } else {
@@ -144,86 +145,38 @@ exports.getAppointmentsByUserId = async (req, res) => {
   }
 };
 
-//
-// exports.updateAppointmentDate = async (req, res) => {
-//   const authHeader = req.headers.authorization;
-//   if (!authHeader) {
-//     return res.status(401).send("Unauthorized");
-//   }
-
-//   const token = authHeader.split(" ")[1];
-//   if (!token) {
-//     return res.status(401).send("Unauthorized");
-//   }
-
-//   try {
-//     const decoded = jwt.verify(token, secretKey);
-//     const { id } = req.params;
-//     const { appointmentDate } = req.body;
-
-
-//     const result = await Appointment.findByIdAndUpdate(
-//       id,
-//       { appointmentDate: appointmentDate },
-//       { new: true }
-//     );
-//     if (result) {
-//       res.status(200).json({
-//         message: "Appointment date updated successfully",
-//         appointment: result,
-//       });
-//     } else {
-//       res.status(404).json({ message: "Appointment not found" });
-//     }
-//   } catch (err) {
-//     if (err.name === "TokenExpiredError") {
-//       return res.status(401).send("Token has expired");
-//     }
-//     res.status(400).send(err);
-//   }
-// };
-
 exports.updateAppointmentDate = async (req, res) => {
+  const { appointmentDate } = req.body;
+
   const authHeader = req.headers.authorization;
   if (!authHeader) {
     return res.status(401).send("Unauthorized");
   }
- 
+
   const token = authHeader.split(" ")[1];
   if (!token) {
     return res.status(401).send("Unauthorized");
   }
- 
+  if (!appointmentDate) {
+    return res.status(400).json({ error: "Appointment date is required" });
+  }
+
   try {
     const decoded = jwt.verify(token, secretKey);
     const { id } = req.params;
-    const { appointmentDate
-      , appointmentTime
-     } = req.body;
-
-    // Check if the same appointment time exists
-    const existingAppointment = await Appointment.findOne({
-      appointmentDate
-    });
-
-    if (existingAppointment) {
-      return res.status(400).json({ message: "Appointment time already exists" });
-    }
-
+    const { appointmentDate, appointmentTime } = req.body;
+    // const { appointmentTime } = req.body;
     const result = await Appointment.findByIdAndUpdate(
       id,
-      { appointmentDate
-        , appointmentTime
-       },
+      { appointmentDate: appointmentDate, appointmentTime: appointmentTime },
+      // { appointmentTime: appointmentTime },
       { new: true }
     );
     if (result) {
-      res
-        .status(200)
-        .json({
-          message: "Appointment date & time updated successfully",
-          appointment: result,
-        });
+      res.status(200).json({
+        message: "Appointment date & time updated successfully",
+        appointment: result,
+      });
     } else {
       res.status(404).json({ message: "Appointment not found" });
     }
@@ -234,4 +187,5 @@ exports.updateAppointmentDate = async (req, res) => {
     res.status(400).send(err);
   }
 };
+
 //

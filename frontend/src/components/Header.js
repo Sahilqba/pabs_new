@@ -1,11 +1,9 @@
 "use client";
-import React from "react";
+import React, { useEffect }  from "react";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Cookies from 'js-cookie';
-
+import Cookies from "js-cookie";
 function Header() {
 
   const router = useRouter();
@@ -16,15 +14,15 @@ function Header() {
     router.push(`/userlogin`);
   };
   useEffect(() => {
-    require("bootstrap/dist/js/bootstrap.js");
-  });
+    import("bootstrap/dist/js/bootstrap.bundle").catch(console.error);
+  }, []);
   // const handleProfileClick = (e) => {
   //   e.preventDefault();
   //   router.push("/user/profile");
   // };
   return (
     <>
-      <nav className="navbar navbar-expand-lg navbar-dark bg-secondary">
+      <nav className="navbar navbar-expand-lg navbar-dark">
         <div className="container-fluid">
           <a className="navbar-brand">
             <i className="bi bi-superscript"></i>
@@ -44,7 +42,7 @@ function Header() {
             <ul className="navbar-nav ms-auto">
               <li className="nav-item dropdown">
                 <a
-                  className="nav-link "
+                  className="nav-link"
                   href="#"
                   role="button"
                   data-bs-toggle="dropdown"
@@ -67,6 +65,7 @@ function Header() {
                       onClick={handleLogout}
                     >
                       <i className="bi bi-box-arrow-right"></i>
+                      <span>Logout</span>
                     </a>
                   </li>
                 </ul>

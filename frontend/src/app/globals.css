@@ -1,7 +1,51 @@
-body{
-  overflow-x: hidden;
+:root {
+  --white: #ffffff;
+  --foreground: #171717;
+  --color1: #EEF5FF;
+  --color2: #B4D4FF;
+  --color3: #86B6F6;
+  --color4: #176B87;
+  --black: #000000;
 }
 
+nextjs-portal {
+  display: none;
+}
+
+body{
+  overflow-x: hidden;
+  /* padding: 10px; */
+  /* background-color: var(--color1) !important; */
+}
+h1 {
+  font-size: 70px !important;
+  line-height: 90px !important;
+  color: var(--black) !important;
+  margin: 0 !important;
+}
+p {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 23px;
+  line-height: 32px;
+  color: var(--black);
+}
+.main{
+  padding: 15px;
+}
+
+nav.navbar.navbar-expand-lg.navbar-dark {
+  background: black;
+}
+i.bi.bi-person-fill {
+  color: white;
+}
+
+.form-control {
+  height: 50px;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
 .flex-container {
   display: flex;
   flex-wrap: wrap;
@@ -20,8 +64,8 @@ body{
   border: 1px solid #ddd;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 600px;
-  height: 300px;
+  width: 50%;
+  height: auto;
 }
 .flex-container-appointment {
   display: flex;
@@ -53,7 +97,8 @@ body{
 
 .hero-image img {
   width: 100%;
-  height: auto;
+  min-height: 700px ;
+  max-height: 100%;
 }
 .hero-content {
   height: 100%;
@@ -84,12 +129,12 @@ body{
   margin: 10px;
   padding: 20px;
   text-align: center;
-  background-color: #f9f9f9;
+  background-color: #f9f9f9;;
   border: 1px solid #ddd;
   border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 600px;
-  height: 300px;
+  box-shadow: 0 4px 20px 0px rgba(0, 0, 0, 0.04);
+  width: 50%;
+  height: auto;
 }
 .drpdwn-sec {
   left: auto !important;
@@ -105,7 +150,7 @@ body{
 } */
 
 footer {
-  background-color: #343a40;
+  background-color: black;
   color: white;
   margin-top: 2rem;
   position: fixed;
@@ -114,8 +159,59 @@ footer {
   right: 0;
   text-align: center;
   padding: 15px;
+  /* position: relative; */
+}
+.ftr-sec p {
+  margin: 0;
+  color: var(--white);
+}
+/* validation alignment */
+.invalid-feedback, .valid-feedback  {
+  text-align: left;
+}
+/* button */
+.btn-grp {
+  /* display: flex; */
+  /* justify-content: center; */
+  gap: 10px;
+  margin-top: 30px;
 }
 
+.btn-grp .btn , .app-sub  {
+  width: 100%;
+  height: 50px;
+  border-radius: 0 !important;
+}
+.modal-footer .btn {
+  width: 48%;
+  height: 50px;
+  border-radius: 0;
+}
+.modal-input {
+  display: flex;
+  gap: 10px;
+  padding: 3px;
+}
+.appnt-btn .btn.btn-primary {
+  height: 50px;
+  margin: 6px 0 30px 0px;
+  border-radius: 0 !important;
+}
+
+.register-link {
+  margin: 10px  0 0 0;
+}
+.login-form h2 , .reg-form h2 {
+  margin-bottom: 30px;
+}
+
+/* spinner */
+.spinner-border {
+  --bs-spinner-width: 120px;
+  --bs-spinner-height: 120px;
+}
+
+/* css appoinment table */
 .input-row {
   display: flex;
   gap: 10px; /* Adjust the gap between inputs as needed */
@@ -155,9 +251,75 @@ footer {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-top: 20px;
+  margin-top: 15px;
+  width: 15%;
 }
 
 .appointment-button:hover {
   background-color: #0056b3;
+}
+.prof-hdng {
+  margin: 0 0px 15px 5px;
+}
+
+.prof-hdng h3 {
+  margin: 0;
+  line-height: 40px;
+  font-size: 30px;
+}
+
+/* icon */
+.action-symbol {display: flex;gap: 7px;}
+
+.action-symbol button {
+  width: 50px;
+  height: 50px;
+  border-radius: 0;
+}
+.appointments-table th:last-child {
+  width: 140px;
+}
+.appointments-table.app-hist th:last-child {
+  width: auto;
+}
+
+.accordion-button {
+  font-size: 25px !important; 
+  color: var(--black) !important;
+  line-height: 30px !important;
+}
+
+th {
+  color: var(--black);
+  font-size: 18px;
+}
+
+.modal-header {
+  font-size: 20px;
+  line-height: 30px;
+}
+.dropdown-item span {
+  margin-left: 10px;
+}
+.no-booking p {
+  font-size: 18px;
+  line-height: 25px;
+}
+
+.hero-buttons a {
+  height: 50px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0 !important;
+}
+/* .hero-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+} */
+ 
+.hero-subtext {
+  margin: 15px 0 30px 0;
 }
