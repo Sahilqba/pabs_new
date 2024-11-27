@@ -33,8 +33,12 @@ function page() {
       }
 
       const data = await response.json();
-      console.log("Appointments:", data);
-      setAppointments(data);
+      const sortedAppointments = data.sort((a, b) => {
+        const dateA = new Date(`${a.appointmentDate}T${a.appointmentTime}`);
+        const dateB = new Date(`${b.appointmentDate}T${b.appointmentTime}`);
+        return dateA - dateB;
+      });
+      setAppointments(sortedAppointments);
     } catch (error) {
       console.error("Failed to fetch appointments:", error);
     }
@@ -48,6 +52,16 @@ function page() {
       fetchAppointments(userIdfetched);
     }
   }, [userIdfetched]);
+  
+  const formatDateTime = (isoString) => {
+    if (!isoString) return "";
+    const dateObj = new Date(isoString);
+    const day = String(dateObj.getDate()).padStart(2, "0");
+    const month = String(dateObj.getMonth() + 1).padStart(2, "0"); 
+    const year = dateObj.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  };
   return (
     <>
       <Header />
@@ -102,6 +116,7 @@ function page() {
                       <th>Disease Symptoms</th>
                       <th>Department</th>
                       <th>Appointment Date</th>
+                      <th>Appointment Time(IST)</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -109,7 +124,8 @@ function page() {
                       <tr key={appointment._id}>
                         <td>{appointment.disease}</td>
                         <td>{appointment.allergies}</td>
-                        <td>{appointment.appointmentDate}</td>
+                        <td>{formatDateTime(appointment.appointmentDate)}</td>
+                        <td>{appointment.appointmentTime}</td>
                       </tr>
                     ))}
                   </tbody>

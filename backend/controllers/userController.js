@@ -56,18 +56,19 @@ exports.createAppointment = async (req, res) => {
 
   try {
     const decoded = jwt.verify(token, secretKey);
-    const { disease, allergies, appointmentDate } = req.body;
+    const { disease, allergies, appointmentDate, appointmentTime } = req.body;
 
     // Check if an appointment with the same userId and appointmentDate already exists
     const existingAppointment = await Appointment.findOne({
       userId: decoded.id,
       appointmentDate,
+      appointmentTime
     });
 
     if (existingAppointment) {
       return res
         .status(400)
-        .send("An appointment with the same date already exists for this user");
+        .send("An appointment with the same date & time already exists for this user");
     }
 
     const appointment = new Appointment({
@@ -75,6 +76,7 @@ exports.createAppointment = async (req, res) => {
       disease,
       allergies,
       appointmentDate,
+      appointmentTime
     });
 
     await appointment.save();
@@ -168,18 +170,19 @@ exports.updateAppointmentDate = async (req, res) => {
   try {
     const decoded = jwt.verify(token, secretKey);
     const { id } = req.params;
-    const { appointmentDate } = req.body;
-
+    const { appointmentDate, appointmentTime } = req.body;
+    // const { appointmentTime } = req.body;
     const result = await Appointment.findByIdAndUpdate(
       id,
-      { appointmentDate: appointmentDate },
+      { appointmentDate: appointmentDate, appointmentTime: appointmentTime },
+      // { appointmentTime: appointmentTime },
       { new: true }
     );
     if (result) {
       res
         .status(200)
         .json({
-          message: "Appointment date updated successfully",
+          message: "Appointment date & time updated successfully",
           appointment: result,
         });
     } else {
