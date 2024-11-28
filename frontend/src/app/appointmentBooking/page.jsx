@@ -110,7 +110,9 @@ function page() {
  
     if (!jwtToken) {
       toast.warning("Please log in again and try deleting.");
-      router.push(`/userlogin`);
+      setTimeout(() => {
+        router.push(`/userlogin`);
+      }, 4000);
       return;
     }
     try {
@@ -140,7 +142,9 @@ function page() {
         Cookies.remove('jwtCookie', { path: '/' });
         sessionStorage.clear();
         localStorage.clear();
-        router.push(`/userlogin`);
+        setTimeout(() => {
+          router.push(`/userlogin`);
+        }, 4000);
       } else {
         const errorMessage = await response.text();
         console.error("Failed to delete appointment:", errorMessage);
@@ -175,11 +179,33 @@ function page() {
 
   const handleEdit = async (appointmentDate) => {
     // const appointmentDate = // get the new date value from your form or state
-    if (!modalAppointmentDate && !modalAppointmentTime) {
+    if (!modalAppointmentDate || !modalAppointmentTime) {
       toast.error("Please select a valid appointment date & time.");
       return;
     }
- 
+    const currentDateTime = new Date(); // Current date and time
+    const selectedDateTime = new Date(`${modalAppointmentDate}T${modalAppointmentTime}`);
+  
+    // Check if the selected appointment is in the past
+    if (selectedDateTime <= currentDateTime) {
+      toast.error("You cannot schedule an appointment in the past.");
+      return;
+    }
+  
+    // Check for a 2-hour gap from existing appointments
+    const twoHoursInMs = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
+    const hasConflict = appointments.some((appointment) => {
+      // Skip checking the current appointment being edited
+      if (appointment._id === modalAppointmentId) return false;
+  
+      const existingDateTime = new Date(`${appointment.appointmentDate}T${appointment.appointmentTime}`);
+      return Math.abs(selectedDateTime - existingDateTime) < twoHoursInMs;
+    });
+  
+    if (hasConflict) {
+      toast.error("There must be at least a 2-hour gap between appointments.");
+      return;
+    }
   //  console.log("New date:", appointmentDate);
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/updateAppointment/${modalAppointmentId}`, {
@@ -210,7 +236,10 @@ function page() {
         Cookies.remove('jwtCookie', { path: '/' });
         sessionStorage.clear();
         localStorage.clear();
-        router.push(`/userlogin`);
+        // router.push(`/userlogin`);
+        setTimeout(() => {
+          router.push(`/userlogin`);
+        }, 4000);
       }
       else {
         const errorData = await response.json();
@@ -278,7 +307,9 @@ function page() {
         Cookies.remove("jwtCookie", { path: "/" });
         sessionStorage.clear();
         localStorage.clear();
-        router.push(`/userlogin`);
+        setTimeout(() => {
+          router.push(`/userlogin`);
+        }, 4000);
       } else {
       const errorMessage = await response.text();
       console.error("Failed to book appointment:", errorMessage);
@@ -286,10 +317,12 @@ function page() {
     }
     } catch (error) {
       console.error("Error booking appointment:", error);
-      toast.error(
-        "An error occurred while booking the appointment. Please try again."
+      toast.warning(
+        "An error occurred while booking the appointment. Please login and try again."
       );
-      router.push(`/userlogin`);
+      setTimeout(() => {
+        router.push(`/userlogin`);
+      }, 4000);
     }
   };
 
