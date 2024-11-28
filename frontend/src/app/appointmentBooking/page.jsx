@@ -9,7 +9,6 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
 import { Tooltip } from "bootstrap";
-import TimePicker from 'react-time-picker';
 function page() {
   // useEffect(() => {
   //   require("bootstrap/dist/js/bootstrap.js");
