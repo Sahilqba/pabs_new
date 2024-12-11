@@ -18,6 +18,7 @@ function page() {
   const [passwordError, setPasswordError] = useState("");
   const [formValidated, setFormValidated] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [role, setRole] = useState("");
   const router = useRouter();
 
   const validatePassword = (value) => {
@@ -53,7 +54,7 @@ function page() {
 
     setFormValidated(true);
     setLoading(true);
-    const user = { name, email, password };
+    const user = { name, email, password, role };
     console.log("User:", user);
     try {
       const response = await fetch(
@@ -141,11 +142,22 @@ function page() {
                     Please provide a valid email address.
                   </div>
                 </div>
-
                 <div className="mb-3">
-                  {/* <label htmlFor="password" className="form-label">
-                    Password
-                  </label> */}
+            <select
+              type="text"
+              className="form-control"
+              placeholder="Select Role"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              required
+            >
+              <option value="">Select Role*</option>
+              <option value="Admin">Admin</option>
+              <option value="Doctor">Doctor</option>
+              <option value="Patient">Patient</option>
+            </select>
+          </div>
+                <div className="mb-3">
                   <input
                     type="password"
                     className={`form-control ${passwordError ? "is-invalid" : password && !passwordError ? "is-valid" : ""}`}

@@ -77,6 +77,7 @@ function page() {
         localStorage.setItem("jwtToken", data.token);
         localStorage.setItem("userId", data.user._id);
         localStorage.setItem("userName", data.user.name);
+        localStorage.setItem("role",data.user.role)
         Cookies.set('jwtCookie', data.token, { expires: 1, path: '/' });
         setTimeout(() => {
           router.push(`/userProfile`);

@@ -4,6 +4,7 @@ const userSchema = new mongoose.Schema({
   name: String,
   email: String,
   password: String,
+  role: { type: String, enum: ["Admin", "Doctor", "Patient"]}
 });
 
 const appointmentSchema = new mongoose.Schema({
@@ -17,6 +18,7 @@ const appointmentSchema = new mongoose.Schema({
 const userLoginSchema = new mongoose.Schema({
   email: String,
   password: String,
+  role: String
 });
 
 const User = mongoose.model("User", userSchema);

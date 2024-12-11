@@ -2,16 +2,21 @@
 import React, { useEffect }  from "react";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import 'bootstrap/dist/js/bootstrap.bundle.min';
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 function Header() {
 
   const router = useRouter();
-  const handleLogout = () => {
-    localStorage.removeItem('jwtToken');
-    sessionStorage.clear();
-    Cookies.remove('jwtCookie', { path: '/' });
-    router.push(`/userlogin`);
+  const handleLogout = async () => {
+    try {
+      localStorage.removeItem('jwtToken');
+      sessionStorage.clear();
+      Cookies.remove('jwtCookie', { path: '/' });
+      await router.push('/userlogin');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap.bundle").catch(console.error);

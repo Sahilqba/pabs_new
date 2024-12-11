@@ -8,6 +8,7 @@ const secretKey = process.env.SECRET_KEY;
 
 exports.createUser = async (req, res) => {
   try {
+    console.log("request body", req.body)
     const existingUser = await User.findOne({ email: req.body.email });
     console.log(`Request body: ${req.body.email}`);
     if (existingUser) {
@@ -18,7 +19,7 @@ exports.createUser = async (req, res) => {
     console.log(`Hashed password: ${hashedPassword}`);
     const user = new User({
       ...req.body,
-      password: hashedPassword,
+      password: hashedPassword
     });
     console.log(`User: ${user}`);
     await user.save();
