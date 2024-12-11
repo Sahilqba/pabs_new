@@ -77,7 +77,7 @@ function page() {
         localStorage.setItem("jwtToken", data.token);
         localStorage.setItem("userId", data.user._id);
         localStorage.setItem("userName", data.user.name);
-        Cookies.set('jwtCookie', data.token, { expires: 1, path: '/' });
+        Cookies.set("jwtCookie", data.token, { expires: 1, path: "/" });
         setTimeout(() => {
           router.push(`/userProfile`);
         }, 2000);
@@ -95,6 +95,11 @@ function page() {
       setLoading(false); // Reset loading state
     }
   };
+
+  const handleGoogleLogin = () => {
+    // window.location.href = "http://localhost:8080/auth/google";
+  };
+
   return (
     <>
       {/* <Header /> */}
@@ -102,61 +107,67 @@ function page() {
         <div className="flex-item-login login-form">
           <h2>Login with Email</h2>
           {/* <div> */}
-            {loading ? (
-              <div className="spinner-border" role="status">
-                <span className="sr-only"></span>
-              </div>
-            ) : (
-              <form
-                className={`needs-validation ${
-                  formValidated ? "was-validated" : ""
-                }`}
-                noValidate
-                onSubmit={handleSubmit}
-              >
-                <div className="mb-3">
-                  {/* <label htmlFor="email" className="form-label">
+          {loading ? (
+            <div className="spinner-border" role="status">
+              <span className="sr-only"></span>
+            </div>
+          ) : (
+            <form
+              className={`needs-validation ${
+                formValidated ? "was-validated" : ""
+              }`}
+              noValidate
+              onSubmit={handleSubmit}
+            >
+              <div className="mb-3">
+                {/* <label htmlFor="email" className="form-label">
                     Email
                   </label> */}
-                  <input
-                    type="email"
-                    className="form-control"
-                    id="email"
-                    placeholder="Email*"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Please provide a valid email address.
-                  </div>
+                <input
+                  type="email"
+                  className="form-control"
+                  id="email"
+                  placeholder="Email*"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <div className="invalid-feedback">
+                  Please provide a valid email address.
                 </div>
+              </div>
 
-                <div className="mb-3">
-                  <input
-                    type="password"
-                    className={`form-control ${passwordError ? "is-invalid" : password && !passwordError ? "is-valid" : ""}`}
-                    id="Password"
-                    placeholder="Password*"
-                    value={password}
-                    onChange={handlePasswordChange}
-                    required
-                  />
-                  {passwordError ? (
-                    <div className="invalid-feedback">{passwordError}</div>
-                  ) : password ? (
-                    <div className="valid-feedback">Password looks good!</div>
-                  ) : null}
-                </div>
-                <div className="btn-grp">
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    // onClick={handleSubmit}
-                  >
-                    Submit
-                  </button>
-                  {/* <div className="register-link">
+              <div className="mb-3">
+                <input
+                  type="password"
+                  className={`form-control ${
+                    passwordError
+                      ? "is-invalid"
+                      : password && !passwordError
+                      ? "is-valid"
+                      : ""
+                  }`}
+                  id="Password"
+                  placeholder="Password*"
+                  value={password}
+                  onChange={handlePasswordChange}
+                  required
+                />
+                {passwordError ? (
+                  <div className="invalid-feedback">{passwordError}</div>
+                ) : password ? (
+                  <div className="valid-feedback">Password looks good!</div>
+                ) : null}
+              </div>
+              <div className="btn-grp">
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  // onClick={handleSubmit}
+                >
+                  Submit
+                </button>
+                {/* <div className="register-link">
                     Don't have an account?{" "}
                     <a
                       href="/userRegistration"
@@ -169,21 +180,28 @@ function page() {
                       Sign Up
                     </a>
                   </div> */}
-                   <div className="register-link">
-      Don't have an account?{" "}
-      {loading ? (
-        <span className="loader">Loading...</span> // Replace with your loader component
-      ) : (
-        <Link href="/userRegistration" className="sign-up-link" onClick={handleSignUpClick}>
-          Sign Up
-        </Link>
-      )}
-    </div>
+                <div className="register-link">
+                  Don't have an account?{" "}
+                  {loading ? (
+                    <span className="loader">Loading...</span> // Replace with your loader component
+                  ) : (
+                    <Link
+                      href="/userRegistration"
+                      className="sign-up-link"
+                      onClick={handleSignUpClick}
+                    >
+                      Sign Up
+                    </Link>
+                  )}
                 </div>
-              </form>
-            )}
-          </div>
+                <div>
+                  <button onClick = {handleGoogleLogin}>Login using google</button>
+                </div>
+              </div>
+            </form>
+          )}
         </div>
+      </div>
       {/* </div> */}
       <ToastContainer />
       {/* <Footer /> */}

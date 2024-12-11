@@ -2,6 +2,7 @@
 import React, { useEffect }  from "react";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import 'bootstrap/dist/js/bootstrap.bundle.min';
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 function Header() {
