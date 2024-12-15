@@ -1,18 +1,38 @@
 "use client";
-import React, { useEffect }  from "react";
+import React, { useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import 'bootstrap/dist/js/bootstrap.bundle.min';
+import "bootstrap/dist/js/bootstrap.bundle.min";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 function Header() {
-
   const router = useRouter();
-  const handleLogout = () => {
-    localStorage.removeItem('jwtToken');
-    sessionStorage.clear();
-    Cookies.remove('jwtCookie', { path: '/' });
-    router.push(`/userlogin`);
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/logout", {
+        method: "GET",
+        credentials: "include",
+      });
+      if (response.ok) {
+        localStorage.removeItem("jwtToken");
+        localStorage.removeItem("role");
+        localStorage.removeItem("userName");
+        localStorage.removeItem("userId");
+        sessionStorage.clear();
+        Cookies.remove("jwtCookie", { path: "/" });
+        Cookies.remove("emailFromGoogle", { path: "/" });
+        Cookies.remove("nameFromGoogle", { path: "/" });
+        Cookies.remove("userId", { path: "/" });
+        Cookies.remove("userRoleGoogle", { path: "/" });
+        Cookies.remove("passwordFromLoginPage", { path: "/" });
+        Cookies.remove("emailFromLoginPage", { path: "/" });
+        await router.push("/userlogin");
+      } else {
+        console.error("Logout failed");
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap.bundle").catch(console.error);

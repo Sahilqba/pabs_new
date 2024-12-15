@@ -7,18 +7,48 @@ import Footer from "@/components/Footer";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.css";
+import Cookies from "js-cookie";
+
 function page() {
   useEffect(() => {
     require("bootstrap/dist/js/bootstrap.js");
   });
   const router = useRouter();
   const [appointments, setAppointments] = useState([]);
-  const userName = localStorage.getItem("userName");
+  // const userName = localStorage.getItem("userName");
+  // const role = localStorage.getItem("role");
+  const [role, setRole] = useState(null); 
+  const [userName, setUserName] = useState(null); 
   const userIdfetched = localStorage.getItem("userId");
   const jwtToken = localStorage.getItem("jwtToken");
   const [loading, setLoading] = useState(false);
+  
+  useEffect(() => {
+    // Initialize user data from localStorage
+    const storedRole = localStorage.getItem("role");
+    const storedUserName = localStorage.getItem("userName");
+    const nameFromGoogle = Cookies.get("nameFromGoogle");
+    const userRoleGoogle = Cookies.get("userRoleGoogle");
+    setRole(storedRole|| userRoleGoogle);
+    setUserName(storedUserName|| nameFromGoogle);
+    // console.log("Fetched Role:", storedRole);
+    // console.log("Fetched Username:", storedUserName);
 
-  const fetchAppointments = async (userIdfetched) => {
+    console.log("Name from google:", nameFromGoogle);
+    console.log("Role from google:", userRoleGoogle);
+  }, []);
+  
+  useEffect(() => {
+    if (role === "patient") {
+      fetchAppointments();
+    }
+  }, [role]);
+
+  const fetchAppointments = async () => {
+    // const userIdFetched = localStorage.getItem("userId");
+    // const jwtToken = localStorage.getItem("jwtToken");
+
+    if (!userIdfetched || !jwtToken) return;
     setLoading(true);
     try {
       const response = await fetch(
@@ -65,83 +95,113 @@ function page() {
 
     return `${day}-${month}-${year}`;
   };
+  if (!role || !userName) {
+    // console.log("Loading state, role or username not ready");
+    return <div>Loading...</div>;
+  }
+  const normalizedRole = role?.toLowerCase();
+  console.log("Final Role Evaluation:", normalizedRole);
+  
+  if (normalizedRole === "admin") {
+    console.log("Rendering admin block");
+    return (
+      <>
+        <Header />
+        <main className="main">
+          <h3>Hi {userName.toUpperCase()}, you are admin.</h3>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  if (normalizedRole === "doctor") {
+    console.log("Rendering doctor block");
+    return (
+      <>
+        <Header />
+        <main className="main">
+          <h3>Hi {userName.toUpperCase()}, you are doctor.</h3>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  if(normalizedRole === "patient" ){
+    console.log("Rendering patient block");
   return (
     <>
       <Header />
       {/* <h1>Profile page</h1> */}
       <main className="main">
-        <div className="prof-hdng">
-          <h3>
-            Welcome {userName.toUpperCase()}. You can view your appointments
-            here.
-          </h3>
-        </div>
-        <div className="appnt-btn">
-          <button
-            className="btn btn-primary"
-            onClick={() => {
-              router.push(`/appointmentBooking`);
-            }}
+      <div className="prof-hdng">
+          <h3>Welcome {userName.toUpperCase()}, {role}. You can view your appointments here.</h3>
+      </div>
+      <div className="appnt-btn">
+      <button
+        className="btn btn-primary"
+        onClick={() => {
+          router.push(`/appointmentBooking`);
+        }}
+      >
+        Book an Appointment
+      </button>
+      </div>
+      {loading ? (
+              <div className="spinner-border" role="status">
+                <span className="sr-only"></span>
+              </div>
+            ) : appointments.length === 0 ? (
+              <div className="no-booking">
+                <p>No booking history available.</p>
+              </div>
+            ) :  (
+      <div className="accordion" id="accordionExample">
+        <div className="accordion-item">
+          <h2 className="accordion-header">
+            <button
+              className="accordion-button"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#collapseOne"
+              aria-expanded="true"
+              aria-controls="collapseOne"
+            >
+              Appointment History
+            </button>
+          </h2>
+          <div
+            id="collapseOne"
+            className="accordion-collapse collapse show"
+            data-bs-parent="#accordionExample"
           >
-            Book an Appointment
-          </button>
-        </div>
-        {loading ? (
-          <div className="spinner-border" role="status">
-            <span className="sr-only"></span>
-          </div>
-        ) : appointments.length === 0 ? (
-          <div className="no-booking">
-            <p>No booking history available.</p>
-          </div>
-        ) : (
-          <div className="accordion" id="accordionExample">
-            <div className="accordion-item">
-              <h2 className="accordion-header">
-                <button
-                  className="accordion-button"
-                  type="button"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#collapseOne"
-                  aria-expanded="true"
-                  aria-controls="collapseOne"
-                >
-                  Appointment History
-                </button>
-              </h2>
-              <div
-                id="collapseOne"
-                className="accordion-collapse collapse show"
-                data-bs-parent="#accordionExample"
-              >
-                <div className="accordion-body">
-                  {appointments.length > 0 ? (
-                    <table className="appointments-table app-hist">
-                      <thead>
-                        <tr>
-                          <th>Disease Symptoms</th>
-                          <th>Department</th>
-                          <th>Appointment Date</th>
-                          <th>Appointment Time(IST)</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {appointments.map((appointment) => (
-                          <tr key={appointment._id}>
-                            <td>{appointment.disease}</td>
-                            <td>{appointment.allergies}</td>
-                            <td>
-                              {formatDateTime(appointment.appointmentDate)}
-                            </td>
-                            <td>{appointment.appointmentTime}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  ) : (
-                    "No appointments booked yet"
-                  )}
-                </div>
+            <div className="accordion-body">
+              {appointments.length > 0 ? (
+                <table className="appointments-table app-hist">
+                  <thead>
+                    <tr>
+                      <th>Disease Symptoms</th>
+                      <th>Department</th>
+                      <th>Appointment Date</th>
+                      <th>Appointment Time(IST)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {appointments.map((appointment) => (
+                      <tr key={appointment._id}>
+                        <td>{appointment.disease}</td>
+                        <td>{appointment.allergies}</td>
+                        <td>{formatDateTime(appointment.appointmentDate)}</td>
+                        <td>{appointment.appointmentTime}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                "No appointments booked yet"
+              )}
+            </div>
               </div>
             </div>
           </div>
@@ -150,6 +210,17 @@ function page() {
       <Footer />
     </>
   );
+}
+// console.log("Rendering fallback block");
+return (
+  <div>
+    <Header />
+    <main className="main">
+      <h3>Unable to determine role. Please contact support.</h3>
+    </main>
+    <Footer />
+  </div>
+);
 }
 
 export default page;

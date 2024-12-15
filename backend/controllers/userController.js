@@ -8,17 +8,19 @@ const secretKey = process.env.SECRET_KEY;
 
 exports.createUser = async (req, res) => {
   try {
-    const existingUser = await User.findOne({ email: req.body.email });
+    // console.log("request body", req.body)
+    const existingUser = await User.findOne({ email: req.body.email, role: req.body.role });
     // console.log(`Request body: ${req.body.email}`);
-    if (existingUser) {
-      return res.status(400).json({ error: "Email already exists" });
-    }
+    const existingPassword = await User.findOne({ password: req.body.password });
+    if (existingPassword) {
+      return res.status(400).json({ message: "Password already in use" });
+    } 
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
     // console.log(`Hashed password: ${hashedPassword}`);
     const user = new User({
       ...req.body,
-      password: hashedPassword,
+      password: hashedPassword
     });
     // console.log(`User: ${user}`);
     await user.save();
@@ -86,17 +88,17 @@ exports.createAppointment = async (req, res) => {
 };
 
 exports.userLogin = async (req, res) => {
-  const { email, password } = req.body;
+  const {email, password, role } = req.body;
   try {
     // console.log(`Secret key: ${secretKey}`);
-    const user = await LoginUser.findOne({ email });
+    const user = await LoginUser.findOne({email, role });
     if (user && (await bcrypt.compare(password, user.password))) {
-      const token = jwt.sign({ id: user._id, email: user.email }, secretKey, {
+      const token = jwt.sign({ id: user._id, email: user.email , role: user.role }, secretKey, {
         expiresIn: "15m",
       });
       res.status(200).json({ user, token });
     } else {
-      res.status(401).send("Invalid email or password");
+      res.status(401).send("Invalid email or password or role");
     }
   } catch (error) {
     res.status(400).send(error);
@@ -187,5 +189,8 @@ exports.updateAppointmentDate = async (req, res) => {
     res.status(400).send(err);
   }
 };
+
+
+
 
 //

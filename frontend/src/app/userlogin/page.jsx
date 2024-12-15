@@ -58,45 +58,14 @@ function page() {
     setFormValidated(true);
     setLoading(true);
 
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/userLogin`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email: email, password: password }),
-        }
-      );
-      const data = await response.json();
-      if (response.ok) {
-        console.log("Login successful");
-        // console.log("Data:", data);
-        toast.success("Login successful !");
-        localStorage.setItem("jwtToken", data.token);
-        localStorage.setItem("userId", data.user._id);
-        localStorage.setItem("userName", data.user.name);
-        Cookies.set("jwtCookie", data.token, { expires: 1, path: "/" });
-        setTimeout(() => {
-          router.push(`/userProfile`);
-        }, 2000);
-      } else {
-        // const errorResult = await response.json();
-        // console.log(errorResult.error);
-        const errorMessage = data?.error || "Invalid credentials";
-        console.error("Login failed:", errorMessage);
-        toast.error(errorMessage);
-      }
-    } catch (error) {
-      console.error("Error during login:", error);
-      toast.error("Incorrect email or password.");
-    } finally {
-      setLoading(false); // Reset loading state
-    }
+    Cookies.set("emailFromLoginPage", email, { expires: 1, path: "/" });
+    Cookies.set("passwordFromLoginPage", password, { expires: 1, path: "/" });
+    router.push("/userRoleVanilla");
   };
 
   const handleGoogleLogin = () => {
+    console.log("Google login clicked");
+    router.push("/userRoleGoogle");
     // window.location.href = "http://localhost:8080/auth/google";
   };
 
@@ -112,93 +81,82 @@ function page() {
               <span className="sr-only"></span>
             </div>
           ) : (
-            <form
-              className={`needs-validation ${
-                formValidated ? "was-validated" : ""
-              }`}
-              noValidate
-              onSubmit={handleSubmit}
-            >
-              <div className="mb-3">
-                {/* <label htmlFor="email" className="form-label">
+            <div>
+              <form
+                className={`needs-validation ${
+                  formValidated ? "was-validated" : ""
+                }`}
+                noValidate
+                onSubmit={handleSubmit}
+              >
+                <div className="mb-3">
+                  {/* <label htmlFor="email" className="form-label">
                     Email
                   </label> */}
-                <input
-                  type="email"
-                  className="form-control"
-                  id="email"
-                  placeholder="Email*"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-                <div className="invalid-feedback">
-                  Please provide a valid email address.
+                  <input
+                    type="email"
+                    className="form-control"
+                    id="email"
+                    placeholder="Email*"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                  <div className="invalid-feedback">
+                    Please provide a valid email address.
+                  </div>
                 </div>
-              </div>
 
-              <div className="mb-3">
-                <input
-                  type="password"
-                  className={`form-control ${
-                    passwordError
-                      ? "is-invalid"
-                      : password && !passwordError
-                      ? "is-valid"
-                      : ""
-                  }`}
-                  id="Password"
-                  placeholder="Password*"
-                  value={password}
-                  onChange={handlePasswordChange}
-                  required
-                />
-                {passwordError ? (
-                  <div className="invalid-feedback">{passwordError}</div>
-                ) : password ? (
-                  <div className="valid-feedback">Password looks good!</div>
-                ) : null}
-              </div>
-              <div className="btn-grp">
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  // onClick={handleSubmit}
-                >
-                  Submit
-                </button>
-                {/* <div className="register-link">
+                <div className="mb-3">
+                  <input
+                    type="password"
+                    className={`form-control ${
+                      passwordError
+                        ? "is-invalid"
+                        : password && !passwordError
+                        ? "is-valid"
+                        : ""
+                    }`}
+                    id="Password"
+                    placeholder="Password*"
+                    value={password}
+                    onChange={handlePasswordChange}
+                    required
+                  />
+                  {passwordError ? (
+                    <div className="invalid-feedback">{passwordError}</div>
+                  ) : password ? (
+                    <div className="valid-feedback">Password looks good!</div>
+                  ) : null}
+                </div>
+                <div className="btn-grp">
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    // onClick={handleSubmit}
+                  >
+                    Submit
+                  </button>
+                  <div className="register-link">
                     Don't have an account?{" "}
-                    <a
-                      href="/userRegistration"
-                      className="sign-up-link"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        router.push("/userRegistration");
-                      }}
-                    >
-                      Sign Up
-                    </a>
-                  </div> */}
-                <div className="register-link">
-                  Don't have an account?{" "}
-                  {loading ? (
-                    <span className="loader">Loading...</span> // Replace with your loader component
-                  ) : (
-                    <Link
-                      href="/userRegistration"
-                      className="sign-up-link"
-                      onClick={handleSignUpClick}
-                    >
-                      Sign Up
-                    </Link>
-                  )}
+                    {loading ? (
+                      <span className="loader">Loading...</span> // Replace with your loader component
+                    ) : (
+                      <Link
+                        href="/userRegistration"
+                        className="sign-up-link"
+                        onClick={handleSignUpClick}
+                      >
+                        Sign Up
+                      </Link>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <button onClick = {handleGoogleLogin}>Login using google</button>
-                </div>
+              </form>
+              <div>
+                <button onClick={handleGoogleLogin}>Login using google</button>
               </div>
-            </form>
+            </div>
           )}
         </div>
       </div>

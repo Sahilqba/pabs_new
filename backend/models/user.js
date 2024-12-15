@@ -1,9 +1,11 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
+  // email: { type: String, unique: true },
+  email: { type: String }, // Removed unique constraint
   name: String,
-  email: String,
   password: String,
+  role: { type: String, enum: ["Admin", "Doctor", "Patient"]}
 });
 
 const appointmentSchema = new mongoose.Schema({
@@ -15,8 +17,10 @@ const appointmentSchema = new mongoose.Schema({
 });
 
 const userLoginSchema = new mongoose.Schema({
-  email: String,
+  // email: { type: String, unique: true },
+  email: { type: String }, // Removed unique constraint
   password: String,
+  role: String
 });
 
 const User = mongoose.model("User", userSchema);
