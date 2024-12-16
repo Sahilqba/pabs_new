@@ -8,7 +8,7 @@ function page() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     Cookies.set("userRoleGoogle", role, { expires: 1, path: "/" });
-    window.location.href = "http://localhost:8080/auth/google";
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
   };
   return (
     <div>

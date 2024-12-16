@@ -7,6 +7,10 @@ require('dotenv').config(); // Load environment variables
 const port = process.env.PORT;
 const mongoPassword = process.env.MONGODB_PASSWORD;
 const appName = process.env.APP_NAME;
+const frontend_url = process.env.FRONTEND_URL;
+const backend_url = process.env.BACKEND_URL;
+const client_ID = process.env.CLIENT_ID;
+const client_secret = process.env.CLIENT_SECRET;
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const session = require("express-session");
@@ -20,7 +24,7 @@ const { User} = require("./models/user");
 
 // CORS configuration
 const corsOptions = {
-  origin: "http://localhost:3000", // Replace with your frontend URL
+  origin: `${frontend_url}`, // Replace with your frontend URL
   credentials: true,
 };
 
@@ -41,9 +45,9 @@ passport.use(
   new GoogleStrategy(
     {
       clientID:
-        "47547183612-ihp89m56gvdg8oikgrjujjk9t1rlf0vp.apps.googleusercontent.com",
-      clientSecret: "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",
-      callbackURL: "http://localhost:8080/auth/google/callback",
+        `${client_ID}`,
+      clientSecret: `${client_secret}`,
+      callbackURL: `${backend_url}/auth/google/callback`,
     },
     function (accessToken, refreshToken, profile, done) {
       // Here you can save the user profile to your database
@@ -132,7 +136,7 @@ app.get(
       });
       res.cookie("userId", req.user.id, { httpOnly: false, secure: false });
       // Redirect to user profile
-      res.redirect("http://localhost:3000/userProfile");
+      res.redirect(`${frontend_url}/userProfile`);
     } catch (error) {
       console.error("Error during Google OAuth callback:", error);
       res.status(500).json({ message: "Internal server error" });
