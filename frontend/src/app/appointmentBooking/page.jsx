@@ -10,14 +10,9 @@ import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
 import { Tooltip } from "bootstrap";
 function page() {
-  // useEffect(() => {
-  //   require("bootstrap/dist/js/bootstrap.js");
-  // });
-  // useEffect(() => {
-  //   // Initialize Bootstrap tooltips
-  //   const tooltipTriggerList = Array.from(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-  //   tooltipTriggerList.forEach((tooltipTriggerEl) => new Tooltip(tooltipTriggerEl));
-  // }, []);
+  const userEmailFromLoginPage = Cookies.get("emailFromLoginPage");
+  const userEmailFromGoogle = Cookies.get("emailFromGoogle");
+  // console.log("User email:", userEmail);
   const [appointments, setAppointments] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAppointmentId, setModalAppointmentId] = useState(null);
@@ -29,38 +24,13 @@ function page() {
   const [loading, setLoading] = useState(false);
   const jwtToken = localStorage.getItem("jwtToken");
   const router = useRouter();
-  // const [disease, setDisease] = React.useState(
-  //   sessionStorage.getItem("disease") || ""
-  // );
-  // const [allergies, setAllergies] = React.useState(
-  //   sessionStorage.getItem("allergies") || ""
-  // );
-  // const [appointmentDate, setAppointmentDate] = React.useState(
-  //   sessionStorage.getItem("appointmentDate") || ""
-  // );
-  // const [appointmentTime, setAppointmentTime] = React.useState(
-  //   sessionStorage.getItem("appointmentTime") || ""
-  // );
-  // useEffect(() => {
-  //   sessionStorage.setItem("disease", disease);
-  // }, [disease]);
-
-  // useEffect(() => {
-  //   sessionStorage.setItem("allergies", allergies);
-  // }, [allergies]);
-
-  // useEffect(() => {
-  //   sessionStorage.setItem("appointmentDate", appointmentDate);
-  // }, [appointmentDate]);
-  // useEffect(() => {
-  //   sessionStorage.setItem("appointmentTime", appointmentTime);
-  // }, [appointmentTime]);
 
   const [disease, setDisease] = useState("");
-  const [allergies, setAllergies] = useState("");
+  const [department, setDepartment] = useState("");
   const [appointmentDate, setAppointmentDate] = useState("");
   const [appointmentTime, setAppointmentTime] = useState("");
-
+  const [doctors, setDoctors] = useState([]);
+  const [selectedDoctor, setSelectedDoctor] = useState("");
   const fetchAppointments = async (userIdfetched) => {
     setLoading(true);
     try {
@@ -180,7 +150,6 @@ function page() {
     setIsModalOpen(false);
   };
 
-
   const handleEdit = async (appointmentDate) => {
     const jwtToken = localStorage.getItem("jwtToken");
 
@@ -195,29 +164,33 @@ function page() {
       return;
     }
     const currentDateTime = new Date(); // Current date and time
-    const selectedDateTime = new Date(`${modalAppointmentDate}T${modalAppointmentTime}`);
-  
+    const selectedDateTime = new Date(
+      `${modalAppointmentDate}T${modalAppointmentTime}`
+    );
+
     // Check if the selected appointment is in the past
     if (selectedDateTime <= currentDateTime) {
       toast.error("You cannot schedule an appointment in the past.");
       return;
     }
-  
+
     // Check for a 2-hour gap from existing appointments
     const twoHoursInMs = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
     const hasConflict = appointments.some((appointment) => {
       // Skip checking the current appointment being edited
       if (appointment._id === modalAppointmentId) return false;
-  
-      const existingDateTime = new Date(`${appointment.appointmentDate}T${appointment.appointmentTime}`);
+
+      const existingDateTime = new Date(
+        `${appointment.appointmentDate}T${appointment.appointmentTime}`
+      );
       return Math.abs(selectedDateTime - existingDateTime) < twoHoursInMs;
     });
-  
+
     if (hasConflict) {
       toast.error("There must be at least a 2-hour gap between appointments.");
       return;
     }
-  //  console.log("New date:", appointmentDate);
+    //  console.log("New date:", appointmentDate);
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/updateAppointment/${modalAppointmentId}`,
@@ -263,13 +236,9 @@ function page() {
         setTimeout(() => {
           router.push(`/userlogin`);
         }, 4000);
-      }
-      else if (response.status === 400) {
-        toast.warning(
-          "Appointment date is required."
-        );
-      }
-      else {
+      } else if (response.status === 400) {
+        toast.warning("Appointment date is required.");
+      } else {
         const errorData = await response.json();
         console.error("Error updating appointment date", errorData);
         // handle error (e.g., show error message)
@@ -279,7 +248,6 @@ function page() {
       // handle network error
     }
   };
-
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -315,7 +283,7 @@ function page() {
           },
           body: JSON.stringify({
             disease,
-            allergies,
+            department,
             appointmentDate,
             appointmentTime,
           }),
@@ -329,7 +297,7 @@ function page() {
           appointment,
         ]);
         setDisease("");
-        setAllergies("");
+        setDepartment("");
         setAppointmentDate("");
         setAppointmentTime("");
         console.log("Appointment booked:", appointment);
@@ -368,6 +336,41 @@ function page() {
 
     return `${day}-${month}-${year}`;
   };
+
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      // const doctors = data.filter((user) => user.role === "Doctor" && user.email !== userEmailFromLoginPage);
+      // const doctors = data.filter((user) => user.role === "Doctor" && user.email !== userEmailFromGoogle);
+      const doctors = data.filter(
+        (user) => 
+          user.role === "Doctor" && 
+          user.email !== userEmailFromGoogle && 
+          user.email !== userEmailFromLoginPage
+      );
+      setDoctors(doctors);
+    } catch (error) {
+      console.error("Failed to fetch appointments:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
   return (
     <>
       <Header />
@@ -393,10 +396,10 @@ function page() {
               <select
                 type="text"
                 className="form-control"
-                placeholder="Enter your allergies"
-                value={allergies}
+                placeholder="Enter your department"
+                value={department}
                 onChange={(e) => {
-                  setAllergies(e.target.value);
+                  setDepartment(e.target.value);
                 }}
                 required
               >
@@ -408,6 +411,27 @@ function page() {
                 <option value="Others">Others</option>
               </select>
             </div>
+
+            <div className="col-md-3">
+              <select
+                type="text"
+                className="form-control"
+                placeholder="Choose doctor"
+                value={selectedDoctor}
+                onChange={(e) => {
+                  setSelectedDoctor(e.target.value);
+                }}
+                required
+              >
+                <option value="">Select Doctor</option>
+                {doctors.map((doc) => (
+                  <option key={doc._id} value={doc.name}>
+                    {doc.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <div className="col-md-2">
               <input
                 type="date"
@@ -485,7 +509,7 @@ function page() {
               {appointments.map((appointment) => (
                 <tr key={appointment._id}>
                   <td>{appointment.disease}</td>
-                  <td>{appointment.allergies}</td>
+                  <td>{appointment.department}</td>
                   <td>{formatDateTime(appointment.appointmentDate)}</td>
                   <td>{appointment.appointmentTime}</td>
                   <td className="action-symbol">

@@ -26,6 +26,7 @@ function Header() {
         Cookies.remove("userRoleGoogle", { path: "/" });
         Cookies.remove("passwordFromLoginPage", { path: "/" });
         Cookies.remove("emailFromLoginPage", { path: "/" });
+        Cookies.remove("userIdinDb", { path: "/" });
         await router.push("/userlogin");
       } else {
         console.error("Logout failed");

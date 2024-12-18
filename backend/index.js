@@ -94,8 +94,12 @@ app.get(
         email: req.user.emails[0].value,
         role: req.cookies.userRoleGoogle, // Check for the specific role
       });
-      // console.log("Existing user:", existingUser);
-      let userRoleGoogle = req.cookies.userRoleGoogle;
+      console.log("Existing user:", existingUser);
+      if(existingUser) {
+        res.cookie("userIdinDb", existingUser._id.toString(), { httpOnly: false, secure: false });
+      }
+      // let userRoleGoogle = req.cookies.userRoleGoogle;
+      let userRoleGoogle = req.cookies.role;
       if (!existingUser) {
         // If the user does not exist, create a new user
         // console.log("User role from cookies:", userRoleGoogle);
@@ -105,6 +109,10 @@ app.get(
           userIdinUse: req.user.id,
           role: userRoleGoogle,
         });
+        console.log("New user:", newUser);
+        console.log("New user email:", newUser.email);
+        // console.log("New user userid:", newUser._id.toString());
+        res.cookie("userIdinDb", newUser._id.toString(), { httpOnly: false, secure: false });
         await newUser.save();
       }else {
         // If the user exists, update the user role if necessary
@@ -159,6 +167,8 @@ app.get("/logout", (req, res) => {
       res.clearCookie("nameFromGoogle", { path: "/" });
       res.clearCookie("emailFromGoogle", { path: "/" });
       res.clearCookie("userRoleGoogle", { path: "/" });
+      res.clearCookie("role", { path: "/" });
+      res.clearCookie("userIdinDb", { path: "/" });
       res.status(200).json({ message: "Logged out successfully" });
     });
   });

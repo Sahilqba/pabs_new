@@ -5,13 +5,14 @@ const userSchema = new mongoose.Schema({
   email: { type: String }, // Removed unique constraint
   name: String,
   password: String,
-  role: { type: String, enum: ["Admin", "Doctor", "Patient"]}
+  role: { type: String, enum: ["Doctor", "Patient"]},
+  department: String
 });
 
 const appointmentSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   disease: String,
-  allergies: String,
+  department: String,
   appointmentDate: String,
   appointmentTime: String
 });

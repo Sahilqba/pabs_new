@@ -8,26 +8,35 @@ const secretKey = process.env.SECRET_KEY;
 
 exports.createUser = async (req, res) => {
   try {
-    // console.log("request body", req.body)
-    const existingUser = await User.findOne({ email: req.body.email, role: req.body.role });
-    // console.log(`Request body: ${req.body.email}`);
-    const existingPassword = await User.findOne({ password: req.body.password });
-    if (existingPassword) {
-      return res.status(400).json({ message: "Password already in use" });
-    } 
+    const { email, password, role } = req.body;
+
+    // Check if a user with the same email and role already exists
+    const existingUser = await User.findOne({ email, role });
+    if (existingUser) {
+      return res.status(400).json({ message: "User with this email and role already exists" });
+    }
+
+    // Check if a user with the same password but different role exists
+    const usersWithSamePassword = await User.find();
+    for (let user of usersWithSamePassword) {
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (isMatch && user.role !== role) {
+        return res.status(400).json({ message: "Password already in use for a different role" });
+      }
+    }
+
     const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
-    // console.log(`Hashed password: ${hashedPassword}`);
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
     const user = new User({
       ...req.body,
       password: hashedPassword
     });
-    // console.log(`User: ${user}`);
+
     await user.save();
-    // const token = jwt.sign({ id: user._id, email: user.email }, secretKey, { expiresIn: '1h' });
     res.status(201).json(user);
   } catch (error) {
-    res.status(400).send(error);
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -46,7 +55,7 @@ exports.createAppointment = async (req, res) => {
 
   try {
     const decoded = jwt.verify(token, secretKey);
-    const { disease, allergies, appointmentDate, appointmentTime } = req.body;
+    const { disease, department, appointmentDate, appointmentTime } = req.body;
 
     // Check if an appointment with the same userId and appointmentDate already exists
     const existingAppointment = await Appointment.findOne({
@@ -66,7 +75,7 @@ exports.createAppointment = async (req, res) => {
     const appointment = new Appointment({
       userId: decoded.id,
       disease,
-      allergies,
+      department,
       appointmentDate,
       appointmentTime,
     });
@@ -88,14 +97,18 @@ exports.createAppointment = async (req, res) => {
 };
 
 exports.userLogin = async (req, res) => {
-  const {email, password, role } = req.body;
+  const { email, password, role } = req.body;
   try {
     // console.log(`Secret key: ${secretKey}`);
-    const user = await LoginUser.findOne({email, role });
+    const user = await LoginUser.findOne({ email, role });
     if (user && (await bcrypt.compare(password, user.password))) {
-      const token = jwt.sign({ id: user._id, email: user.email , role: user.role }, secretKey, {
-        expiresIn: "15m",
-      });
+      const token = jwt.sign(
+        { id: user._id, email: user.email, role: user.role },
+        secretKey,
+        {
+          expiresIn: "15m",
+        }
+      );
       res.status(200).json({ user, token });
     } else {
       res.status(401).send("Invalid email or password or role");
@@ -190,7 +203,53 @@ exports.updateAppointmentDate = async (req, res) => {
   }
 };
 
+exports.getUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    if (!users) {
+      return res.status(404).send("No users found for this user");
+    }
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};
 
+exports.updateDepartment = async (req, res) => {
+  const { department } = req.body;
 
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).send("Unauthorized");
+  }
+
+  const token = authHeader.split(" ")[1];
+  if (!token) {
+    return res.status(401).send("Unauthorized");
+  }
+
+  try {
+    const decoded = jwt.verify(token, secretKey);
+    const { id } = req.params;
+    const result = await User.findByIdAndUpdate(
+      id,
+      { department: department },
+      { new: true }
+    );
+    if (result) {
+      res.status(200).json({
+        message: "Department updated successfully",
+        user: result,
+      });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).send("Token has expired");
+    }
+    res.status(400).send(err);
+  }
+};
 
 //
