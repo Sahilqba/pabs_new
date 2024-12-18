@@ -8,7 +8,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.css";
 import Cookies from "js-cookie";
-
+ 
 function page() {
   useEffect(() => {
     require("bootstrap/dist/js/bootstrap.js");
@@ -17,37 +17,37 @@ function page() {
   const [appointments, setAppointments] = useState([]);
   // const userName = localStorage.getItem("userName");
   // const role = localStorage.getItem("role");
-  const [role, setRole] = useState(null); 
-  const [userName, setUserName] = useState(null); 
+  const [role, setRole] = useState(null);
+  const [userName, setUserName] = useState(null);
   const userIdfetched = localStorage.getItem("userId");
   const jwtToken = localStorage.getItem("jwtToken");
   const [loading, setLoading] = useState(false);
-  
+ 
   useEffect(() => {
     // Initialize user data from localStorage
     const storedRole = localStorage.getItem("role");
     const storedUserName = localStorage.getItem("userName");
     const nameFromGoogle = Cookies.get("nameFromGoogle");
-    const userRoleGoogle = Cookies.get("userRoleGoogle");
+    const userRoleGoogle = Cookies.get("role");
     setRole(storedRole|| userRoleGoogle);
     setUserName(storedUserName|| nameFromGoogle);
     // console.log("Fetched Role:", storedRole);
     // console.log("Fetched Username:", storedUserName);
-
+ 
     console.log("Name from google:", nameFromGoogle);
     console.log("Role from google:", userRoleGoogle);
   }, []);
-  
+ 
   useEffect(() => {
     if (role === "patient") {
       fetchAppointments();
     }
   }, [role]);
-
+ 
   const fetchAppointments = async () => {
     // const userIdFetched = localStorage.getItem("userId");
     // const jwtToken = localStorage.getItem("jwtToken");
-
+ 
     if (!userIdfetched || !jwtToken) return;
     setLoading(true);
     try {
@@ -61,11 +61,11 @@ function page() {
           },
         }
       );
-
+ 
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-
+ 
       const data = await response.json();
       const sortedAppointments = data.sort((a, b) => {
         const dateA = new Date(`${a.appointmentDate}T${a.appointmentTime}`);
@@ -79,20 +79,20 @@ function page() {
       setLoading(false);
     }
   };
-
+ 
   useEffect(() => {
     if (userIdfetched) {
       fetchAppointments(userIdfetched);
     }
   }, [userIdfetched]);
-
+ 
   const formatDateTime = (isoString) => {
     if (!isoString) return "";
     const dateObj = new Date(isoString);
     const day = String(dateObj.getDate()).padStart(2, "0");
     const month = String(dateObj.getMonth() + 1).padStart(2, "0");
     const year = dateObj.getFullYear();
-
+ 
     return `${day}-${month}-${year}`;
   };
   if (!role || !userName) {
@@ -101,7 +101,7 @@ function page() {
   }
   const normalizedRole = role?.toLowerCase();
   console.log("Final Role Evaluation:", normalizedRole);
-  
+ 
   if (normalizedRole === "admin") {
     console.log("Rendering admin block");
     return (
@@ -114,7 +114,7 @@ function page() {
       </>
     );
   }
-
+ 
   if (normalizedRole === "doctor") {
     console.log("Rendering doctor block");
     return (
@@ -127,7 +127,7 @@ function page() {
       </>
     );
   }
-
+ 
   if(normalizedRole === "patient" ){
     console.log("Rendering patient block");
   return (
@@ -222,5 +222,5 @@ return (
   </div>
 );
 }
-
+ 
 export default page;

@@ -18,19 +18,19 @@ const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const secretKey = process.env.SECRET_KEY;
 const { User} = require("./models/user");
-
+ 
 // Enable CORS
 // app.use(cors());
-
+ 
 // CORS configuration
 const corsOptions = {
   origin: `${frontend_url}`, // Replace with your frontend URL
   credentials: true,
 };
-
+ 
 app.use(cors(corsOptions));
-
-
+ 
+ 
 // Body parser middleware
 app.use(express.json());
 app.use(cookieParser());
@@ -40,7 +40,7 @@ app.use(
 // Initialize Passport
 app.use(passport.initialize());
 app.use(passport.session());
-
+ 
 passport.use(
   new GoogleStrategy(
     {
@@ -56,32 +56,32 @@ passport.use(
     }
   )
 );
-
+ 
 passport.serializeUser((user, done) => {
   done(null, user);
 });
-
+ 
 passport.deserializeUser((obj, done) => {
   done(null, obj);
 });
-
-
+ 
+ 
 main().catch((err) => console.log(err));
-
+ 
 async function main() {
   await mongoose.connect(
     `mongodb+srv://${appName}:${mongoPassword}@cluster0.oullp.mongodb.net/demoAppdbName`
   );
 }
-
+ 
 // Use routes
 app.use("/", userRoutes);
-
+ 
 app.get(
   "/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
-
+ 
 app.get(
   "/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/" }),
@@ -95,7 +95,8 @@ app.get(
         role: req.cookies.userRoleGoogle, // Check for the specific role
       });
       // console.log("Existing user:", existingUser);
-      let userRoleGoogle = req.cookies.userRoleGoogle;
+      // let userRoleGoogle = req.cookies.userRoleGoogle;
+      let userRoleGoogle = req.cookies.role;
       if (!existingUser) {
         // If the user does not exist, create a new user
         // console.log("User role from cookies:", userRoleGoogle);
@@ -123,7 +124,7 @@ app.get(
         secretKey,
         { expiresIn: "1h" }
       );
-
+ 
       // Set cookies
       res.cookie("jwtCookie", token, { httpOnly: false, secure: false }); // Set secure: true in production
       res.cookie("nameFromGoogle", req.user.displayName, {
@@ -143,7 +144,7 @@ app.get(
     }
   }
 );
-
+ 
 app.get("/logout", (req, res) => {
   req.logout((err) => {
     if (err) {
@@ -159,11 +160,13 @@ app.get("/logout", (req, res) => {
       res.clearCookie("nameFromGoogle", { path: "/" });
       res.clearCookie("emailFromGoogle", { path: "/" });
       res.clearCookie("userRoleGoogle", { path: "/" });
+      res.clearCookie("role", { path: "/" });
+ 
       res.status(200).json({ message: "Logged out successfully" });
     });
   });
 });
-
+ 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });

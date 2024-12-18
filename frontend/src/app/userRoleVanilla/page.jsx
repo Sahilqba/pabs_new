@@ -3,6 +3,7 @@ import { React, useState } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function page() {
   const router = useRouter();
@@ -51,13 +52,13 @@ function page() {
       }
     } catch (error) {
       console.error("Error during login:", error);
-      toast.error("Incorrect email or password.");
+      toast.error("Incorrect Role.");
     } finally {
     //   setLoading(false); // Reset loading state
     }
   };
   return (
-    <div>
+    <>
       <h1>user role page</h1>
       {/* <input
         type="text"
@@ -82,7 +83,8 @@ function page() {
         <option value="Patient">Patient</option>
       </select>
       <button onClick={handleSubmit}>Click</button>
-    </div>
+      <ToastContainer/>
+    </>
   );
 }
 

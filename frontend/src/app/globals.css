@@ -324,3 +324,47 @@ th {
 /* .hero-subtext {
   margin: 15px 0 30px 0;
 } */
+ /* svg G */
+ svg {
+  height: 33px;
+  width: 50px;
+}
+.alternate-signin .btn {
+  width: 100%;
+  margin: 15px 0;
+  border-radius: 0;
+}
+.separator {
+  display: flex;
+  align-items: center;
+  margin: 20px 0; /* Adds space above and below the separator */
+  color: #888; /* Light gray color for the text */
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.separator::before,
+.separator::after {
+  content: "";
+  flex: 1; /* Makes the line stretch */
+  height: 1px;
+  background-color: #ddd; /* Light gray line */
+  margin: 0 10px; /* Space around the text */
+}
+.mdl-btn {
+  width: 29% !important;
+  border-radius: 0 !important;
+  font-size: 18px !important;
+}
+.custom-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  transition: color 0.3s ease;
+}
+
+.custom-close-btn:hover {color: #ff0000;}

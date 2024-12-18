@@ -2,11 +2,19 @@
 import React, { useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import "bootstrap/dist/js/bootstrap.bundle.min";
+// import "bootstrap/dist/js/bootstrap.bundle.min";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 function Header() {
   const router = useRouter();
+  useEffect(() => {
+    // Dynamically load Bootstrap's JS bundle
+    import("bootstrap/dist/js/bootstrap.bundle.min").then(() => {
+      console.log("Bootstrap JS loaded successfully");
+    }).catch((err) => {
+      console.error("Error loading Bootstrap JS:", err);
+    });
+  }, []);
   const handleLogout = async () => {
     try {
       const response = await fetch("http://localhost:8080/logout", {
@@ -34,9 +42,9 @@ function Header() {
       console.error("Logout failed:", error);
     }
   };
-  useEffect(() => {
-    import("bootstrap/dist/js/bootstrap.bundle").catch(console.error);
-  }, []);
+  // useEffect(() => {
+  //   import("bootstrap/dist/js/bootstrap.bundle").catch(console.error);
+  // }, []);
   // const handleProfileClick = (e) => {
   //   e.preventDefault();
   //   router.push("/user/profile");
@@ -61,24 +69,16 @@ function Header() {
           </button>
           <div className="collapse navbar-collapse" id="navbarNavDropdown">
             <ul className="navbar-nav ms-auto">
-              <li className="nav-item dropdown">
-                <a
+              {/* <li className="nav-item dropdown">
+                <button
                   className="nav-link"
-                  href="#"
                   role="button"
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
                   <i className="bi bi-person-fill"></i>
-                </a>
+                </button>
                 <ul className="dropdown-menu drpdwn-sec">
-                  <li>
-                    {/* <a className="dropdown-item" href="#" 
-                    // onClick = {handleProfileClick}
-                    >
-                      Profile
-                    </a> */}
-                  </li>
                   <li>
                     <a
                       className="dropdown-item"
@@ -90,7 +90,31 @@ function Header() {
                     </a>
                   </li>
                 </ul>
-              </li>
+              </li> */}
+              <li className="nav-item dropdown">
+  <button
+    className="nav-link dropdown-toggle"
+    id="navbarDropdown"
+    role="button"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+    style={{ background: "none", border: "none", color: "inherit" }}
+  >
+    <i className="bi bi-person-fill"></i>
+  </button>
+  <ul className="dropdown-menu drpdwn-sec" aria-labelledby="navbarDropdown">
+    <li>
+      <button
+        className="dropdown-item"
+        onClick={handleLogout}
+        style={{ background: "none", border: "none", color: "inherit" }}
+      >
+        <i className="bi bi-box-arrow-right"></i>
+        <span>Logout</span>
+      </button>
+    </li>
+  </ul>
+</li>
             </ul>
           </div>
         </div>
