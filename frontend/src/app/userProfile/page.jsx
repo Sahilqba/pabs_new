@@ -244,7 +244,7 @@ function page() {
                         <thead>
                           <tr>
                             <th>Disease Symptoms</th>
-                            <th>Department</th>
+                            <th>Doctor</th>
                             <th>Appointment Date</th>
                             <th>Appointment Time(IST)</th>
                           </tr>
@@ -253,7 +253,7 @@ function page() {
                           {appointments.map((appointment) => (
                             <tr key={appointment._id}>
                               <td>{appointment.disease}</td>
-                              <td>{appointment.department}</td>
+                              <td>{appointment.doctor}</td>
                               <td>
                                 {formatDateTime(appointment.appointmentDate)}
                               </td>

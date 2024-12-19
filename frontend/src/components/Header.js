@@ -70,27 +70,8 @@ function Header() {
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  <i className="bi bi-person-fill"></i>
+                  <i className="bi bi-power" onClick={handleLogout}></i>
                 </a>
-                <ul className="dropdown-menu drpdwn-sec">
-                  <li>
-                    {/* <a className="dropdown-item" href="#" 
-                    // onClick = {handleProfileClick}
-                    >
-                      Profile
-                    </a> */}
-                  </li>
-                  <li>
-                    <a
-                      className="dropdown-item"
-                      href="#"
-                      onClick={handleLogout}
-                    >
-                      <i className="bi bi-box-arrow-right"></i>
-                      <span>Logout</span>
-                    </a>
-                  </li>
-                </ul>
               </li>
             </ul>
           </div>

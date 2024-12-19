@@ -23,6 +23,7 @@ function page() {
   const userIdfetched = localStorage.getItem("userId");
   const [loading, setLoading] = useState(false);
   const jwtToken = localStorage.getItem("jwtToken");
+  const jwtCookie = Cookies.get("jwtCookie");
   const router = useRouter();
 
   const [disease, setDisease] = useState("");
@@ -198,7 +199,8 @@ function page() {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${jwtToken}`, // replace with your actual token
+            // Authorization: `Bearer ${jwtToken}`,
+            Authorization:`Bearer ${jwtToken ? jwtToken : jwtCookie}`
           },
           body: JSON.stringify({
             appointmentDate: modalAppointmentDate,
@@ -279,11 +281,11 @@ function page() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${jwtToken}`,
+            Authorization: `Bearer ${jwtToken ? jwtToken : jwtCookie}`,
           },
           body: JSON.stringify({
             disease,
-            department,
+            doctor: selectedDoctor,
             appointmentDate,
             appointmentTime,
           }),
@@ -297,7 +299,9 @@ function page() {
           appointment,
         ]);
         setDisease("");
-        setDepartment("");
+        // setDepartment("");
+        // setDoctors("");
+        setSelectedDoctor("");
         setAppointmentDate("");
         setAppointmentTime("");
         console.log("Appointment booked:", appointment);
@@ -392,7 +396,7 @@ function page() {
                 required
               />
             </div>
-            <div className="col-md-3">
+            {/* <div className="col-md-3">
               <select
                 type="text"
                 className="form-control"
@@ -410,7 +414,7 @@ function page() {
                 <option value="Cardiology">Cardiology</option>
                 <option value="Others">Others</option>
               </select>
-            </div>
+            </div> */}
 
             <div className="col-md-3">
               <select
@@ -499,7 +503,7 @@ function page() {
             <thead>
               <tr>
                 <th>Disease Symptoms</th>
-                <th>Department</th>
+                <th>Doctor</th>
                 <th>Appointment Date</th>
                 <th>Appointment Time (IST)</th>
                 <th>Actions</th>
@@ -509,7 +513,7 @@ function page() {
               {appointments.map((appointment) => (
                 <tr key={appointment._id}>
                   <td>{appointment.disease}</td>
-                  <td>{appointment.department}</td>
+                  <td>{appointment.doctor}</td>
                   <td>{formatDateTime(appointment.appointmentDate)}</td>
                   <td>{appointment.appointmentTime}</td>
                   <td className="action-symbol">

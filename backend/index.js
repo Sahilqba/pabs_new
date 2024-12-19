@@ -95,45 +95,36 @@ app.get(
         role: req.cookies.userRoleGoogle, // Check for the specific role
       });
       console.log("Existing user:", existingUser);
-      if(existingUser) {
-        res.cookie("userIdinDb", existingUser._id.toString(), { httpOnly: false, secure: false });
-      }
-      // let userRoleGoogle = req.cookies.userRoleGoogle;
-      let userRoleGoogle = req.cookies.role;
-      if (!existingUser) {
+      let userId;
+      if (existingUser) {
+        userId = existingUser._id.toString();
+        res.cookie("userIdinDb", userId, { httpOnly: false, secure: false });
+      } else {
         // If the user does not exist, create a new user
-        // console.log("User role from cookies:", userRoleGoogle);
         const newUser = new User({
           email: req.user.emails[0].value,
           name: req.user.displayName,
           userIdinUse: req.user.id,
-          role: userRoleGoogle,
+          role: req.cookies.userRoleGoogle,
         });
-        console.log("New user:", newUser);
-        console.log("New user email:", newUser.email);
-        // console.log("New user userid:", newUser._id.toString());
-        res.cookie("userIdinDb", newUser._id.toString(), { httpOnly: false, secure: false });
         await newUser.save();
-      }else {
-        // If the user exists, update the user role if necessary
-        if (existingUser.role !== userRoleGoogle) {
-          existingUser.role = userRoleGoogle;
-          await existingUser.save();
-        }
+        userId = newUser._id.toString();
+        res.cookie("userIdinDb", userId, { httpOnly: false, secure: false });
       }
-      // Generate JWT token
+
+      // Generate JWT token with MongoDB ObjectId
       const token = jwt.sign(
         {
-          id: req.user.id,
+          id: userId,
           email: req.user.emails[0].value,
-          role: userRoleGoogle,
+          role: req.cookies.userRoleGoogle,
         },
         secretKey,
         { expiresIn: "1h" }
       );
 
       // Set cookies
-      res.cookie("jwtCookie", token, { httpOnly: false, secure: false }); // Set secure: true in production
+      res.cookie("jwtCookie", token, { httpOnly: false, secure: false });
       res.cookie("nameFromGoogle", req.user.displayName, {
         httpOnly: false,
         secure: false,
@@ -142,7 +133,7 @@ app.get(
         httpOnly: false,
         secure: false,
       });
-      res.cookie("userId", req.user.id, { httpOnly: false, secure: false });
+      res.cookie("userId", userId, { httpOnly: false, secure: false });
       // Redirect to user profile
       res.redirect(`${frontend_url}/userProfile`);
     } catch (error) {

@@ -8,35 +8,30 @@ const secretKey = process.env.SECRET_KEY;
 
 exports.createUser = async (req, res) => {
   try {
-    const { email, password, role } = req.body;
-
-    // Check if a user with the same email and role already exists
-    const existingUser = await User.findOne({ email, role });
+    // console.log("request body", req.body)
+    const existingUser = await User.findOne({
+      email: req.body.email,
+      role: req.body.role,
+    });
+    // console.log(`Request body: ${req.body.email}`);
     if (existingUser) {
-      return res.status(400).json({ message: "User with this email and role already exists" });
+      return res
+        .status(400)
+        .json({ message: "User with this email and role already exists" });
     }
-
-    // Check if a user with the same password but different role exists
-    const usersWithSamePassword = await User.find();
-    for (let user of usersWithSamePassword) {
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (isMatch && user.role !== role) {
-        return res.status(400).json({ message: "Password already in use for a different role" });
-      }
-    }
-
     const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-
+    const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
+    // console.log(`Hashed password: ${hashedPassword}`);
     const user = new User({
       ...req.body,
-      password: hashedPassword
+      password: hashedPassword,
     });
-
+    // console.log(`User: ${user}`);
     await user.save();
+    // const token = jwt.sign({ id: user._id, email: user.email }, secretKey, { expiresIn: '1h' });
     res.status(201).json(user);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(400).send(error);
   }
 };
 
@@ -55,7 +50,7 @@ exports.createAppointment = async (req, res) => {
 
   try {
     const decoded = jwt.verify(token, secretKey);
-    const { disease, department, appointmentDate, appointmentTime } = req.body;
+    const { disease, appointmentDate, appointmentTime, doctor } = req.body;
 
     // Check if an appointment with the same userId and appointmentDate already exists
     const existingAppointment = await Appointment.findOne({
@@ -71,13 +66,17 @@ exports.createAppointment = async (req, res) => {
           "An appointment with the same date & time already exists for this user"
         );
     }
-
+    if (!disease || !appointmentDate || !appointmentTime || !doctor) {
+      return res
+        .status(400)
+        .json({ error: "All fields are required to book an appointment" });
+    }
     const appointment = new Appointment({
       userId: decoded.id,
       disease,
-      department,
       appointmentDate,
       appointmentTime,
+      doctor,
     });
 
     await appointment.save();
@@ -92,7 +91,7 @@ exports.createAppointment = async (req, res) => {
     if (err.name === "TokenExpiredError") {
       return res.status(401).send("Token has expired");
     }
-    res.status(400).send(error.message);
+    res.status(400).send(err.message);
   }
 };
 

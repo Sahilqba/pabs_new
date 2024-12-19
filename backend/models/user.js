@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
 const appointmentSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   disease: String,
-  department: String,
+  doctor: String,
   appointmentDate: String,
   appointmentTime: String
 });
