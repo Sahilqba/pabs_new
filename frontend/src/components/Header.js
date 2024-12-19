@@ -5,7 +5,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 // import "bootstrap/dist/js/bootstrap.bundle.min";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-function Header() {
+function Header({toggleSidebar}) {
   const router = useRouter();
   useEffect(() => {
     // Dynamically load Bootstrap's JS bundle
@@ -34,6 +34,7 @@ function Header() {
         Cookies.remove("userRoleGoogle", { path: "/" });
         Cookies.remove("passwordFromLoginPage", { path: "/" });
         Cookies.remove("emailFromLoginPage", { path: "/" });
+        Cookies.remove("userIdinDb", { path: "/" });
         await router.push("/userlogin");
       } else {
         console.error("Logout failed");
@@ -53,9 +54,15 @@ function Header() {
     <>
       <nav className="navbar navbar-expand-lg navbar-dark">
         <div className="container-fluid">
+          <div className="hmbrgr-drpdwn">
           <a className="navbar-brand">
             <i className="bi bi-superscript"></i>
           </a>
+          <button className="hamburger-btn" onClick={toggleSidebar}>
+            <i className="bi bi-list"></i>
+          </button>
+          </div>
+          <div className="logout-drpdwn">
           <button
             className="navbar-toggler"
             type="button"
@@ -116,6 +123,7 @@ function Header() {
   </ul>
 </li>
             </ul>
+          </div>
           </div>
         </div>
       </nav>

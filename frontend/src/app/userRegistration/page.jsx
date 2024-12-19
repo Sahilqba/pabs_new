@@ -143,24 +143,30 @@ function page() {
                   </div>
                 </div>
                 <div className="mb-3">
-            <select
-              type="text"
-              className="form-control"
-              placeholder="Select Role"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              required
-            >
-              <option value="">Select Role*</option>
-              <option value="Admin">Admin</option>
-              <option value="Doctor">Doctor</option>
-              <option value="Patient">Patient</option>
-            </select>
-          </div>
+                  <select
+                    type="text"
+                    className="form-control"
+                    placeholder="Select Role"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    required
+                  >
+                    <option value="">Select Role*</option>
+                    {/* <option value="Admin">Admin</option> */}
+                    <option value="Doctor">Doctor</option>
+                    <option value="Patient">Patient</option>
+                  </select>
+                </div>
                 <div className="mb-3">
                   <input
                     type="password"
-                    className={`form-control ${passwordError ? "is-invalid" : password && !passwordError ? "is-valid" : ""}`}
+                    className={`form-control ${
+                      passwordError
+                        ? "is-invalid"
+                        : password && !passwordError
+                        ? "is-valid"
+                        : ""
+                    }`}
                     id="password"
                     placeholder="Password*"
                     value={password}
@@ -174,13 +180,13 @@ function page() {
                   ) : null}
                 </div>
                 <div className="btn-grp">
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  // onClick={handleSubmit}
-                >
-                  Submit
-                </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    // onClick={handleSubmit}
+                  >
+                    Submit
+                  </button>
                 </div>
               </form>
             )}

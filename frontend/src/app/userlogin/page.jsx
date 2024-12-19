@@ -50,7 +50,6 @@ function page() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (isGoogleLogin) return;
     const form = e.currentTarget;
     if (!form.checkValidity() || passwordError) {
@@ -64,10 +63,7 @@ function page() {
 
     Cookies.set("emailFromLoginPage", email, { expires: 1, path: "/" });
     Cookies.set("passwordFromLoginPage", password, { expires: 1, path: "/" });
-    Cookies.set("userRole", userRole, { expires: 1, path: "/" });
-
     // router.push("/userRoleVanilla");
-
     setShowRoleModal(true);
   };
 
@@ -85,13 +81,14 @@ function page() {
     setShowRoleModal(false);
     // You can now use the selectedRole state to capture the input
     console.log("Selected Role:", role);
- 
+
     if (isGoogleLogin) {
       Cookies.set("role", role, { expires: 1, path: "/" });
+      Cookies.set("userRoleGoogle", role, { expires: 1, path: "/" });
       window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
       return;
   }
- 
+
     Cookies.set("emailFromLoginPage", email, { expires: 1, path: "/" });
     Cookies.set("passwordFromLoginPage", password, { expires: 1, path: "/" });
     Cookies.set("role", role, { expires: 1, path: "/" });
@@ -120,6 +117,7 @@ function page() {
         localStorage.setItem("userName", data.user.name);
         localStorage.setItem("role", data.user.role);
         Cookies.set("jwtCookie", data.token, { expires: 1, path: "/" });
+        Cookies.set("userIdinDb", data.user._id, { expires: 1, path: "/" });
         setTimeout(() => {
           router.push(`/userProfile`);
         }, 2000);
@@ -143,7 +141,6 @@ function page() {
       <div className="flex-container">
         <div className="flex-item-login login-form">
           <h2>Login with Email</h2>
-
           {loading ? (
             <div className="spinner-border" role="status">
               <span className="sr-only"></span>
@@ -278,18 +275,12 @@ function page() {
                 <p>Please select your role to continue:</p>
                 <button
                   className="btn btn-primary mdl-btn m-2"
-                  onClick={() => handleRoleSelection("Admin")}
-                >
-                  Admin
-                </button>
-                <button
-                  className="btn btn-secondary mdl-btn m-2"
                   onClick={() => handleRoleSelection("Doctor")}
                 >
                   Doctor
                 </button>
                 <button
-                  className="btn btn-info mdl-btn m-2"
+                  className="btn btn-secondary mdl-btn m-2"
                   onClick={() => handleRoleSelection("Patient")}
                 >
                   Patient

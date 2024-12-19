@@ -18,4 +18,8 @@ router.get('/appointments/:userId', userController.getAppointmentsByUserId);
 
 router.patch('/updateAppointment/:id', userController.updateAppointmentDate);
 
+router.get('/users', userController.getUsers);
+
+router.patch('/updateDepartment/:id', userController.updateDepartment);
+
 module.exports = router;

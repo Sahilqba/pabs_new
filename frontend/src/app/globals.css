@@ -33,6 +33,15 @@ p {
 .main{
   padding: 15px;
 }
+main.main-container {
+  width: 100%;
+  padding-left: 15px;
+  transition: 0.5s;
+  min-height: 100vh;
+}
+main.main-container.show {
+  padding-left: 265px;
+}
 
 nav.navbar.navbar-expand-lg.navbar-dark {
   background: black;
@@ -153,14 +162,14 @@ i.bi.bi-person-fill {
 footer {
   background-color: black;
   color: white;
-  margin-top: 2rem;
-  position: fixed;
+  /* margin-top: 2rem; */
+  /* position: fixed; */
   bottom: 0;
   left: 0;
   right: 0;
   text-align: center;
   padding: 15px;
-  /* position: relative; */
+  position: relative;
 }
 .ftr-sec p {
   margin: 0;
@@ -260,7 +269,7 @@ footer {
   background-color: #0056b3;
 }
 .prof-hdng {
-  margin: 0 0px 15px 5px;
+  margin: 15px 15px 15px 5px;
 }
 
 .prof-hdng h3 {
@@ -325,7 +334,8 @@ th {
   margin: 15px 0 30px 0;
 } */
  /* svg G */
- svg {
+
+svg {
   height: 33px;
   width: 50px;
 }
@@ -368,3 +378,53 @@ th {
 }
 
 .custom-close-btn:hover {color: #ff0000;}
+
+/* sidebar */
+.sidebar {
+  width: 250px;
+  min-height: 100vh;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  position: absolute;
+  left: -250px;
+  transition: 0.5s;
+}
+.sidebar.show {
+  left: 0;
+}
+.sd-link {
+  font-size: 20px !important;
+  /* margin: 10px; */
+  cursor: pointer;
+  color: #333 !important;
+  padding: 10px 15px !important;
+  transition: background-color 0.2s ease-in-out !important;
+}
+.sd-link:hover {
+  background-color: #f8f9fa !important;
+  color: #007bff !important;
+}
+
+/* user profile doc */
+.dept-sel {
+    height: 50px;
+    width: 30% !important;
+    border-radius: 0 !important;
+  }
+
+.doc-dept {display: flex;gap: 12px;}
+
+button.btn.btn-primary.dept-btn {
+    height: 50px;
+    border-radius: 0;
+    width: 10%;
+}
+
+.hamburger-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 25px;
+}
+.hamburger-btn:hover {
+  color: #e4e2e2;
+}
