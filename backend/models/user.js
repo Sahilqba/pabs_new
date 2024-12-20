@@ -24,9 +24,14 @@ const userLoginSchema = new mongoose.Schema({
   role: String
 });
 
+const doctorAppointmentSchema = new mongoose.Schema({
+  doctor: { type: String }
+});
+
 const User = mongoose.model("User", userSchema);
 const Appointment = mongoose.model("Appointment", appointmentSchema);
 const LoginUser = mongoose.model("LoginUser", userLoginSchema, "users");
+const DoctorAppointment = mongoose.model("DoctorAppointment", doctorAppointmentSchema);
 
 
-module.exports = {User, LoginUser, Appointment};
+module.exports = {User, LoginUser, Appointment, DoctorAppointment};

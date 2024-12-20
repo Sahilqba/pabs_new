@@ -19,13 +19,13 @@ function page() {
   // const role = localStorage.getItem("role");
   const [role, setRole] = useState(null);
   const [userName, setUserName] = useState(null);
-  const userIdfetched = localStorage.getItem("userId");
+  // const userIdfetched = localStorage.getItem("userId");
+  const userIdfetched = Cookies.get("userId");
   const jwtToken = localStorage.getItem("jwtToken");
   const [loading, setLoading] = useState(false);
   const [department, setDepartment] = useState("");
   const userIdinDb = Cookies.get("userIdinDb");
   const jwtCookie = Cookies.get("jwtCookie");
-
 
   useEffect(() => {
     // Initialize user data from localStorage
@@ -36,12 +36,10 @@ function page() {
     setRole(storedRole || userRoleGoogle);
     setUserName(storedUserName || nameFromGoogle);
 
-
-
     // console.log("Name from google:", nameFromGoogle);
     // console.log("userName from google:", userName);
-    // console.log("Role from google:", role);
-    // console.log("userRolegoogle from google:", userRoleGoogle);
+    console.log("Role from google:", storedRole || userRoleGoogle);
+    console.log("userRolegoogle from google:", userRoleGoogle);
     // console.log("use id in db:", userIdinDb);
   }, []);
 
@@ -51,11 +49,14 @@ function page() {
     }
   }, [role]);
 
-  const fetchAppointments = async () => {
+  const fetchAppointments = async (userIdfetched) => {
     // const userIdFetched = localStorage.getItem("userId");
     // const jwtToken = localStorage.getItem("jwtToken");
 
-    if (!userIdfetched || !jwtToken) return;
+    // if (!userIdfetched || !jwtToken) return;
+    console.log("Fetching appointments for user:", userIdfetched);
+    console.log("JWT Token:", jwtToken);
+    console.log("JWT Cookie:", jwtCookie);
     setLoading(true);
     try {
       const response = await fetch(
@@ -63,7 +64,8 @@ function page() {
         {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${jwtToken}`,
+            // Authorization: `Bearer ${jwtToken}`,
+            Authorization: `Bearer ${jwtToken ? jwtToken : jwtCookie}`,
             "Content-Type": "application/json",
           },
         }
@@ -88,6 +90,8 @@ function page() {
   };
 
   useEffect(() => {
+    const userIdfetched = Cookies.get("userId");
+    console.log("userIdfetched from cookies:", userIdfetched);
     if (userIdfetched) {
       fetchAppointments(userIdfetched);
     }
@@ -104,10 +108,10 @@ function page() {
           headers: {
             "Content-Type": "application/json",
             // Authorization: `Bearer ${jwtToken}`,
-            Authorization: `Bearer ${jwtToken ? jwtToken : jwtCookie}`
+            Authorization: `Bearer ${jwtToken ? jwtToken : jwtCookie}`,
           },
           body: JSON.stringify({
-            department: department
+            department: department,
           }),
         }
       );
@@ -134,6 +138,128 @@ function page() {
       // handle network error
     }
   };
+
+  const viewAppointments = async () => {
+    // router.push("/viewDoctorAppointments");
+       try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/viewDoctorAppointments`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              doctor: userName
+            }),
+          }
+        );
+        let errorMessage;
+        if (response.ok) {
+          const data = await response.json();
+          // console.log("Login successful");
+          // console.log("Data:", data);
+          // toast.success("Login successful !");
+          // localStorage.setItem("jwtToken", data.token);
+          // localStorage.setItem("userId", data.user._id);
+          // localStorage.setItem("userName", data.user.name);
+          // localStorage.setItem("role", data.user.role);
+          // Cookies.set("jwtCookie", data.token, { expires: 1, path: "/" });
+          // Cookies.set("userIdinDb", data.user._id, { expires: 1, path: "/" });
+          // Cookies.set("userId", data.user._id, { expires: 1, path: "/" });
+          // setTimeout(() => {
+          //   router.push(`/viewDoctorAppointments`);
+          // }, 2000);
+        } else {
+          const contentType = response.headers.get("content-type");
+          if (contentType && contentType.includes("application/json")) {
+            const data = await response.json();
+            errorMessage = data.message || "Failed to login";
+          } else {
+            errorMessage = await response.text();
+          }
+          console.error("Login failed:", errorMessage);
+          // toast.error(errorMessage);
+          // Cookies.remove("emailFromLoginPage", { path: "/" });
+          // Cookies.remove("role", { path: "/" });
+          // Cookies.remove("passwordFromLoginPage", { path: "/" });
+        }
+      } catch (error) {
+        console.error("Error during login:", error);
+        toast.error(error.message);
+      } finally {
+        setLoading(false); // Reset loading state
+      }
+  }
+
+    // const handleRoleSelection = async (role) => {
+    //   setUserRole(role);
+    //   setShowRoleModal(false);
+    //   // You can now use the selectedRole state to capture the input
+    //   console.log("Selected Role:", role);
+  
+    //   if (isGoogleLogin) {
+    //     Cookies.set("role", role, { expires: 1, path: "/" });
+    //     Cookies.set("userRoleGoogle", role, { expires: 1, path: "/" });
+    //     window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
+    //     return;
+    //   }
+  
+    //   Cookies.set("emailFromLoginPage", email, { expires: 1, path: "/" });
+    //   Cookies.set("passwordFromLoginPage", password, { expires: 1, path: "/" });
+    //   Cookies.set("role", role, { expires: 1, path: "/" });
+    //   try {
+    //     const response = await fetch(
+    //       `${process.env.NEXT_PUBLIC_API_URL}/userLogin`,
+    //       {
+    //         method: "POST",
+    //         headers: {
+    //           "Content-Type": "application/json",
+    //         },
+    //         body: JSON.stringify({
+    //           email: email,
+    //           password: password,
+    //           role: role,
+    //         }),
+    //       }
+    //     );
+    //     let errorMessage;
+    //     if (response.ok) {
+    //       const data = await response.json();
+    //       console.log("Login successful");
+    //       // console.log("Data:", data);
+    //       toast.success("Login successful !");
+    //       localStorage.setItem("jwtToken", data.token);
+    //       // localStorage.setItem("userId", data.user._id);
+    //       localStorage.setItem("userName", data.user.name);
+    //       localStorage.setItem("role", data.user.role);
+    //       Cookies.set("jwtCookie", data.token, { expires: 1, path: "/" });
+    //       Cookies.set("userIdinDb", data.user._id, { expires: 1, path: "/" });
+    //       Cookies.set("userId", data.user._id, { expires: 1, path: "/" });
+    //       setTimeout(() => {
+    //         router.push(`/userProfile`);
+    //       }, 2000);
+    //     } else {
+    //       const contentType = response.headers.get("content-type");
+    //       if (contentType && contentType.includes("application/json")) {
+    //         const data = await response.json();
+    //         errorMessage = data.message || "Failed to login";
+    //       } else {
+    //         errorMessage = await response.text();
+    //       }
+    //       console.error("Login failed:", errorMessage);
+    //       toast.error(errorMessage);
+    //       Cookies.remove("emailFromLoginPage", { path: "/" });
+    //       Cookies.remove("role", { path: "/" });
+    //       Cookies.remove("passwordFromLoginPage", { path: "/" });
+    //     }
+    //   } catch (error) {
+    //     console.error("Error during login:", error);
+    //     toast.error(error.message);
+    //   } finally {
+    //     setLoading(false); // Reset loading state
+    //   }
+    // };
 
   const formatDateTime = (isoString) => {
     if (!isoString) return "";
@@ -181,6 +307,7 @@ function page() {
               Click here to select your department
             </button>
           </form>
+          <button onClick = {viewAppointments}>Click here to view your appointments</button>
         </main>
         <Footer />
       </>

@@ -22,4 +22,6 @@ router.get('/users', userController.getUsers);
 
 router.patch('/updateDepartment/:id', userController.updateDepartment);
 
+router.post("/viewDoctorAppointments", userController.doctorAppointments);
+
 module.exports = router;
