@@ -9,6 +9,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
 import { Tooltip } from "bootstrap";
+import Sidebar from "@/components/Sidebar";
+// import React from "react";
 function page() {
   const userEmailFromLoginPage = Cookies.get("emailFromLoginPage");
   const userEmailFromGoogle = Cookies.get("emailFromGoogle");
@@ -23,14 +25,17 @@ function page() {
   const userIdfetched = localStorage.getItem("userId");
   const [loading, setLoading] = useState(false);
   const jwtToken = localStorage.getItem("jwtToken");
+  const jwtCookie = Cookies.get("jwtCookie");
   const router = useRouter();
 
   const [disease, setDisease] = useState("");
-  const [department, setDepartment] = useState("");
+  // const [department, setDepartment] = useState("");
   const [appointmentDate, setAppointmentDate] = useState("");
   const [appointmentTime, setAppointmentTime] = useState("");
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState("");
+  const [filteredDoctors, setFilteredDoctors] = useState([]);
+  const [selectedDepartment, setSelectedDepartment] = useState("");
   const fetchAppointments = async (userIdfetched) => {
     setLoading(true);
     try {
@@ -62,7 +67,19 @@ function page() {
       setLoading(false);
     }
   };
-
+  // const addAppointment = (newAppointment) => {
+  //   setAppointments((prevAppointments) => {
+  //     // Add the new appointment and sort the array
+  //     const updatedAppointments = [...prevAppointments, newAppointment].sort(
+  //       (a, b) => {
+  //         const dateA = new Date(`${a.appointmentDate}T${a.appointmentTime}`);
+  //         const dateB = new Date(`${b.appointmentDate}T${b.appointmentTime}`);
+  //         return dateA - dateB;
+  //       }
+  //     );
+  //     return updatedAppointments;
+  //   });
+  // };
   useEffect(() => {
     if (userIdfetched) {
       fetchAppointments(userIdfetched);
@@ -198,7 +215,8 @@ function page() {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${jwtToken}`, // replace with your actual token
+            // Authorization: `Bearer ${jwtToken}`,
+            Authorization:`Bearer ${jwtToken ? jwtToken : jwtCookie}`
           },
           body: JSON.stringify({
             appointmentDate: modalAppointmentDate,
@@ -279,11 +297,11 @@ function page() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${jwtToken}`,
+            Authorization: `Bearer ${jwtToken ? jwtToken : jwtCookie}`,
           },
           body: JSON.stringify({
             disease,
-            department,
+            doctor: selectedDoctor,
             appointmentDate,
             appointmentTime,
           }),
@@ -297,7 +315,9 @@ function page() {
           appointment,
         ]);
         setDisease("");
-        setDepartment("");
+        // setDepartment("");
+        // setDoctors("");
+        setSelectedDoctor("");
         setAppointmentDate("");
         setAppointmentTime("");
         console.log("Appointment booked:", appointment);
@@ -351,35 +371,55 @@ function page() {
         throw new Error("Network response was not ok");
       }
       const data = await response.json();
-      // const doctors = data.filter((user) => user.role === "Doctor" && user.email !== userEmailFromLoginPage);
-      // const doctors = data.filter((user) => user.role === "Doctor" && user.email !== userEmailFromGoogle);
       const doctors = data.filter(
         (user) => 
           user.role === "Doctor" && 
           user.email !== userEmailFromGoogle && 
-          user.email !== userEmailFromLoginPage
+          user.email !== userEmailFromLoginPage && 
+          user.department
       );
       setDoctors(doctors);
+      setFilteredDoctors(doctors);
     } catch (error) {
       console.error("Failed to fetch appointments:", error);
+      setDoctors([]); 
+      setFilteredDoctors([]); 
     } finally {
       setLoading(false);
     }
   };
-
+ 
+  const handleDepartmentChange = (department) => {
+    setSelectedDepartment(department);
+    if (department === ""){
+      setFilteredDoctors(doctors.filter((doc) => doc.department));
+    } else {
+      const filtered = doctors.filter(
+        (doc) => doc.department.toLowerCase() === department.toLowerCase()
+      )
+      setFilteredDoctors(filtered);
+    }
+  }
   useEffect(() => {
     fetchUsers();
   }, []);
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
 
+  const toggleSidebar = () => {
+    setSidebarOpen(!isSidebarOpen);
+  };
+  
   return (
     <>
-      <Header />
-      <main className="main">
+      <Header toggleSidebar={toggleSidebar}/>
+      <div className="app-bkng">
+      <Sidebar isOpen={isSidebarOpen} role="patient"/>
+      <main className={`main-container ${isSidebarOpen ? "show" : ""}`}>
         <div className="prof-hdng">
           <h3>Manage Appointment</h3>
         </div>
         <form onSubmit={handleSubmit}>
-          <div className="row">
+          <div className="row app-frm">
             <div className="col-md-4">
               <input
                 type="text"
@@ -392,7 +432,7 @@ function page() {
                 required
               />
             </div>
-            <div className="col-md-3">
+            {/* <div className="col-md-3">
               <select
                 type="text"
                 className="form-control"
@@ -410,13 +450,45 @@ function page() {
                 <option value="Cardiology">Cardiology</option>
                 <option value="Others">Others</option>
               </select>
-            </div>
+            </div> */}
+        {/* Department Filter with Icon */}
+        <div className="col-md-4">
+          <select
+            className="form-control"
+            value={selectedDepartment}
+            onChange={(e) => handleDepartmentChange(e.target.value)}
+          >
+            <option value="">Select Department</option>
+            {Array.from(
+          new Set(
+            doctors
+              .filter((doc) => doc.department) // Ensure only valid departments are listed
+              .map((doc) => doc.department)
+          )
+        ).map((department) => (
+          <option key={department} value={department}>
+            {department}
+          </option>
+        ))}
+          </select>
+          {/* Filter Icon
+          <i
+            className="bi bi-filter position-absolute"
+            style={{
+              left: "10px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              fontSize: "1.2rem",
+              color: "#6c757d",
+            }}
+          ></i> */}
+        </div>
 
-            <div className="col-md-3">
+            <div className="col-md-4">
               <select
-                type="text"
+                // type="text"
                 className="form-control"
-                placeholder="Choose doctor"
+                // placeholder="Choose doctor"
                 value={selectedDoctor}
                 onChange={(e) => {
                   setSelectedDoctor(e.target.value);
@@ -424,15 +496,15 @@ function page() {
                 required
               >
                 <option value="">Select Doctor</option>
-                {doctors.map((doc) => (
+                {Array.isArray(filteredDoctors) && filteredDoctors.map((doc) => (
                   <option key={doc._id} value={doc.name}>
-                   Dr. {doc.name}
+                   Dr. {doc.name.toUpperCase()} ({doc.department})
                   </option>
                 ))}
               </select>
             </div>
 
-            <div className="col-md-2">
+            <div className="col-md-4">
               <input
                 type="date"
                 className="form-control"
@@ -445,7 +517,7 @@ function page() {
                 required
               />
             </div>
-            <div className="col-md-1">
+            <div className="col-md-4">
               <input
                 type="time"
                 className="form-control"
@@ -457,7 +529,7 @@ function page() {
                 required
               />
             </div>
-            <div className="col-md-2">
+            <div className="col-md-4">
               <button className="btn btn-primary app-sub">Submit</button>
             </div>
           </div>
@@ -499,7 +571,8 @@ function page() {
             <thead>
               <tr>
                 <th>Disease Symptoms</th>
-                <th>Department</th>
+                <th>Doctor</th>
+                {/* <th>Department</th> */}
                 <th>Appointment Date</th>
                 <th>Appointment Time (IST)</th>
                 <th>Actions</th>
@@ -509,7 +582,8 @@ function page() {
               {appointments.map((appointment) => (
                 <tr key={appointment._id}>
                   <td>{appointment.disease}</td>
-                  <td>{appointment.department}</td>
+                  <td>Dr. {appointment.doctor.toUpperCase()}</td>
+                  {/* <td>{appointment.department}</td> */}
                   <td>{formatDateTime(appointment.appointmentDate)}</td>
                   <td>{appointment.appointmentTime}</td>
                   <td className="action-symbol">
@@ -632,6 +706,7 @@ function page() {
           </div>
         )}
       </main>
+      </div>
       <Footer />
       <ToastContainer />
     </>

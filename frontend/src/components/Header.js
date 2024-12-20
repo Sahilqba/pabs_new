@@ -99,17 +99,16 @@ function Header({toggleSidebar}) {
                 </ul>
               </li> */}
               <li className="nav-item dropdown">
-  <button
-    className="nav-link dropdown-toggle"
-    id="navbarDropdown"
-    role="button"
-    data-bs-toggle="dropdown"
-    aria-expanded="false"
-    style={{ background: "none", border: "none", color: "inherit" }}
-  >
-    <i className="bi bi-person-fill"></i>
-  </button>
-  <ul className="dropdown-menu drpdwn-sec" aria-labelledby="navbarDropdown">
+              <a
+                  className="nav-link"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+    {/* <i className="bi bi-person-fill"></i> */}
+  {/* </a> */}
+  {/* <ul className="dropdown-menu drpdwn-sec" aria-labelledby="navbarDropdown">
     <li>
       <button
         className="dropdown-item"
@@ -120,8 +119,11 @@ function Header({toggleSidebar}) {
         <span>Logout</span>
       </button>
     </li>
-  </ul>
-</li>
+  </ul> */}
+{/* </li> */}
+                  <i className="bi bi-power" onClick={handleLogout} title="Logout"></i>
+                </a>
+              </li>
             </ul>
           </div>
           </div>

@@ -35,12 +35,13 @@ p {
 }
 main.main-container {
   width: 100%;
-  padding-left: 15px;
+  padding-left: 25px;
+  padding-right: 25px;
   transition: 0.5s;
   min-height: 100vh;
 }
 main.main-container.show {
-  padding-left: 265px;
+  padding-left: 275px;
 }
 
 nav.navbar.navbar-expand-lg.navbar-dark {
@@ -382,28 +383,32 @@ svg {
 /* sidebar */
 .sidebar {
   width: 250px;
-  min-height: 100vh;
+  min-height: 103vh;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   position: absolute;
   left: -250px;
+  top: 56px;
   transition: 0.5s;
 }
 .sidebar.show {
   left: 0;
 }
 .sd-link {
-  font-size: 20px !important;
+  font-size: 19px !important;
   /* margin: 10px; */
   cursor: pointer;
   color: #333 !important;
-  padding: 10px 15px !important;
+  /* padding: 10px 15px !important; */
+  padding-left: 0 !important;
   transition: background-color 0.2s ease-in-out !important;
 }
 .sd-link:hover {
   background-color: #f8f9fa !important;
   color: #007bff !important;
 }
-
+.sd-link i {
+  margin-right: 8px;
+}
 /* user profile doc */
 .dept-sel {
     height: 50px;
@@ -427,4 +432,7 @@ button.btn.btn-primary.dept-btn {
 }
 .hamburger-btn:hover {
   color: #e4e2e2;
+}
+.app-frm {
+  gap: 25px 0px;
 }

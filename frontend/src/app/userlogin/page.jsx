@@ -87,7 +87,7 @@ function page() {
       Cookies.set("userRoleGoogle", role, { expires: 1, path: "/" });
       window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
       return;
-  }
+    }
 
     Cookies.set("emailFromLoginPage", email, { expires: 1, path: "/" });
     Cookies.set("passwordFromLoginPage", password, { expires: 1, path: "/" });
@@ -107,8 +107,9 @@ function page() {
           }),
         }
       );
-      const data = await response.json();
+      let errorMessage;
       if (response.ok) {
+        const data = await response.json();
         console.log("Login successful");
         // console.log("Data:", data);
         toast.success("Login successful !");
@@ -122,17 +123,24 @@ function page() {
           router.push(`/userProfile`);
         }, 2000);
       } else {
-        // const errorResult = await response.json();
-        // console.log(errorResult.error);
-        const errorMessage = data?.error || "Invalid credentials";
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const data = await response.json();
+          errorMessage = data.message || "Failed to login";
+        } else {
+          errorMessage = await response.text();
+        }
         console.error("Login failed:", errorMessage);
         toast.error(errorMessage);
+        Cookies.remove("emailFromLoginPage", { path: "/" });
+        Cookies.remove("role", { path: "/" });
+        Cookies.remove("passwordFromLoginPage", { path: "/" });
       }
     } catch (error) {
       console.error("Error during login:", error);
-      toast.error("Incorrect Role.");
+      toast.error(error.message);
     } finally {
-      //   setLoading(false); // Reset loading state
+      setLoading(false); // Reset loading state
     }
   };
 

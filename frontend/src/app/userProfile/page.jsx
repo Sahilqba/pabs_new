@@ -162,7 +162,7 @@ function page() {
       <>
       <Header toggleSidebar={toggleSidebar}/>
       <div className="doc-panel">
-      <Sidebar isOpen={isSidebarOpen}/>
+      <Sidebar isOpen={isSidebarOpen} role={normalizedRole}/>
       <main className={`main-container ${isSidebarOpen ? "show" : ""}`}>
         <div className="prof-hdng">
           <h3>Hi Dr. {userName.toUpperCase()}, Welcome.</h3>
@@ -215,9 +215,10 @@ function page() {
     // console.log("Rendering patient block");
     return (
       <>
-        <Header />
-        {/* <h1>Profile page</h1> */}
-        <main className="main">
+        <Header toggleSidebar={toggleSidebar}/>
+        <div className="patient-pnl">
+        <Sidebar isOpen={isSidebarOpen} role={normalizedRole}/>
+        <main className={`main-container ${isSidebarOpen ? "show" : ""}`}>
           <div className="prof-hdng">
             <h3>
               Welcome {userName.toUpperCase()}. You can view your
@@ -268,7 +269,7 @@ function page() {
                         <thead>
                           <tr>
                             <th>Disease Symptoms</th>
-                            <th>Department</th>
+                            <th>Doctor</th>
                             <th>Appointment Date</th>
                             <th>Appointment Time(IST)</th>
                           </tr>
@@ -277,7 +278,7 @@ function page() {
                           {appointments.map((appointment) => (
                             <tr key={appointment._id}>
                               <td>{appointment.disease}</td>
-                              <td>{appointment.department}</td>
+                              <td>Dr. {appointment.doctor.toUpperCase()}</td>
                               <td>
                                 {formatDateTime(appointment.appointmentDate)}
                               </td>
@@ -295,6 +296,7 @@ function page() {
             </div>
           )}
         </main>
+        </div>
         <Footer />
       </>
     );
