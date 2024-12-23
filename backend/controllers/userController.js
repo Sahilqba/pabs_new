@@ -50,7 +50,7 @@ exports.createAppointment = async (req, res) => {
 
   try {
     const decoded = jwt.verify(token, secretKey);
-    const { disease, appointmentDate, appointmentTime, doctor } = req.body;
+    const { disease, appointmentDate, appointmentTime, doctor, department } = req.body;
 
     // Check if an appointment with the same userId and appointmentDate already exists
     const existingAppointment = await Appointment.findOne({
@@ -66,7 +66,7 @@ exports.createAppointment = async (req, res) => {
           "An appointment with the same date & time already exists for this user"
         );
     }
-    if (!disease || !appointmentDate || !appointmentTime || !doctor) {
+    if (!disease || !appointmentDate || !appointmentTime || !doctor || !department) {
       return res
         .status(400)
         .json({ error: "All fields are required to book an appointment" });
@@ -77,6 +77,7 @@ exports.createAppointment = async (req, res) => {
       appointmentDate,
       appointmentTime,
       doctor,
+      department
     });
 
     await appointment.save();

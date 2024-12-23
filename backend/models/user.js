@@ -14,7 +14,8 @@ const appointmentSchema = new mongoose.Schema({
   disease: String,
   doctor: String,
   appointmentDate: String,
-  appointmentTime: String
+  appointmentTime: String,
+  department: String
 });
 
 const userLoginSchema = new mongoose.Schema({

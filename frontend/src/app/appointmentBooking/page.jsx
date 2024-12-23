@@ -297,6 +297,7 @@ function page() {
             doctor: selectedDoctor,
             appointmentDate,
             appointmentTime,
+            department
           }),
         }
       );
@@ -405,7 +406,7 @@ function page() {
                 required
               />
             </div>
-            {/* <div className="col-md-3">
+            <div className="col-md-3">
               <select
                 type="text"
                 className="form-control"
@@ -423,7 +424,7 @@ function page() {
                 <option value="Cardiology">Cardiology</option>
                 <option value="Others">Others</option>
               </select>
-            </div> */}
+            </div>
 
             <div className="col-md-3">
               <select
@@ -513,6 +514,7 @@ function page() {
               <tr>
                 <th>Disease Symptoms</th>
                 <th>Doctor</th>
+                <th>Department</th>
                 <th>Appointment Date</th>
                 <th>Appointment Time (IST)</th>
                 <th>Actions</th>
@@ -523,6 +525,7 @@ function page() {
                 <tr key={appointment._id}>
                   <td>{appointment.disease}</td>
                   <td>{appointment.doctor}</td>
+                  <td>{appointment.department}</td>
                   <td>{formatDateTime(appointment.appointmentDate)}</td>
                   <td>{appointment.appointmentTime}</td>
                   <td className="action-symbol">
