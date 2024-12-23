@@ -104,9 +104,55 @@ function page() {
     }
   }, [userIdfetched]);
 
+  const fetchDepartment = async (userIdfetched) => {
+
+    // if (!userIdfetched || !jwtToken) return;
+    console.log("Fetching department for user:", userIdfetched);
+    console.log("JWT Token:", jwtToken);
+    console.log("JWT Cookie:", jwtCookie);
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/doctorDepartment/${userIdfetched}`,
+        {
+          method: "GET",
+          headers: {
+            // Authorization: `Bearer ${jwtToken}`,
+            Authorization: `Bearer ${jwtToken ? jwtToken : jwtCookie}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+ 
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+ 
+      const data = await response.json();
+      console.log("Department data:", data);
+      setDepartment(data);
+    } catch (error) {
+      console.error("Failed to fetch department:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+ 
+  useEffect(() => {
+    const userIdfetched = Cookies.get("userId");
+    console.log("userIdfetched from cookies:", userIdfetched);
+    if (userIdfetched) {
+      fetchDepartment(userIdfetched);
+    }
+  }, [userIdfetched]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Department selected:", department);
+    if (!department) {
+      toast.error("Please select your department.");
+      return;
+    }
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/updateDepartment/${userIdinDb}`,
@@ -145,6 +191,7 @@ function page() {
       // handle network error
     }
   };
+
 
   const viewAppointments = async () => {
     // router.push("/viewDoctorAppointments");
@@ -329,8 +376,14 @@ function page() {
           >
             Submit
           </button> */}
+
+<div className="mb-3">
+  <label for="formFileSm" class="form-label">Small file input example</label>
+  <input className="form-control form-control-sm" id="formFileSm" type="file" accept="image/*"/>
+</div>
+
         </form>
-        <button onClick = {viewAppointments}>Click here to view your appointments</button>
+        {/* <button onClick = {viewAppointments}>Click here to view your appointments</button> */}
       </main>
       </div>
       <Footer />

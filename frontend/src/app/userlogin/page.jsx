@@ -117,6 +117,7 @@ function page() {
         // localStorage.setItem("userId", data.user._id);
         localStorage.setItem("userName", data.user.name);
         localStorage.setItem("role", data.user.role);
+        // localStorage.setItem("department", data.user.department);
         Cookies.set("jwtCookie", data.token, { expires: 1, path: "/" });
         Cookies.set("userIdinDb", data.user._id, { expires: 1, path: "/" });
         Cookies.set("userId", data.user._id, { expires: 1, path: "/" });

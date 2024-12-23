@@ -266,4 +266,26 @@ exports.doctorAppointments = async (req, res) => {
   }
 };
 
+exports.getDoctorDepartmentByUserId = async (req, res) => {
+  try {
+    console.log(`Fetching department for user with ID: ${req.params.userId}`);
+    const userId = req.params.userId;
+    // const user = await User.find({ userId: userId });
+    const user = await User.findById(userId);
+    console.log(`User: ${user}`);
+    if (!user) {
+      return res.status(404).send("No user found");
+    }
+    if (user.role !== 'Doctor') {
+      return res.status(400).json({ message: 'User is not a doctor' });
+  }
+  if (!user.department) {
+    return res.status(400).json({ message: 'No department selected' });
+}
+    res.status(200).json(user.department);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};
+
 //
