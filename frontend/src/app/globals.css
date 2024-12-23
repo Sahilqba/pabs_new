@@ -436,3 +436,50 @@ button.btn.btn-primary.dept-btn {
 .app-frm {
   gap: 25px 0px;
 }
+/* doc appointment */
+.appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Adds spacing between appointments */
+  padding: 20px; /* Optional: Adds padding around the list */
+  background-color: #f9f9f9; /* Light background for the container */
+}
+
+.appointment-card {
+  padding: 15px;
+  border-bottom: 1px solid #ccc; /* Adds a line after each card */
+  background-color: #ffffff; 
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+  border-radius: 5px; 
+}
+
+
+.appointment-card:nth-child(even) {
+  background-color: #f0f8ff; 
+}
+
+
+.appointment-card:hover {
+  transform: scale(1.02);
+  transition: transform 0.2s ease-in-out;
+}
+
+
+.appointment-card h3 {
+  margin: 0 0 10px;
+  color: #333; /* Darker color for the patient's name */
+  font-size: 1.2em;
+}
+
+.appointment-card p {
+  margin: 5px 0;
+  color: #555;
+  font-size: 25px;
+  line-height: 30px;
+}
+.appointment-card p span {
+  font-weight: 600;
+}
+.doc-app h2 {
+  padding: 15px 0px;
+}
