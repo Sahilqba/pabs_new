@@ -30,7 +30,7 @@ function page() {
   const router = useRouter();
 
   const [disease, setDisease] = useState("");
-  // const [department, setDepartment] = useState("");
+  const [department, setDepartment] = useState("");
   const [appointmentDate, setAppointmentDate] = useState("");
   const [appointmentTime, setAppointmentTime] = useState("");
   const [doctors, setDoctors] = useState([]);
@@ -313,6 +313,7 @@ function page() {
             doctor: selectedDoctor,
             appointmentDate,
             appointmentTime,
+            department
           }),
         }
       );
@@ -441,7 +442,7 @@ function page() {
                 required
               />
             </div>
-            {/* <div className="col-md-3">
+            <div className="col-md-3">
               <select
                 type="text"
                 className="form-control"
@@ -459,9 +460,9 @@ function page() {
                 <option value="Cardiology">Cardiology</option>
                 <option value="Others">Others</option>
               </select>
-            </div> */}
+            </div> 
         {/* Department Filter with Icon */}
-        <div className="col-md-4">
+        {/* <div className="col-md-4">
           <select
             className="form-control"
             value={selectedDepartment}
@@ -480,18 +481,7 @@ function page() {
           </option>
         ))}
           </select>
-          {/* Filter Icon
-          <i
-            className="bi bi-filter position-absolute"
-            style={{
-              left: "10px",
-              top: "50%",
-              transform: "translateY(-50%)",
-              fontSize: "1.2rem",
-              color: "#6c757d",
-            }}
-          ></i> */}
-        </div>
+        </div> */}
 
             <div className="col-md-4">
               <select
@@ -581,7 +571,7 @@ function page() {
               <tr>
                 <th>Disease Symptoms</th>
                 <th>Doctor</th>
-                {/* <th>Department</th> */}
+                <th>Department</th>
                 <th>Appointment Date</th>
                 <th>Appointment Time (IST)</th>
                 <th>Actions</th>
@@ -591,8 +581,8 @@ function page() {
               {appointments.map((appointment) => (
                 <tr key={appointment._id}>
                   <td>{appointment.disease}</td>
-                  <td>Dr. {appointment.doctor.toUpperCase()}</td>
-                  {/* <td>{appointment.department}</td> */}
+                  <td>{appointment.doctor}</td>
+                  <td>{appointment.department}</td>
                   <td>{formatDateTime(appointment.appointmentDate)}</td>
                   <td>{appointment.appointmentTime}</td>
                   <td className="action-symbol">
