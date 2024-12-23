@@ -120,7 +120,7 @@ app.get(
           role: req.cookies.userRoleGoogle,
         },
         secretKey,
-        { expiresIn: "1h" }
+        { expiresIn: "15m" }
       );
  
       // Set cookies

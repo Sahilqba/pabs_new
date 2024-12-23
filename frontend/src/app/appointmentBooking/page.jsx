@@ -22,7 +22,8 @@ function page() {
   const [modalAppointmentTime, setModalAppointmentTime] = useState("");
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [appointmentToDelete, setAppointmentToDelete] = useState(null);
-  const userIdfetched = localStorage.getItem("userId");
+  // const userIdfetched = localStorage.getItem("userId");
+  const userIdfetched = Cookies.get("userId");
   const [loading, setLoading] = useState(false);
   const jwtToken = localStorage.getItem("jwtToken");
   const jwtCookie = Cookies.get("jwtCookie");
@@ -39,6 +40,9 @@ function page() {
   const fetchAppointments = async (userIdfetched) => {
     setLoading(true);
     try {
+      // if (!jwtToken) {
+      //   throw new Error("No token found");
+      // }
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/appointments/${userIdfetched}`,
         {
@@ -81,6 +85,9 @@ function page() {
   //   });
   // };
   useEffect(() => {
+    // const userIdfetched = localStorage.getItem("userId");
+    const userIdfetched = Cookies.get("userId");
+    console.log("userIdfetched from cookies:", userIdfetched);
     if (userIdfetched) {
       fetchAppointments(userIdfetched);
     }
@@ -99,13 +106,13 @@ function page() {
   const handleDelete = async (appointmentId) => {
     const jwtToken = localStorage.getItem("jwtToken");
 
-    if (!jwtToken) {
-      toast.warning("Please log in again and try deleting.");
-      setTimeout(() => {
-        router.push(`/userlogin`);
-      }, 4000);
-      return;
-    }
+    // if (!jwtToken) {
+    //   toast.warning("Please log in again and try deleting.");
+    //   setTimeout(() => {
+    //     router.push(`/userlogin`);
+    //   }, 4000);
+    //   return;
+    // }
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/deleteAppointment/${appointmentId}`,
@@ -113,7 +120,8 @@ function page() {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${jwtToken}`,
+            // Authorization: `Bearer ${jwtToken}`,
+            Authorization: `Bearer ${jwtToken ? jwtToken : jwtCookie}`,
           },
         }
       );
@@ -168,13 +176,14 @@ function page() {
   };
 
   const handleEdit = async (appointmentDate) => {
-    const jwtToken = localStorage.getItem("jwtToken");
+    console.log("hiiiiiiiiiiii");
+    // const jwtToken = localStorage.getItem("jwtToken");
 
-    if (!jwtToken) {
-      toast.warning("Please log in again and try deleting.");
-      router.push(`/userlogin`);
-      return;
-    }
+    // if (!jwtToken) {
+    //   toast.warning("Please log in again and try deleting.");
+    //   router.push(`/userlogin`);
+    //   return;
+    // }
     // const appointmentDate = // get the new date value from your form or state
     if (!modalAppointmentDate || !modalAppointmentTime) {
       toast.error("Please select a valid appointment date & time.");
@@ -216,7 +225,7 @@ function page() {
           headers: {
             "Content-Type": "application/json",
             // Authorization: `Bearer ${jwtToken}`,
-            Authorization:`Bearer ${jwtToken ? jwtToken : jwtCookie}`
+            Authorization: `Bearer ${jwtToken ? jwtToken : jwtCookie}`,
           },
           body: JSON.stringify({
             appointmentDate: modalAppointmentDate,
