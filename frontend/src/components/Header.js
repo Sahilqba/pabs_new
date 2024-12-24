@@ -10,7 +10,7 @@ function Header({toggleSidebar}) {
   useEffect(() => {
     // Dynamically load Bootstrap's JS bundle
     import("bootstrap/dist/js/bootstrap.bundle.min").then(() => {
-      console.log("Bootstrap JS loaded successfully");
+      // console.log("Bootstrap JS loaded successfully");
     }).catch((err) => {
       console.error("Error loading Bootstrap JS:", err);
     });

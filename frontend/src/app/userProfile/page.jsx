@@ -9,7 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.css";
 import Cookies from "js-cookie";
 import Sidebar from "@/components/Sidebar";
- 
+
 function page() {
   useEffect(() => {
     require("bootstrap/dist/js/bootstrap.js");
@@ -77,11 +77,11 @@ function page() {
           },
         }
       );
- 
+
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
- 
+
       const data = await response.json();
       const sortedAppointments = data.sort((a, b) => {
         const dateA = new Date(`${a.appointmentDate}T${a.appointmentTime}`);
@@ -95,7 +95,7 @@ function page() {
       setLoading(false);
     }
   };
- 
+
   useEffect(() => {
     const userIdfetched = Cookies.get("userId");
     console.log("userIdfetched from cookies:", userIdfetched);
@@ -105,7 +105,6 @@ function page() {
   }, [userIdfetched]);
 
   const fetchDepartment = async (userIdfetched) => {
-
     // if (!userIdfetched || !jwtToken) return;
     console.log("Fetching department for user:", userIdfetched);
     console.log("JWT Token:", jwtToken);
@@ -123,11 +122,11 @@ function page() {
           },
         }
       );
- 
+
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
- 
+
       const data = await response.json();
       console.log("Department data:", data);
       setDepartment(data);
@@ -137,7 +136,7 @@ function page() {
       setLoading(false);
     }
   };
- 
+
   useEffect(() => {
     const userIdfetched = Cookies.get("userId");
     console.log("userIdfetched from cookies:", userIdfetched);
@@ -192,128 +191,127 @@ function page() {
     }
   };
 
-
   const viewAppointments = async () => {
     // router.push("/viewDoctorAppointments");
-       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/viewDoctorAppointments`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              doctor: userName
-            }),
-          }
-        );
-        let errorMessage;
-        if (response.ok) {
-          const data = await response.json();
-          // console.log("Login successful");
-          // console.log("Data:", data);
-          // toast.success("Login successful !");
-          // localStorage.setItem("jwtToken", data.token);
-          // localStorage.setItem("userId", data.user._id);
-          // localStorage.setItem("userName", data.user.name);
-          // localStorage.setItem("role", data.user.role);
-          // Cookies.set("jwtCookie", data.token, { expires: 1, path: "/" });
-          // Cookies.set("userIdinDb", data.user._id, { expires: 1, path: "/" });
-          // Cookies.set("userId", data.user._id, { expires: 1, path: "/" });
-          // setTimeout(() => {
-          //   router.push(`/viewDoctorAppointments`);
-          // }, 2000);
-        } else {
-          const contentType = response.headers.get("content-type");
-          if (contentType && contentType.includes("application/json")) {
-            const data = await response.json();
-            errorMessage = data.message || "Failed to login";
-          } else {
-            errorMessage = await response.text();
-          }
-          console.error("Login failed:", errorMessage);
-          // toast.error(errorMessage);
-          // Cookies.remove("emailFromLoginPage", { path: "/" });
-          // Cookies.remove("role", { path: "/" });
-          // Cookies.remove("passwordFromLoginPage", { path: "/" });
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/viewDoctorAppointments`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            doctor: userName,
+          }),
         }
-      } catch (error) {
-        console.error("Error during login:", error);
-        toast.error(error.message);
-      } finally {
-        setLoading(false); // Reset loading state
+      );
+      let errorMessage;
+      if (response.ok) {
+        const data = await response.json();
+        // console.log("Login successful");
+        // console.log("Data:", data);
+        // toast.success("Login successful !");
+        // localStorage.setItem("jwtToken", data.token);
+        // localStorage.setItem("userId", data.user._id);
+        // localStorage.setItem("userName", data.user.name);
+        // localStorage.setItem("role", data.user.role);
+        // Cookies.set("jwtCookie", data.token, { expires: 1, path: "/" });
+        // Cookies.set("userIdinDb", data.user._id, { expires: 1, path: "/" });
+        // Cookies.set("userId", data.user._id, { expires: 1, path: "/" });
+        // setTimeout(() => {
+        //   router.push(`/viewDoctorAppointments`);
+        // }, 2000);
+      } else {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const data = await response.json();
+          errorMessage = data.message || "Failed to login";
+        } else {
+          errorMessage = await response.text();
+        }
+        console.error("Login failed:", errorMessage);
+        // toast.error(errorMessage);
+        // Cookies.remove("emailFromLoginPage", { path: "/" });
+        // Cookies.remove("role", { path: "/" });
+        // Cookies.remove("passwordFromLoginPage", { path: "/" });
       }
-  }
+    } catch (error) {
+      console.error("Error during login:", error);
+      toast.error(error.message);
+    } finally {
+      setLoading(false); // Reset loading state
+    }
+  };
 
-    // const handleRoleSelection = async (role) => {
-    //   setUserRole(role);
-    //   setShowRoleModal(false);
-    //   // You can now use the selectedRole state to capture the input
-    //   console.log("Selected Role:", role);
-  
-    //   if (isGoogleLogin) {
-    //     Cookies.set("role", role, { expires: 1, path: "/" });
-    //     Cookies.set("userRoleGoogle", role, { expires: 1, path: "/" });
-    //     window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
-    //     return;
-    //   }
-  
-    //   Cookies.set("emailFromLoginPage", email, { expires: 1, path: "/" });
-    //   Cookies.set("passwordFromLoginPage", password, { expires: 1, path: "/" });
-    //   Cookies.set("role", role, { expires: 1, path: "/" });
-    //   try {
-    //     const response = await fetch(
-    //       `${process.env.NEXT_PUBLIC_API_URL}/userLogin`,
-    //       {
-    //         method: "POST",
-    //         headers: {
-    //           "Content-Type": "application/json",
-    //         },
-    //         body: JSON.stringify({
-    //           email: email,
-    //           password: password,
-    //           role: role,
-    //         }),
-    //       }
-    //     );
-    //     let errorMessage;
-    //     if (response.ok) {
-    //       const data = await response.json();
-    //       console.log("Login successful");
-    //       // console.log("Data:", data);
-    //       toast.success("Login successful !");
-    //       localStorage.setItem("jwtToken", data.token);
-    //       // localStorage.setItem("userId", data.user._id);
-    //       localStorage.setItem("userName", data.user.name);
-    //       localStorage.setItem("role", data.user.role);
-    //       Cookies.set("jwtCookie", data.token, { expires: 1, path: "/" });
-    //       Cookies.set("userIdinDb", data.user._id, { expires: 1, path: "/" });
-    //       Cookies.set("userId", data.user._id, { expires: 1, path: "/" });
-    //       setTimeout(() => {
-    //         router.push(`/userProfile`);
-    //       }, 2000);
-    //     } else {
-    //       const contentType = response.headers.get("content-type");
-    //       if (contentType && contentType.includes("application/json")) {
-    //         const data = await response.json();
-    //         errorMessage = data.message || "Failed to login";
-    //       } else {
-    //         errorMessage = await response.text();
-    //       }
-    //       console.error("Login failed:", errorMessage);
-    //       toast.error(errorMessage);
-    //       Cookies.remove("emailFromLoginPage", { path: "/" });
-    //       Cookies.remove("role", { path: "/" });
-    //       Cookies.remove("passwordFromLoginPage", { path: "/" });
-    //     }
-    //   } catch (error) {
-    //     console.error("Error during login:", error);
-    //     toast.error(error.message);
-    //   } finally {
-    //     setLoading(false); // Reset loading state
-    //   }
-    // };
+  // const handleRoleSelection = async (role) => {
+  //   setUserRole(role);
+  //   setShowRoleModal(false);
+  //   // You can now use the selectedRole state to capture the input
+  //   console.log("Selected Role:", role);
+
+  //   if (isGoogleLogin) {
+  //     Cookies.set("role", role, { expires: 1, path: "/" });
+  //     Cookies.set("userRoleGoogle", role, { expires: 1, path: "/" });
+  //     window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
+  //     return;
+  //   }
+
+  //   Cookies.set("emailFromLoginPage", email, { expires: 1, path: "/" });
+  //   Cookies.set("passwordFromLoginPage", password, { expires: 1, path: "/" });
+  //   Cookies.set("role", role, { expires: 1, path: "/" });
+  //   try {
+  //     const response = await fetch(
+  //       `${process.env.NEXT_PUBLIC_API_URL}/userLogin`,
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({
+  //           email: email,
+  //           password: password,
+  //           role: role,
+  //         }),
+  //       }
+  //     );
+  //     let errorMessage;
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       console.log("Login successful");
+  //       // console.log("Data:", data);
+  //       toast.success("Login successful !");
+  //       localStorage.setItem("jwtToken", data.token);
+  //       // localStorage.setItem("userId", data.user._id);
+  //       localStorage.setItem("userName", data.user.name);
+  //       localStorage.setItem("role", data.user.role);
+  //       Cookies.set("jwtCookie", data.token, { expires: 1, path: "/" });
+  //       Cookies.set("userIdinDb", data.user._id, { expires: 1, path: "/" });
+  //       Cookies.set("userId", data.user._id, { expires: 1, path: "/" });
+  //       setTimeout(() => {
+  //         router.push(`/userProfile`);
+  //       }, 2000);
+  //     } else {
+  //       const contentType = response.headers.get("content-type");
+  //       if (contentType && contentType.includes("application/json")) {
+  //         const data = await response.json();
+  //         errorMessage = data.message || "Failed to login";
+  //       } else {
+  //         errorMessage = await response.text();
+  //       }
+  //       console.error("Login failed:", errorMessage);
+  //       toast.error(errorMessage);
+  //       Cookies.remove("emailFromLoginPage", { path: "/" });
+  //       Cookies.remove("role", { path: "/" });
+  //       Cookies.remove("passwordFromLoginPage", { path: "/" });
+  //     }
+  //   } catch (error) {
+  //     console.error("Error during login:", error);
+  //     toast.error(error.message);
+  //   } finally {
+  //     setLoading(false); // Reset loading state
+  //   }
+  // };
 
   const formatDateTime = (isoString) => {
     if (!isoString) return "";
@@ -321,7 +319,7 @@ function page() {
     const day = String(dateObj.getDate()).padStart(2, "0");
     const month = String(dateObj.getMonth() + 1).padStart(2, "0");
     const year = dateObj.getFullYear();
- 
+
     return `${day}-${month}-${year}`;
   };
   if (!role || !userName) {
@@ -334,42 +332,42 @@ function page() {
     // console.log("Rendering doctor block");
     return (
       <>
-      <Header toggleSidebar={toggleSidebar}/>
-      <div className="doc-panel">
-      <Sidebar isOpen={isSidebarOpen} role={normalizedRole}/>
-      <main className={`main-container ${isSidebarOpen ? "show" : ""}`}>
-        <div className="prof-hdng">
-          <h3>Hi Dr. {userName.toUpperCase()}, Welcome.</h3>
-        </div>
-        <form className="doc-form">
-          {/* <div className="row">
+        <Header toggleSidebar={toggleSidebar} />
+        <div className="doc-panel">
+          <Sidebar isOpen={isSidebarOpen} role={normalizedRole} />
+          <main className={`main-container ${isSidebarOpen ? "show" : ""}`}>
+            <div className="prof-hdng">
+              <h3>Hi Dr. {userName.toUpperCase()}, Welcome.</h3>
+            </div>
+            <form className="doc-form">
+              {/* <div className="row">
           <div className="mb-3 col-md-6"> */}
-           <div className="doc-dept"> 
-            <select
-              type="text"
-              className="form-select dept-sel"
-              value={department}
-              onChange={(e) => setDepartment(e.target.value)}
-              required
-            >
-              <option value="">Select your Department</option>
-              <option value="GeneralPhysician">General Physician</option>
-              <option value="Orthopedic">Orthopedic</option>
-              <option value="Neurology">Neurology</option>
-              <option value="Cardiology">Cardiology</option>
-              <option value="Others">Others</option>
-            </select>
-            <button
-            className="btn btn-primary dept-btn"
-            type="button"
-            onClick={handleSubmit}
-          >
-            Submit
-          </button>
-          {/* </div>
+              <div className="doc-dept">
+                <select
+                  type="text"
+                  className="form-select dept-sel"
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                  required
+                >
+                  <option value="">Select your Department</option>
+                  <option value="GeneralPhysician">General Physician</option>
+                  <option value="Orthopedic">Orthopedic</option>
+                  <option value="Neurology">Neurology</option>
+                  <option value="Cardiology">Cardiology</option>
+                  <option value="Others">Others</option>
+                </select>
+                <button
+                  className="btn btn-primary dept-btn"
+                  type="button"
+                  onClick={handleSubmit}
+                >
+                  Submit
+                </button>
+                {/* </div>
           </div> */}
-          </div>
-          {/* <button
+              </div>
+              {/* <button
             className="btn btn-primary"
             type="button"
             onClick={handleSubmit}
@@ -377,18 +375,17 @@ function page() {
             Submit
           </button> */}
 
-<div className="mb-3">
+              {/* <div className="mb-3">
   <label for="formFileSm" class="form-label">Small file input example</label>
   <input className="form-control form-control-sm" id="formFileSm" type="file" accept="image/*"/>
-</div>
-
-        </form>
-        {/* <button onClick = {viewAppointments}>Click here to view your appointments</button> */}
-      </main>
-      </div>
-      <Footer />
-      <ToastContainer />
-    </>
+</div> */}
+            </form>
+            {/* <button onClick = {viewAppointments}>Click here to view your appointments</button> */}
+          </main>
+        </div>
+        <Footer />
+        <ToastContainer />
+      </>
     );
   }
 
@@ -396,87 +393,87 @@ function page() {
     // console.log("Rendering patient block");
     return (
       <>
-        <Header toggleSidebar={toggleSidebar}/>
+        <Header toggleSidebar={toggleSidebar} />
         <div className="patient-pnl">
-        <Sidebar isOpen={isSidebarOpen} role={normalizedRole}/>
-        <main className={`main-container ${isSidebarOpen ? "show" : ""}`}>
-          <div className="prof-hdng">
-            <h3>
-              Welcome {userName.toUpperCase()}. You can view your
-              appointments here.
-            </h3>
-          </div>
-          <div className="appnt-btn">
-            <button
-              className="btn btn-primary"
-              onClick={() => {
-                router.push(`/appointmentBooking`);
-              }}
-            >
-              Book an Appointment
-            </button>
-          </div>
-          {loading ? (
-            <div className="spinner-border" role="status">
-              <span className="sr-only"></span>
+          <Sidebar isOpen={isSidebarOpen} role={normalizedRole} />
+          <main className={`main-container ${isSidebarOpen ? "show" : ""}`}>
+            <div className="prof-hdng">
+              <h3>
+                Welcome {userName.toUpperCase()}. You can view your appointments
+                here.
+              </h3>
             </div>
-          ) : appointments.length === 0 ? (
-            <div className="no-booking">
-              <p>No booking history available.</p>
+            <div className="appnt-btn">
+              <button
+                className="btn btn-primary"
+                onClick={() => {
+                  router.push(`/appointmentBooking`);
+                }}
+              >
+                Book an Appointment
+              </button>
             </div>
-          ) : (
-            <div className="accordion" id="accordionExample">
-              <div className="accordion-item">
-                <h2 className="accordion-header">
-                  <button
-                    className="accordion-button"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#collapseOne"
-                    aria-expanded="true"
-                    aria-controls="collapseOne"
+            {loading ? (
+              <div className="spinner-border" role="status">
+                <span className="sr-only"></span>
+              </div>
+            ) : appointments.length === 0 ? (
+              <div className="no-booking">
+                <p>No booking history available.</p>
+              </div>
+            ) : (
+              <div className="accordion" id="accordionExample">
+                <div className="accordion-item">
+                  <h2 className="accordion-header">
+                    <button
+                      className="accordion-button"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#collapseOne"
+                      aria-expanded="true"
+                      aria-controls="collapseOne"
+                    >
+                      Appointment History
+                    </button>
+                  </h2>
+                  <div
+                    id="collapseOne"
+                    className="accordion-collapse collapse show"
+                    data-bs-parent="#accordionExample"
                   >
-                    Appointment History
-                  </button>
-                </h2>
-                <div
-                  id="collapseOne"
-                  className="accordion-collapse collapse show"
-                  data-bs-parent="#accordionExample"
-                >
-                  <div className="accordion-body">
-                    {appointments.length > 0 ? (
-                      <table className="appointments-table app-hist">
-                        <thead>
-                          <tr>
-                            <th>Disease Symptoms</th>
-                            <th>Doctor</th>
-                            <th>Appointment Date</th>
-                            <th>Appointment Time(IST)</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {appointments.map((appointment) => (
-                            <tr key={appointment._id}>
-                              <td>{appointment.disease}</td>
-                              <td>Dr. {appointment.doctor.toUpperCase()}</td>
-                              <td>
-                                {formatDateTime(appointment.appointmentDate)}
-                              </td>
-                              <td>{appointment.appointmentTime}</td>
+                    <div className="accordion-body">
+                      {appointments.length > 0 ? (
+                        <table className="appointments-table app-hist">
+                          <thead>
+                            <tr>
+                              <th>Disease Symptoms</th>
+                              <th>Doctor</th>
+                              <th>Appointment Date</th>
+                              <th>Appointment Time(IST)</th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    ) : (
-                      "No appointments booked yet"
-                    )}
+                          </thead>
+                          <tbody>
+                            {appointments.map((appointment) => (
+                              <tr key={appointment._id}>
+                                <td>{appointment.disease}</td>
+                                <td>Dr. {appointment.doctor.toUpperCase()}</td>
+                                <td>
+                                  {formatDateTime(appointment.appointmentDate)}
+                                </td>
+                                <td>{appointment.appointmentTime}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      ) : (
+                        "No appointments booked yet"
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
-        </main>
+            )}
+          </main>
         </div>
         <Footer />
       </>

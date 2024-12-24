@@ -27,7 +27,7 @@ const Sidebar = ({ isOpen, role }) => {
             {role === "doctor" && (
           <>
             <li className="nav-item">
-              <Link href="#" className="nav-link sd-link">
+              <Link href="/docAppointment" className="nav-link sd-link">
                 Appointments
               </Link>
             </li>

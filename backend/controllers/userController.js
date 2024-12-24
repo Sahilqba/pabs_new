@@ -288,4 +288,30 @@ exports.getDoctorDepartmentByUserId = async (req, res) => {
   }
 };
 
+// exports.getUserbyId = async (req, res) => {
+//   try {
+//     const userId = req.params.userId;
+//     const users = await User.findById(userId);
+//     if (!users) {
+//       return res.status(404).send("No users found for this user");
+//     }
+//     res.status(200).json(users);
+//   } catch (error) {
+//     res.status(400).send(error);
+//   }
+// };
+
+exports.getUserbyId = async (req, res) => {
+  try {
+    const userIds = req.query.userIds.split(',');
+    const users = await User.find({ _id: { $in: userIds } });
+    if (!users.length) {
+      return res.status(404).send("No users found for the provided IDs");
+    }
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};
+
 //

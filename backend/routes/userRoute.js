@@ -26,4 +26,8 @@ router.post("/viewDoctorAppointments", userController.doctorAppointments);
 
 router.get('/doctorDepartment/:userId', userController.getDoctorDepartmentByUserId);
 
+// router.get('/user/:userId', userController.getUserbyId);
+
+router.get('/user', userController.getUserbyId);
+
 module.exports = router;

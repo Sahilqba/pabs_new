@@ -36,7 +36,7 @@ function page() {
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState("");
   const [filteredDoctors, setFilteredDoctors] = useState([]);
-  const [selectedDepartment, setSelectedDepartment] = useState("");
+  // const [selectedDepartment, setSelectedDepartment] = useState("");
   const fetchAppointments = async (userIdfetched) => {
     setLoading(true);
     try {
@@ -176,7 +176,6 @@ function page() {
   };
 
   const handleEdit = async (appointmentDate) => {
-    console.log("hiiiiiiiiiiii");
     // const jwtToken = localStorage.getItem("jwtToken");
 
     // if (!jwtToken) {
@@ -325,7 +324,7 @@ function page() {
           appointment,
         ]);
         setDisease("");
-        // setDepartment("");
+        setDepartment("");
         // setDoctors("");
         setSelectedDoctor("");
         setAppointmentDate("");
@@ -400,7 +399,7 @@ function page() {
   };
  
   const handleDepartmentChange = (department) => {
-    setSelectedDepartment(department);
+    setDepartment(department);
     if (department === ""){
       setFilteredDoctors(doctors.filter((doc) => doc.department));
     } else {
@@ -442,23 +441,29 @@ function page() {
                 required
               />
             </div>
-            <div className="col-md-3">
+            <div className="col-md-4">
               <select
                 type="text"
                 className="form-control"
                 placeholder="Enter your department"
                 value={department}
                 onChange={(e) => {
-                  setDepartment(e.target.value);
+                  handleDepartmentChange(e.target.value);
                 }}
                 required
               >
-                <option value="">Select Department</option>
-                <option value="GeneralPhysician">General Physician</option>
-                <option value="Orthopedic">Orthopedic</option>
-                <option value="Neurology">Neurology</option>
-                <option value="Cardiology">Cardiology</option>
-                <option value="Others">Others</option>
+              <option value="">Select Department</option>
+            {Array.from(
+          new Set(
+            doctors
+              .filter((doc) => doc.department) // Ensure only valid departments are listed
+              .map((doc) => doc.department)
+          )
+        ).map((department) => (
+          <option key={department} value={department}>
+            {department}
+          </option>
+        ))}
               </select>
             </div> 
         {/* Department Filter with Icon */}
