@@ -1,4 +1,17 @@
 // const User = require("../models/user");
+const multer = require('multer');
+const path = require('path');
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    // cb(null, `${Date.now()}-${file.originalname}`);
+    cb(null, file.originalname); // Use the original filename
+    // cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+const upload = multer({ storage: storage });
 const bcrypt = require("bcrypt");
 const { User, Appointment, LoginUser } = require("../models/user");
 const jwt = require("jsonwebtoken");
@@ -215,42 +228,87 @@ exports.getUsers = async (req, res) => {
   }
 };
 
-exports.updateDepartment = async (req, res) => {
-  const { department } = req.body;
+// exports.updateDepartment = async (req, res) => {
+//   const { department, image } = req.body;
 
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
-    return res.status(401).send("Unauthorized");
-  }
+//   const authHeader = req.headers.authorization;
+//   if (!authHeader) {
+//     return res.status(401).send("Unauthorized");
+//   }
 
-  const token = authHeader.split(" ")[1];
-  if (!token) {
-    return res.status(401).send("Unauthorized");
-  }
+//   const token = authHeader.split(" ")[1];
+//   if (!token) {
+//     return res.status(401).send("Unauthorized");
+//   }
 
-  try {
-    const decoded = jwt.verify(token, secretKey);
-    const { id } = req.params;
-    const result = await User.findByIdAndUpdate(
-      id,
-      { department: department },
-      { new: true }
-    );
-    if (result) {
-      res.status(200).json({
-        message: "Department updated successfully",
-        user: result,
-      });
-    } else {
-      res.status(404).json({ message: "User not found" });
+//   try {
+//     const decoded = jwt.verify(token, secretKey);
+//     const { id } = req.params;
+//     const updateData = { department };
+//     if (image) {
+//       updateData.image = image; // Add image to update data if provided
+//     }
+//     const result = await User.findByIdAndUpdate(
+//       id, updateData, { new: true });
+//     if (result) {
+//       res.status(200).json({
+//         message: "Department and image updated successfully",
+//         user: result,
+//       });
+//     } else {
+//       res.status(404).json({ message: "User not found" });
+//     }
+//   } catch (err) {
+//     if (err.name === "TokenExpiredError") {
+//       return res.status(401).send("Token has expired");
+//     }
+//     res.status(400).send(err);
+//   }
+// };
+
+exports.updateDepartment = [
+  upload.single('image'), // Middleware to handle file upload
+  async (req, res) => {
+    const { department } = req.body;
+    const image = req.file; // Access the uploaded file
+
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).send("Unauthorized");
     }
-  } catch (err) {
-    if (err.name === "TokenExpiredError") {
-      return res.status(401).send("Token has expired");
+
+    const token = authHeader.split(" ")[1];
+    if (!token) {
+      return res.status(401).send("Unauthorized");
     }
-    res.status(400).send(err);
+
+    try {
+      const decoded = jwt.verify(token, secretKey);
+      const { id } = req.params;
+      const updateData = { department };
+      if (image) {
+        // updateData.image = image.path; // Save the file path or handle the file as needed
+        updateData.filename = image.filename; // Save the original file name
+        updateData.path = image.path; // Save the original file name
+        updateData.createdAt = image.createdAt; // Save the original file name
+      }
+      const result = await User.findByIdAndUpdate(id, updateData, { new: true });
+      if (result) {
+        res.status(200).json({
+          message: "Department and image updated successfully",
+          user: result,
+        });
+      } else {
+        res.status(404).json({ message: "User not found" });
+      }
+    } catch (err) {
+      if (err.name === "TokenExpiredError") {
+        return res.status(401).send("Token has expired");
+      }
+      res.status(400).send(err);
+    }
   }
-};
+];
 
 exports.doctorAppointments = async (req, res) => {
   const { doctor} = req.body;
@@ -282,7 +340,7 @@ exports.getDoctorDepartmentByUserId = async (req, res) => {
   if (!user.department) {
     return res.status(400).json({ message: 'No department selected' });
 }
-    res.status(200).json(user.department);
+    res.status(200).json(user);
   } catch (error) {
     res.status(400).send(error);
   }

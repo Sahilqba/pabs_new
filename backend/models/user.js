@@ -6,7 +6,19 @@ const userSchema = new mongoose.Schema({
   name: String,
   password: String,
   role: { type: String, enum: ["Doctor", "Patient"]},
-  department: String
+  department: String,
+  filename: {
+    type: String,
+    // required: true,
+  },
+  path: {
+    type: String,
+    // required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 const appointmentSchema = new mongoose.Schema({
