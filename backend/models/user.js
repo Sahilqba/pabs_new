@@ -44,7 +44,9 @@ const doctorAppointmentSchema = new mongoose.Schema({
 const User = mongoose.model("User", userSchema);
 const Appointment = mongoose.model("Appointment", appointmentSchema);
 const LoginUser = mongoose.model("LoginUser", userLoginSchema, "users");
-const DoctorAppointment = mongoose.model("DoctorAppointment", doctorAppointmentSchema);
+// const DoctorAppointment = mongoose.model("DoctorAppointment", doctorAppointmentSchema);
 
 
-module.exports = {User, LoginUser, Appointment, DoctorAppointment};
+module.exports = {User, LoginUser, Appointment, 
+  // DoctorAppointment
+};

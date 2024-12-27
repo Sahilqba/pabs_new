@@ -439,7 +439,7 @@ function page() {
                   onChange={(e) => setImage(e.target.files[0])} // Add this line
                 />
                 {imageName && <p>Current Image: {imageName}</p>}{" "}
-                <img src={`http://localhost:8080/${imagePath}`} alt={imageName} />
+                <img src={`${process.env.NEXT_PUBLIC_API_URL}/${imagePath}`} alt={imageName} />
                 {/* Add this line */}
               </div>
             </form>
