@@ -15,6 +15,9 @@ function page() {
     require("bootstrap/dist/js/bootstrap.js");
   });
   const router = useRouter();
+  const [image, setImage] = useState(null); // Add this line
+  const [imageName, setImageName] = useState(""); // Add this line
+  const [imagePath, setImagePath] = useState(""); // Add this line
   const [appointments, setAppointments] = useState([]);
   // const userName = localStorage.getItem("userName");
   // const role = localStorage.getItem("role");
@@ -45,8 +48,8 @@ function page() {
 
     // console.log("Name from google:", nameFromGoogle);
     // console.log("userName from google:", userName);
-    console.log("Role from google:", storedRole || userRoleGoogle);
-    console.log("userRolegoogle from google:", userRoleGoogle);
+    // console.log("Role from google:", storedRole || userRoleGoogle);
+    // console.log("userRolegoogle from google:", userRoleGoogle);
     // console.log("use id in db:", userIdinDb);
   }, []);
 
@@ -61,9 +64,9 @@ function page() {
     // const jwtToken = localStorage.getItem("jwtToken");
 
     // if (!userIdfetched || !jwtToken) return;
-    console.log("Fetching appointments for user:", userIdfetched);
-    console.log("JWT Token:", jwtToken);
-    console.log("JWT Cookie:", jwtCookie);
+    // console.log("Fetching appointments for user:", userIdfetched);
+    // console.log("JWT Token:", jwtToken);
+    // console.log("JWT Cookie:", jwtCookie);
     setLoading(true);
     try {
       const response = await fetch(
@@ -98,7 +101,7 @@ function page() {
 
   useEffect(() => {
     const userIdfetched = Cookies.get("userId");
-    console.log("userIdfetched from cookies:", userIdfetched);
+    // console.log("userIdfetched from cookies:", userIdfetched);
     if (userIdfetched) {
       fetchAppointments(userIdfetched);
     }
@@ -106,9 +109,9 @@ function page() {
 
   const fetchDepartment = async (userIdfetched) => {
     // if (!userIdfetched || !jwtToken) return;
-    console.log("Fetching department for user:", userIdfetched);
-    console.log("JWT Token:", jwtToken);
-    console.log("JWT Cookie:", jwtCookie);
+    // console.log("Fetching department for user:", userIdfetched);
+    // console.log("JWT Token:", jwtToken);
+    // console.log("JWT Cookie:", jwtCookie);
     setLoading(true);
     try {
       const response = await fetch(
@@ -128,8 +131,10 @@ function page() {
       }
 
       const data = await response.json();
-      console.log("Department data:", data);
-      setDepartment(data);
+      // console.log("Department data:", data);
+      setDepartment(data.department);
+      setImageName(data.filename);
+      setImagePath(data.path);
     } catch (error) {
       console.error("Failed to fetch department:", error);
     } finally {
@@ -139,55 +144,102 @@ function page() {
 
   useEffect(() => {
     const userIdfetched = Cookies.get("userId");
-    console.log("userIdfetched from cookies:", userIdfetched);
+    // console.log("userIdfetched from cookies:", userIdfetched);
     if (userIdfetched) {
       fetchDepartment(userIdfetched);
     }
   }, [userIdfetched]);
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   console.log("Department selected:", department);
+  //   if (!department) {
+  //     toast.error("Please select your department.");
+  //     return;
+  //   }
+  //   try {
+  //     const response = await fetch(
+  //       `${process.env.NEXT_PUBLIC_API_URL}/updateDepartment/${userIdinDb}`,
+  //       {
+  //         method: "PATCH",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           // Authorization: `Bearer ${jwtToken}`,
+  //           Authorization: `Bearer ${jwtToken ? jwtToken : jwtCookie}`,
+  //         },
+  //         body: JSON.stringify({
+  //           department: department,
+  //         }),
+  //       }
+  //     );
+
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       toast.success("Department set successfully");
+  //     } else if (response.status === 401) {
+  //       toast.warning(
+  //         "Token has expired. Please log in again and try rescheduling."
+  //       );
+  //       // Cookies.remove("jwtCookie", { path: "/" });
+  //       // sessionStorage.clear();
+  //       // localStorage.clear();
+  //     } else if (response.status === 400) {
+  //       toast.warning("Appointment date is required.");
+  //     } else {
+  //       const errorData = await response.json();
+  //       console.error("Error updating appointment date", errorData);
+  //       // handle error (e.g., show error message)
+  //     }
+  //   } catch (error) {
+  //     console.error("Network error", error);
+  //     // handle network error
+  //   }
+  // };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Department selected:", department);
+    // console.log("Department selected:", department);
     if (!department) {
       toast.error("Please select your department.");
       return;
     }
+
+    const formData = new FormData();
+    formData.append("department", department);
+    if (image) {
+      formData.append("image", image);
+    }
+
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/updateDepartment/${userIdinDb}`,
         {
           method: "PATCH",
           headers: {
-            "Content-Type": "application/json",
-            // Authorization: `Bearer ${jwtToken}`,
+            // "Content-Type": "application/json", // Remove this line
             Authorization: `Bearer ${jwtToken ? jwtToken : jwtCookie}`,
           },
-          body: JSON.stringify({
-            department: department,
-          }),
+          body: formData,
         }
       );
 
       if (response.ok) {
         const data = await response.json();
-        toast.success("Department set successfully");
+        toast.success("Department and image set successfully");
+        setImageName(data.image);
+      fetchDepartment(userIdfetched);
       } else if (response.status === 401) {
         toast.warning(
           "Token has expired. Please log in again and try rescheduling."
         );
-        // Cookies.remove("jwtCookie", { path: "/" });
-        // sessionStorage.clear();
-        // localStorage.clear();
       } else if (response.status === 400) {
         toast.warning("Appointment date is required.");
       } else {
         const errorData = await response.json();
         console.error("Error updating appointment date", errorData);
-        // handle error (e.g., show error message)
       }
     } catch (error) {
       console.error("Network error", error);
-      // handle network error
     }
   };
 
@@ -375,12 +427,22 @@ function page() {
             Submit
           </button> */}
 
-              {/* <div className="mb-3">
-  <label for="formFileSm" class="form-label">Small file input example</label>
-  <input className="form-control form-control-sm" id="formFileSm" type="file" accept="image/*"/>
-</div> */}
+              <div className="mb-3">
+                <label className="form-label">
+                  Upload your profile picture
+                </label>
+                <input
+                  className="form-control form-control-sm"
+                  id="formFileSm"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setImage(e.target.files[0])} // Add this line
+                />
+                {imageName && <p>Current Image: {imageName}</p>}{" "}
+                <img src={`http://localhost:8080/${imagePath}`} alt={imageName} />
+                {/* Add this line */}
+              </div>
             </form>
-            {/* <button onClick = {viewAppointments}>Click here to view your appointments</button> */}
           </main>
         </div>
         <Footer />

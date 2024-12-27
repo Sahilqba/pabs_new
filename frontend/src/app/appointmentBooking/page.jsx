@@ -502,7 +502,7 @@ function page() {
                 <option value="">Select Doctor</option>
                 {Array.isArray(filteredDoctors) && filteredDoctors.map((doc) => (
                   <option key={doc._id} value={doc.name}>
-                   Dr. {doc.name.toUpperCase()} ({doc.department})
+                   Dr. {doc.name.toUpperCase()}, {doc.image} ({doc.department})
                   </option>
                 ))}
               </select>

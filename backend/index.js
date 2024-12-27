@@ -16,6 +16,7 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const path = require('path');
 const secretKey = process.env.SECRET_KEY;
 const { User} = require("./models/user");
  
@@ -27,9 +28,11 @@ const corsOptions = {
   origin: `${frontend_url}`, // Replace with your frontend URL
   credentials: true,
 };
- 
+
+// Serve static files from the "uploads" directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 app.use(cors(corsOptions));
- 
  
 // Body parser middleware
 app.use(express.json());
