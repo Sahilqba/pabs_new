@@ -9,38 +9,24 @@ const Sidebar = ({ isOpen, role }) => {
              Home Page
             </Link>
           </li>
-          {/* <li className="nav-item">
-            <Link href="#" className="nav-link sd-link">
-              Appointments
-            </Link>
-          </li>
-          <li className="nav-item">
-            <Link href="#" className="nav-link sd-link">
-              Patients
-            </Link>
-          </li>
-          <li className="nav-item">
-            <Link href="#" className="nav-link sd-link">
-              Reports
-            </Link>
-          </li> */}
             {role === "doctor" && (
           <>
             <li className="nav-item">
               <Link href="/docAppointment" className="nav-link sd-link">
-                Appointments
+              <i className="bi bi-capsule-pill"></i>
+                Upcoming Appointments
               </Link>
             </li>
-            <li className="nav-item">
-              <Link href="#" className="nav-link sd-link">
-                Patients
+             <li className="nav-item">
+              <Link href="/docPastApp" className="nav-link sd-link">
+                Past Appointments
               </Link>
             </li>
-            <li className="nav-item">
+           {/* <li className="nav-item">
               <Link href="#" className="nav-link sd-link">
                 Reports
               </Link>
-            </li>
+            </li> */}
           </>
         )}
         {role === "patient" && (

@@ -387,7 +387,7 @@ svg {
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   position: absolute;
   left: -250px;
-  top: 56px;
+  top: 57px;
   transition: 0.5s;
 }
 .sidebar.show {
@@ -466,9 +466,10 @@ button.btn.btn-primary.dept-btn {
 
 
 .appointment-card h3 {
-  margin: 0 0 10px;
-  color: #333; /* Darker color for the patient's name */
-  font-size: 1.2em;
+	margin: 0 0 10px;
+	color: #333;
+	font-size: 40px;
+	font-weight: 600;
 }
 
 .appointment-card p {
@@ -480,6 +481,28 @@ button.btn.btn-primary.dept-btn {
 .appointment-card p span {
   font-weight: 600;
 }
+.appointment-details {
+  padding: 10px 0;
+}
+
+.appointment-details:not(:last-child) {
+  border-bottom: 1px solid #ddd; 
+  /* margin-bottom: 10px; */
+}
+.appointment-details h4 {
+	/* color: #3f3f95; */
+	font-weight: 600;
+}
 .doc-app h2 {
   padding: 15px 0px;
+}
+
+i.bi.bi-power {
+  padding-right: 14px;
+  color: white;
+  font-size: 21px;
+}
+
+i.bi.bi-power:hover {
+  color: #bcb7b7;
 }
