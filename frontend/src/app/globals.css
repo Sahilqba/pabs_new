@@ -506,3 +506,19 @@ i.bi.bi-power {
 i.bi.bi-power:hover {
   color: #bcb7b7;
 }
+
+
+/* Image upload section */
+.mb-3 {
+  margin-bottom: 20px;
+}
+
+.mb-3 img {
+  max-width: 100px;
+  max-height: 100px;
+  margin-top: 10px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+}
+
+

@@ -132,6 +132,16 @@ const docApp = () => {
   //   viewUserData();
   //   // }
   // }, []);
+  const groupAppointmentsByUser = (appointments) => {
+    return appointments.reduce((acc, appointment) => {
+      const userId = appointment.userId;
+      if (!acc[userId]) {
+        acc[userId] = [];
+      }
+      acc[userId].push(appointment);
+      return acc;
+    }, {});
+  };
   const formatDateTime = (isoString) => {
     if (!isoString) return "";
     const dateObj = new Date(isoString);
@@ -153,7 +163,7 @@ const docApp = () => {
             {!loading && appointments?.length === 0 && (
               <p>No appointments found.</p>
             )}
-            {!loading &&
+            {/* {!loading &&
               appointments?.map((appointment) => (
                 <div key={appointment._id} className="appointment-card">
                   <h3>{userData[appointment.userId]?.name || "Unknown"}</h3>
@@ -162,12 +172,34 @@ const docApp = () => {
                     <span>Appointment Date & Time:</span>{" "}
                     {formatDateTime(appointment.appointmentDate)}, {appointment.appointmentTime}
                   </p>
-                  {/* <p><span>Appointment Time:</span> {appointment.appointmentTime}</p> */}
                   <p>
                     <span>Disease Symptoms:</span> {appointment.disease}
                   </p>
                 </div>
-              ))}
+              ))} */}
+               {!loading &&
+            Object.entries(groupAppointmentsByUser(appointments)).map(
+              ([userId, userAppointments]) => (
+                <div key={userId} className="appointment-card">
+                  <h3>{userData[userId]?.name || "Unknown"}</h3>
+                  {userAppointments.map((appointment, index) => (
+                    <div key={appointment._id} className="appointment-details">
+                      {userAppointments.length > 1 && (
+                        <h4>Appointment {index + 1}:</h4>
+                      )}
+                      <p>
+                        <span>Appointment Date & Time:</span>{" "}
+                        {formatDateTime(appointment.appointmentDate)},{" "}
+                        {appointment.appointmentTime}
+                      </p>
+                      <p>
+                        <span>Disease Symptoms:</span> {appointment.disease}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )
+            )}
           </div>
         </main>
       </div>

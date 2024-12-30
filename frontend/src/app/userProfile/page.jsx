@@ -38,19 +38,12 @@ function page() {
   };
 
   useEffect(() => {
-    // Initialize user data from localStorage
     const storedRole = localStorage.getItem("role");
     const storedUserName = localStorage.getItem("userName");
     const nameFromGoogle = Cookies.get("nameFromGoogle");
     const userRoleGoogle = Cookies.get("userRoleGoogle");
     setRole(storedRole || userRoleGoogle);
     setUserName(storedUserName || nameFromGoogle);
-
-    // console.log("Name from google:", nameFromGoogle);
-    // console.log("userName from google:", userName);
-    // console.log("Role from google:", storedRole || userRoleGoogle);
-    // console.log("userRolegoogle from google:", userRoleGoogle);
-    // console.log("use id in db:", userIdinDb);
   }, []);
 
   useEffect(() => {
@@ -60,13 +53,6 @@ function page() {
   }, [role]);
 
   const fetchAppointments = async (userIdfetched) => {
-    // const userIdFetched = localStorage.getItem("userId");
-    // const jwtToken = localStorage.getItem("jwtToken");
-
-    // if (!userIdfetched || !jwtToken) return;
-    // console.log("Fetching appointments for user:", userIdfetched);
-    // console.log("JWT Token:", jwtToken);
-    // console.log("JWT Cookie:", jwtCookie);
     setLoading(true);
     try {
       const response = await fetch(
@@ -101,17 +87,12 @@ function page() {
 
   useEffect(() => {
     const userIdfetched = Cookies.get("userId");
-    // console.log("userIdfetched from cookies:", userIdfetched);
     if (userIdfetched) {
       fetchAppointments(userIdfetched);
     }
   }, [userIdfetched]);
 
   const fetchDepartment = async (userIdfetched) => {
-    // if (!userIdfetched || !jwtToken) return;
-    // console.log("Fetching department for user:", userIdfetched);
-    // console.log("JWT Token:", jwtToken);
-    // console.log("JWT Cookie:", jwtCookie);
     setLoading(true);
     try {
       const response = await fetch(
@@ -144,71 +125,25 @@ function page() {
 
   useEffect(() => {
     const userIdfetched = Cookies.get("userId");
-    // console.log("userIdfetched from cookies:", userIdfetched);
     if (userIdfetched) {
       fetchDepartment(userIdfetched);
     }
   }, [userIdfetched]);
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   console.log("Department selected:", department);
-  //   if (!department) {
-  //     toast.error("Please select your department.");
-  //     return;
-  //   }
-  //   try {
-  //     const response = await fetch(
-  //       `${process.env.NEXT_PUBLIC_API_URL}/updateDepartment/${userIdinDb}`,
-  //       {
-  //         method: "PATCH",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           // Authorization: `Bearer ${jwtToken}`,
-  //           Authorization: `Bearer ${jwtToken ? jwtToken : jwtCookie}`,
-  //         },
-  //         body: JSON.stringify({
-  //           department: department,
-  //         }),
-  //       }
-  //     );
 
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       toast.success("Department set successfully");
-  //     } else if (response.status === 401) {
-  //       toast.warning(
-  //         "Token has expired. Please log in again and try rescheduling."
-  //       );
-  //       // Cookies.remove("jwtCookie", { path: "/" });
-  //       // sessionStorage.clear();
-  //       // localStorage.clear();
-  //     } else if (response.status === 400) {
-  //       toast.warning("Appointment date is required.");
-  //     } else {
-  //       const errorData = await response.json();
-  //       console.error("Error updating appointment date", errorData);
-  //       // handle error (e.g., show error message)
-  //     }
-  //   } catch (error) {
-  //     console.error("Network error", error);
-  //     // handle network error
-  //   }
-  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // console.log("Department selected:", department);
     if (!department) {
       toast.error("Please select your department.");
       return;
     }
 
-    const formData = new FormData();
-    formData.append("department", department);
-    if (image) {
-      formData.append("image", image);
-    }
+    // const formData = new FormData();
+    // formData.append("department", department);
+    // if (image) {
+    //   formData.append("image", image);
+    // }
 
     try {
       const response = await fetch(
@@ -243,127 +178,8 @@ function page() {
     }
   };
 
-  const viewAppointments = async () => {
-    // router.push("/viewDoctorAppointments");
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/viewDoctorAppointments`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            doctor: userName,
-          }),
-        }
-      );
-      let errorMessage;
-      if (response.ok) {
-        const data = await response.json();
-        // console.log("Login successful");
-        // console.log("Data:", data);
-        // toast.success("Login successful !");
-        // localStorage.setItem("jwtToken", data.token);
-        // localStorage.setItem("userId", data.user._id);
-        // localStorage.setItem("userName", data.user.name);
-        // localStorage.setItem("role", data.user.role);
-        // Cookies.set("jwtCookie", data.token, { expires: 1, path: "/" });
-        // Cookies.set("userIdinDb", data.user._id, { expires: 1, path: "/" });
-        // Cookies.set("userId", data.user._id, { expires: 1, path: "/" });
-        // setTimeout(() => {
-        //   router.push(`/viewDoctorAppointments`);
-        // }, 2000);
-      } else {
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-          const data = await response.json();
-          errorMessage = data.message || "Failed to login";
-        } else {
-          errorMessage = await response.text();
-        }
-        console.error("Login failed:", errorMessage);
-        // toast.error(errorMessage);
-        // Cookies.remove("emailFromLoginPage", { path: "/" });
-        // Cookies.remove("role", { path: "/" });
-        // Cookies.remove("passwordFromLoginPage", { path: "/" });
-      }
-    } catch (error) {
-      console.error("Error during login:", error);
-      toast.error(error.message);
-    } finally {
-      setLoading(false); // Reset loading state
-    }
-  };
-
-  // const handleRoleSelection = async (role) => {
-  //   setUserRole(role);
-  //   setShowRoleModal(false);
-  //   // You can now use the selectedRole state to capture the input
-  //   console.log("Selected Role:", role);
-
-  //   if (isGoogleLogin) {
-  //     Cookies.set("role", role, { expires: 1, path: "/" });
-  //     Cookies.set("userRoleGoogle", role, { expires: 1, path: "/" });
-  //     window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
-  //     return;
-  //   }
-
-  //   Cookies.set("emailFromLoginPage", email, { expires: 1, path: "/" });
-  //   Cookies.set("passwordFromLoginPage", password, { expires: 1, path: "/" });
-  //   Cookies.set("role", role, { expires: 1, path: "/" });
-  //   try {
-  //     const response = await fetch(
-  //       `${process.env.NEXT_PUBLIC_API_URL}/userLogin`,
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           email: email,
-  //           password: password,
-  //           role: role,
-  //         }),
-  //       }
-  //     );
-  //     let errorMessage;
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       console.log("Login successful");
-  //       // console.log("Data:", data);
-  //       toast.success("Login successful !");
-  //       localStorage.setItem("jwtToken", data.token);
-  //       // localStorage.setItem("userId", data.user._id);
-  //       localStorage.setItem("userName", data.user.name);
-  //       localStorage.setItem("role", data.user.role);
-  //       Cookies.set("jwtCookie", data.token, { expires: 1, path: "/" });
-  //       Cookies.set("userIdinDb", data.user._id, { expires: 1, path: "/" });
-  //       Cookies.set("userId", data.user._id, { expires: 1, path: "/" });
-  //       setTimeout(() => {
-  //         router.push(`/userProfile`);
-  //       }, 2000);
-  //     } else {
-  //       const contentType = response.headers.get("content-type");
-  //       if (contentType && contentType.includes("application/json")) {
-  //         const data = await response.json();
-  //         errorMessage = data.message || "Failed to login";
-  //       } else {
-  //         errorMessage = await response.text();
-  //       }
-  //       console.error("Login failed:", errorMessage);
-  //       toast.error(errorMessage);
-  //       Cookies.remove("emailFromLoginPage", { path: "/" });
-  //       Cookies.remove("role", { path: "/" });
-  //       Cookies.remove("passwordFromLoginPage", { path: "/" });
-  //     }
-  //   } catch (error) {
-  //     console.error("Error during login:", error);
-  //     toast.error(error.message);
-  //   } finally {
-  //     setLoading(false); // Reset loading state
-  //   }
-  // };
+  // added code start
+  
 
   const formatDateTime = (isoString) => {
     if (!isoString) return "";
@@ -378,10 +194,8 @@ function page() {
     return <div>Loading...</div>;
   }
   const normalizedRole = role?.toLowerCase();
-  // console.log("Final Role Evaluation:", normalizedRole);
 
   if (normalizedRole === "doctor") {
-    // console.log("Rendering doctor block");
     return (
       <>
         <Header toggleSidebar={toggleSidebar} />
@@ -416,17 +230,7 @@ function page() {
                 >
                   Submit
                 </button>
-                {/* </div>
-          </div> */}
               </div>
-              {/* <button
-            className="btn btn-primary"
-            type="button"
-            onClick={handleSubmit}
-          >
-            Submit
-          </button> */}
-
               <div className="mb-3">
                 <label className="form-label">
                   Upload your profile picture
