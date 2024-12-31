@@ -68,7 +68,6 @@ function page() {
   };
 
   const handleGoogleLogin = () => {
-    
     console.log("Google login clicked");
     // router.push("/userRoleGoogle");
     setIsGoogleLogin(true);
@@ -265,44 +264,54 @@ function page() {
             </form>
           )}
           {/* Bootstrap Modal */}
-      {showRoleModal && (
-        <div className="modal fade show d-block" tabIndex="-1" role="dialog">
-          <div className="modal-dialog modal-dialog-centered" role="document">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Select Your Role</h5>
-                <button
+          {showRoleModal && (
+            <div
+              className="modal fade show d-block"
+              tabIndex="-1"
+              role="dialog"
+            >
+              <div
+                className="modal-dialog modal-dialog-centered"
+                role="document"
+              >
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title">Select Your Role</h5>
+                    <button
                       type="button"
                       className="custom-close-btn"
                       data-bs-dismiss="modal"
                       aria-label="Close"
-                      onClick={() => setShowRoleModal(false)}
-                >
-                  <span>&times;</span>
-                </button>
-              </div>
-              <div className="modal-body">
-                <p>Please select your role to continue:</p>
-                <button
-                  className="btn btn-primary mdl-btn m-2"
-                  onClick={() => handleRoleSelection("Doctor")}
-                >
-                  Doctor
-                </button>
-                <button
-                  className="btn btn-secondary mdl-btn m-2"
-                  onClick={() => handleRoleSelection("Patient")}
-                >
-                  Patient
-                </button>
+                      onClick={() => {
+                        setShowRoleModal(false);
+                        setLoading(false);
+                      }}
+                    >
+                      <span>&times;</span>
+                    </button>
+                  </div>
+                  <div className="modal-body">
+                    <p>Please select your role to continue:</p>
+                    <button
+                      className="btn btn-primary mdl-btn m-2"
+                      onClick={() => handleRoleSelection("Doctor")}
+                    >
+                      Doctor
+                    </button>
+                    <button
+                      className="btn btn-secondary mdl-btn m-2"
+                      onClick={() => handleRoleSelection("Patient")}
+                    >
+                      Patient
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          )}
 
-      {/* Modal Backdrop */}
-      {showRoleModal && <div className="modal-backdrop fade show"></div>}
+          {/* Modal Backdrop */}
+          {showRoleModal && <div className="modal-backdrop fade show"></div>}
         </div>
       </div>
 
