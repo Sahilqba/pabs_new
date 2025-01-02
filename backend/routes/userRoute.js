@@ -304,4 +304,6 @@ router.get('/doctorDepartment/:userId', userController.getDoctorDepartmentByUser
  */
 router.get('/user', userController.getUserbyId);
 
+router.delete('/deleteDoctorImage/:id', userController.deleteDoctorImage);
+
 module.exports = router;

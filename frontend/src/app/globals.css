@@ -387,7 +387,7 @@ svg {
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   position: absolute;
   left: -250px;
-  top: 56px;
+  top: 64px;
   transition: 0.5s;
 }
 .sidebar.show {
@@ -466,9 +466,10 @@ button.btn.btn-primary.dept-btn {
 
 
 .appointment-card h3 {
-  margin: 0 0 10px;
-  color: #333; /* Darker color for the patient's name */
-  font-size: 1.2em;
+	margin: 0 0 10px;
+	color: #333;
+	font-size: 40px;
+	font-weight: 600;
 }
 
 .appointment-card p {
@@ -480,12 +481,52 @@ button.btn.btn-primary.dept-btn {
 .appointment-card p span {
   font-weight: 600;
 }
+.appointment-details {
+  padding: 10px 0;
+}
+
+.appointment-details:not(:last-child) {
+  border-bottom: 1px solid #ddd; 
+  /* margin-bottom: 10px; */
+}
+.appointment-details h4 {
+	/* color: #3f3f95; */
+	font-weight: 600;
+}
 .doc-app h2 {
   padding: 15px 0px;
 }
 
+i.bi.bi-power {
+  padding-right: 14px;
+  color: white;
+  font-size: 21px;
+}
+
+i.bi.bi-power:hover {
+  color: #bcb7b7;
+}
+
+
+/* Image upload section */
+.mb-3 {
+  margin-bottom: 20px;
+}
+
+.mb-3 img {
+  max-width: 100px;
+  max-height: 100px;
+  margin-top: 10px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+}
+
 .custom-select {
   position: relative;
+}
+
+.custom-select .form-control {
+  padding: 10px;
 }
 
 .doctor-images {
@@ -510,8 +551,116 @@ button.btn.btn-primary.dept-btn {
 }
 
 .doctor-option img {
-  width: 50px;
-  height: 50px;
+  /* width: 50px;
+  height: 50px; */
   margin-right: 10px;
 }
+img.doctor-image {
+  height: 60px ;
+  width: 60px ;
+  border-radius: 50% ;
+  background-color: #e8e6e6;
+}
+.dropdown-menu.show {
+  display: block;
+  width: 100%;
+  border-radius: 11px;
+}
+/* added css */
+.prof-main {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 0px;
+}
 
+  .profile-picture-container {
+    text-align: center;
+  }
+  .avatar-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+  .avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  /* .avatar-image,
+.avatar-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+} */
+  .avatar-placeholder {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background-color: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+  }
+  .menu-trigger {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    padding: 5px;
+    cursor: pointer;
+  }
+  .menu {
+    position: absolute;
+    /* top: 40px;  */
+    right: 15px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000; /* Ensure it's above other elements */
+  }
+  
+  .menu-item {
+    padding: 8px 12px;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .menu-item:hover {
+    background-color: #f0f0f0;
+  }
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+  }
+  .close-btn {
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: red;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }

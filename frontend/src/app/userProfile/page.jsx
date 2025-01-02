@@ -19,54 +19,39 @@ function page() {
   const [imageName, setImageName] = useState(""); // Add this line
   const [imagePath, setImagePath] = useState(""); // Add this line
   const [appointments, setAppointments] = useState([]);
-  // const userName = localStorage.getItem("userName");
-  // const role = localStorage.getItem("role");
   const [role, setRole] = useState(null);
   const [userName, setUserName] = useState(null);
-  // const userIdfetched = localStorage.getItem("userId");
   const userIdfetched = Cookies.get("userId");
   const jwtToken = localStorage.getItem("jwtToken");
   const [loading, setLoading] = useState(false);
   const [department, setDepartment] = useState("");
   const userIdinDb = Cookies.get("userIdinDb");
   const jwtCookie = Cookies.get("jwtCookie");
-
+  const [previewImage, setPreviewImage] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen);
   };
+  const toggleMenu = () => {
+    console.log("Menu toggled!");
+    setMenuOpen(!menuOpen);
+  }
+  useEffect(() => {
+    console.log("Menu state:", menuOpen);
+  }, [menuOpen]);
 
   useEffect(() => {
-    // Initialize user data from localStorage
     const storedRole = localStorage.getItem("role");
     const storedUserName = localStorage.getItem("userName");
     const nameFromGoogle = Cookies.get("nameFromGoogle");
     const userRoleGoogle = Cookies.get("userRoleGoogle");
     setRole(storedRole || userRoleGoogle);
     setUserName(storedUserName || nameFromGoogle);
-
-    // console.log("Name from google:", nameFromGoogle);
-    // console.log("userName from google:", userName);
-    // console.log("Role from google:", storedRole || userRoleGoogle);
-    // console.log("userRolegoogle from google:", userRoleGoogle);
-    // console.log("use id in db:", userIdinDb);
   }, []);
-
-  useEffect(() => {
-    if (role === "patient") {
-      fetchAppointments();
-    }
-  }, [role]);
-
+   
   const fetchAppointments = async (userIdfetched) => {
-    // const userIdFetched = localStorage.getItem("userId");
-    // const jwtToken = localStorage.getItem("jwtToken");
-
-    // if (!userIdfetched || !jwtToken) return;
-    // console.log("Fetching appointments for user:", userIdfetched);
-    // console.log("JWT Token:", jwtToken);
-    // console.log("JWT Cookie:", jwtCookie);
     setLoading(true);
     try {
       const response = await fetch(
@@ -98,20 +83,14 @@ function page() {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     const userIdfetched = Cookies.get("userId");
-    // console.log("userIdfetched from cookies:", userIdfetched);
     if (userIdfetched) {
       fetchAppointments(userIdfetched);
     }
   }, [userIdfetched]);
 
   const fetchDepartment = async (userIdfetched) => {
-    // if (!userIdfetched || !jwtToken) return;
-    // console.log("Fetching department for user:", userIdfetched);
-    // console.log("JWT Token:", jwtToken);
-    // console.log("JWT Cookie:", jwtCookie);
     setLoading(true);
     try {
       const response = await fetch(
@@ -144,61 +123,15 @@ function page() {
 
   useEffect(() => {
     const userIdfetched = Cookies.get("userId");
-    // console.log("userIdfetched from cookies:", userIdfetched);
     if (userIdfetched) {
       fetchDepartment(userIdfetched);
     }
   }, [userIdfetched]);
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   console.log("Department selected:", department);
-  //   if (!department) {
-  //     toast.error("Please select your department.");
-  //     return;
-  //   }
-  //   try {
-  //     const response = await fetch(
-  //       `${process.env.NEXT_PUBLIC_API_URL}/updateDepartment/${userIdinDb}`,
-  //       {
-  //         method: "PATCH",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           // Authorization: `Bearer ${jwtToken}`,
-  //           Authorization: `Bearer ${jwtToken ? jwtToken : jwtCookie}`,
-  //         },
-  //         body: JSON.stringify({
-  //           department: department,
-  //         }),
-  //       }
-  //     );
 
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       toast.success("Department set successfully");
-  //     } else if (response.status === 401) {
-  //       toast.warning(
-  //         "Token has expired. Please log in again and try rescheduling."
-  //       );
-  //       // Cookies.remove("jwtCookie", { path: "/" });
-  //       // sessionStorage.clear();
-  //       // localStorage.clear();
-  //     } else if (response.status === 400) {
-  //       toast.warning("Appointment date is required.");
-  //     } else {
-  //       const errorData = await response.json();
-  //       console.error("Error updating appointment date", errorData);
-  //       // handle error (e.g., show error message)
-  //     }
-  //   } catch (error) {
-  //     console.error("Network error", error);
-  //     // handle network error
-  //   }
-  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // console.log("Department selected:", department);
     if (!department) {
       toast.error("Please select your department.");
       return;
@@ -206,10 +139,10 @@ function page() {
 
     const formData = new FormData();
     formData.append("department", department);
-    if (image) {
-      formData.append("image", image);
-    }
-
+    // if (image) {
+    //   formData.append("image", image);
+    // }
+    
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/updateDepartment/${userIdinDb}`,
@@ -225,8 +158,8 @@ function page() {
 
       if (response.ok) {
         const data = await response.json();
-        toast.success("Department and image set successfully");
-        setImageName(data.image);
+        toast.success("Department set successfully");
+        // setImageName(data.image);
       fetchDepartment(userIdfetched);
       } else if (response.status === 401) {
         toast.warning(
@@ -242,128 +175,93 @@ function page() {
       console.error("Network error", error);
     }
   };
-
-  const viewAppointments = async () => {
-    // router.push("/viewDoctorAppointments");
+  
+  const fetchProfilePicture = async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/viewDoctorAppointments`,
+        `${process.env.NEXT_PUBLIC_API_URL}/doctorDepartment/${userIdinDb}`,
         {
-          method: "POST",
           headers: {
-            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwtToken || jwtCookie}`,
           },
-          body: JSON.stringify({
-            doctor: userName,
-          }),
         }
       );
-      let errorMessage;
+
       if (response.ok) {
         const data = await response.json();
-        // console.log("Login successful");
-        // console.log("Data:", data);
-        // toast.success("Login successful !");
-        // localStorage.setItem("jwtToken", data.token);
-        // localStorage.setItem("userId", data.user._id);
-        // localStorage.setItem("userName", data.user.name);
-        // localStorage.setItem("role", data.user.role);
-        // Cookies.set("jwtCookie", data.token, { expires: 1, path: "/" });
-        // Cookies.set("userIdinDb", data.user._id, { expires: 1, path: "/" });
-        // Cookies.set("userId", data.user._id, { expires: 1, path: "/" });
-        // setTimeout(() => {
-        //   router.push(`/viewDoctorAppointments`);
-        // }, 2000);
+        setImagePath(data.path);
+        setImageName(data.filename);
       } else {
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-          const data = await response.json();
-          errorMessage = data.message || "Failed to login";
-        } else {
-          errorMessage = await response.text();
-        }
-        console.error("Login failed:", errorMessage);
-        // toast.error(errorMessage);
-        // Cookies.remove("emailFromLoginPage", { path: "/" });
-        // Cookies.remove("role", { path: "/" });
-        // Cookies.remove("passwordFromLoginPage", { path: "/" });
+        throw new Error("Failed to fetch profile picture.");
       }
     } catch (error) {
-      console.error("Error during login:", error);
-      toast.error(error.message);
-    } finally {
-      setLoading(false); // Reset loading state
+      console.error(error);
     }
   };
 
-  // const handleRoleSelection = async (role) => {
-  //   setUserRole(role);
-  //   setShowRoleModal(false);
-  //   // You can now use the selectedRole state to capture the input
-  //   console.log("Selected Role:", role);
+  const handleUpload = async (file) => {
+    const formData = new FormData();
+    formData.append("image", file);
 
-  //   if (isGoogleLogin) {
-  //     Cookies.set("role", role, { expires: 1, path: "/" });
-  //     Cookies.set("userRoleGoogle", role, { expires: 1, path: "/" });
-  //     window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
-  //     return;
-  //   }
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/updateDepartment/${userIdinDb}`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${jwtToken || jwtCookie}`,
+          },
+          body: formData,
+        }
+      );
 
-  //   Cookies.set("emailFromLoginPage", email, { expires: 1, path: "/" });
-  //   Cookies.set("passwordFromLoginPage", password, { expires: 1, path: "/" });
-  //   Cookies.set("role", role, { expires: 1, path: "/" });
-  //   try {
-  //     const response = await fetch(
-  //       `${process.env.NEXT_PUBLIC_API_URL}/userLogin`,
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           email: email,
-  //           password: password,
-  //           role: role,
-  //         }),
-  //       }
-  //     );
-  //     let errorMessage;
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       console.log("Login successful");
-  //       // console.log("Data:", data);
-  //       toast.success("Login successful !");
-  //       localStorage.setItem("jwtToken", data.token);
-  //       // localStorage.setItem("userId", data.user._id);
-  //       localStorage.setItem("userName", data.user.name);
-  //       localStorage.setItem("role", data.user.role);
-  //       Cookies.set("jwtCookie", data.token, { expires: 1, path: "/" });
-  //       Cookies.set("userIdinDb", data.user._id, { expires: 1, path: "/" });
-  //       Cookies.set("userId", data.user._id, { expires: 1, path: "/" });
-  //       setTimeout(() => {
-  //         router.push(`/userProfile`);
-  //       }, 2000);
-  //     } else {
-  //       const contentType = response.headers.get("content-type");
-  //       if (contentType && contentType.includes("application/json")) {
-  //         const data = await response.json();
-  //         errorMessage = data.message || "Failed to login";
-  //       } else {
-  //         errorMessage = await response.text();
-  //       }
-  //       console.error("Login failed:", errorMessage);
-  //       toast.error(errorMessage);
-  //       Cookies.remove("emailFromLoginPage", { path: "/" });
-  //       Cookies.remove("role", { path: "/" });
-  //       Cookies.remove("passwordFromLoginPage", { path: "/" });
-  //     }
-  //   } catch (error) {
-  //     console.error("Error during login:", error);
-  //     toast.error(error.message);
-  //   } finally {
-  //     setLoading(false); // Reset loading state
-  //   }
-  // };
+      if (response.ok) {
+        const data = await response.json();
+        toast.success("Profile picture updated successfully.");
+        setImagePath(data.path);
+        setImageName(data.filename);
+        fetchProfilePicture(userIdfetched);
+      } else if (response.status === 401) {
+        toast.warning(
+          "Token has expired. Please log in again and try rescheduling."
+        );
+      } else {
+        toast.error("Failed to update profile picture")
+        const errorData = await response.json();
+        console.error("Error updating image", errorData);
+      }
+    } catch (error) {
+      console.error("Network error", error);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/deleteDoctorImage/${userIdinDb}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${jwtToken || jwtCookie}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        toast.success("Profile picture deleted.");
+        setImagePath("");
+        setImageName("");
+      } else {
+        toast.error("Failed to delete picture.");
+      }
+    } catch (error) {
+      console.error("Error deleting image:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProfilePicture();
+  }, []);
 
   const formatDateTime = (isoString) => {
     if (!isoString) return "";
@@ -378,23 +276,82 @@ function page() {
     return <div>Loading...</div>;
   }
   const normalizedRole = role?.toLowerCase();
-  // console.log("Final Role Evaluation:", normalizedRole);
 
   if (normalizedRole === "doctor") {
-    // console.log("Rendering doctor block");
     return (
       <>
-        <Header toggleSidebar={toggleSidebar} />
-        <div className="doc-panel">
-          <Sidebar isOpen={isSidebarOpen} role={normalizedRole} />
-          <main className={`main-container ${isSidebarOpen ? "show" : ""}`}>
-            <div className="prof-hdng">
+      <Header toggleSidebar={toggleSidebar} />
+      <div className="doc-panel">
+        <Sidebar isOpen={isSidebarOpen} role="doctor" />
+        <main className={`main-container ${isSidebarOpen ? "show" : ""}`}>
+        <div className="prof-main">
+        <div className="prof-hdng">
               <h3>Hi Dr. {userName.toUpperCase()}, Welcome.</h3>
             </div>
-            <form className="doc-form">
-              {/* <div className="row">
-          <div className="mb-3 col-md-6"> */}
-              <div className="doc-dept">
+          <div className="profile-picture-container">
+            <div className="avatar-wrapper">
+              {imagePath ? (
+                <img
+                  src={`${process.env.NEXT_PUBLIC_API_URL}/${imagePath}`}
+                  alt="Profile"
+                  className="avatar"
+                />
+              ) : (
+                <div className="avatar-placeholder"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
+                <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+              </svg></div>
+              )}
+              <div className="menu-trigger" onClick={toggleMenu}  style={{ cursor: "pointer" }}>
+                ...
+              </div>
+            </div>
+            {menuOpen && (
+              <div className="menu">
+                <button
+                  className="menu-item"
+                  onClick={() =>
+                    document.getElementById("file-input").click()
+                  }
+                >
+                  Upload Picture
+                </button>
+                <button className="menu-item" onClick={handleDelete}>
+                  Delete Picture
+                </button>
+                {/* <button
+                  className="menu-item"
+                  onClick={() => setPreviewImage(imagePath)}
+                >
+                  Preview Picture
+                </button> */}
+              </div>
+            )}
+          </div>
+          <input
+            id="file-input"
+            type="file"
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={(e) => handleUpload(e.target.files[0])}
+          />
+          </div>
+          {/* {previewImage && (
+            <div className="modal">
+              <div className="modal-content">
+                <img
+                  src={`${process.env.NEXT_PUBLIC_API_URL}/${previewImage}`}
+                  alt="Preview"
+                />
+                <button
+                  className="close-btn"
+                  onClick={() => setPreviewImage(null)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )} */}
+          <div className="doc-dept">
                 <select
                   type="text"
                   className="form-select dept-sel"
@@ -416,41 +373,14 @@ function page() {
                 >
                   Submit
                 </button>
-                {/* </div>
-          </div> */}
               </div>
-              {/* <button
-            className="btn btn-primary"
-            type="button"
-            onClick={handleSubmit}
-          >
-            Submit
-          </button> */}
-
-              <div className="mb-3">
-                <label className="form-label">
-                  Upload your profile picture
-                </label>
-                <input
-                  className="form-control form-control-sm"
-                  id="formFileSm"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setImage(e.target.files[0])} // Add this line
-                />
-                {imageName && <p>Current Image: {imageName}</p>}{" "}
-                <img src={`${process.env.NEXT_PUBLIC_API_URL}/${imagePath}`} alt={imageName} />
-                {/* Add this line */}
-              </div>
-            </form>
-          </main>
-        </div>
-        <Footer />
-        <ToastContainer />
+        </main>
+      </div>
+      <Footer />
+      <ToastContainer />
       </>
     );
   }
-
   if (normalizedRole === "patient") {
     // console.log("Rendering patient block");
     return (

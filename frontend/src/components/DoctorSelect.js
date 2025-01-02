@@ -43,7 +43,7 @@ const DoctorSelect = ({ doctors, selectedDoctor, setSelectedDoctor }) => {
   return (
     <div className="custom-select">
       <div
-        className="form-control dropdown-toggle"
+        className="form-control"
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
       >
         {selectedDoctor

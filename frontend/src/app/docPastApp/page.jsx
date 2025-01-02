@@ -52,7 +52,7 @@ const docApp = () => {
           const appointmentDateTime = new Date(
             `${appointment.appointmentDate}T${appointment.appointmentTime}`
           );
-          return appointmentDateTime > now; // Include only future appointments
+          return appointmentDateTime < now; // Include only future appointments
         });
         // Sort appointments by date and time
         appointmentsData = appointmentsData.sort((a, b) => {
@@ -157,11 +157,11 @@ const docApp = () => {
       <div className="doc-app">
         <Sidebar isOpen={isSidebarOpen} role="doctor" />
         <main className={`main-container ${isSidebarOpen ? "show" : ""}`}>
-          <h2>Your upcoming Appointments:-</h2>
+          <h2>Appointment History:-</h2>
           <div className="appointments-list">
             {loading && <p>Loading appointments...</p>}
             {!loading && appointments?.length === 0 && (
-              <p>No appointments found.</p>
+              <p>No appointments history found.</p>
             )}
             {/* {!loading &&
               appointments?.map((appointment) => (
@@ -177,7 +177,7 @@ const docApp = () => {
                   </p>
                 </div>
               ))} */}
-               {!loading &&
+              {!loading &&
             Object.entries(groupAppointmentsByUser(appointments)).map(
               ([userId, userAppointments]) => (
                 <div key={userId} className="appointment-card">
