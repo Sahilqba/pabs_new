@@ -3,6 +3,8 @@ const app = express();
 const mongoose = require("mongoose");
 const cors = require("cors");
 const userRoutes = require("./routes/userRoute");
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./swaggerConfig');
 require('dotenv').config(); // Load environment variables
 const port = process.env.PORT;
 const mongoPassword = process.env.MONGODB_PASSWORD;
@@ -167,6 +169,9 @@ app.get("/logout", (req, res) => {
     });
   });
 });
+
+// Serve Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
