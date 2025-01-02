@@ -373,3 +373,41 @@ exports.getUserbyId = async (req, res) => {
 };
 
 //
+exports.deleteDoctorImage = async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).send("Unauthorized");
+  }
+ 
+  const token = authHeader.split(" ")[1];
+  if (!token) {
+    return res.status(401).send("Unauthorized");
+  }
+ 
+  try {
+    const decoded = jwt.verify(token, secretKey);
+    const { id } = req.params;
+    const result =         await User.updateOne(
+      { _id: id },
+      {
+          $unset: {
+              filename: "",
+              path: ""
+          }
+      }
+  );
+    if (result) {
+      res.status(200).json({ message: "Image deleted successfully" });
+    } else {
+      res.status(404).json({ message: "Image not found" });
+    }
+  } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).send("Token has expired");
+    }
+    res.status(500).send(err.message);
+  }
+};
+ 
+
+ 

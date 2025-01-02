@@ -14,11 +14,12 @@ const Sidebar = ({ isOpen, role }) => {
             <li className="nav-item">
               <Link href="/docAppointment" className="nav-link sd-link">
               <i className="bi bi-capsule-pill"></i>
-                Upcoming Appointments
+                 Appointments
               </Link>
             </li>
              <li className="nav-item">
               <Link href="/docPastApp" className="nav-link sd-link">
+              <i className="bi bi-prescription2"></i>
                 Past Appointments
               </Link>
             </li>

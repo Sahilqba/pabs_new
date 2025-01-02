@@ -161,7 +161,7 @@ const docApp = () => {
           <div className="appointments-list">
             {loading && <p>Loading appointments...</p>}
             {!loading && appointments?.length === 0 && (
-              <p>No appointments found.</p>
+              <p>No appointments history found.</p>
             )}
             {/* {!loading &&
               appointments?.map((appointment) => (

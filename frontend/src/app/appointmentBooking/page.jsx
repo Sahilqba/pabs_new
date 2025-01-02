@@ -10,6 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
 import { Tooltip } from "bootstrap";
 import Sidebar from "@/components/Sidebar";
+import DoctorSelect from "@/components/DoctorSelect";
 // import React from "react";
 function page() {
   const userEmailFromLoginPage = Cookies.get("emailFromLoginPage");
@@ -22,6 +23,8 @@ function page() {
   const [modalAppointmentTime, setModalAppointmentTime] = useState("");
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [appointmentToDelete, setAppointmentToDelete] = useState(null);
+  const [imagePath, setImagePath] = useState("");
+  const [imageName, setImageName] = useState("");
   // const userIdfetched = localStorage.getItem("userId");
   const userIdfetched = Cookies.get("userId");
   const [loading, setLoading] = useState(false);
@@ -298,6 +301,11 @@ function page() {
       toast.error("There must be at least a 2-hour gap between appointments.");
       return;
     }
+
+  // Fetch the doctor's name based on the selected doctor's ID
+  const selectedDoctorObj = doctors.find((doc) => doc._id === selectedDoctor);
+  const doctorName = selectedDoctorObj ? selectedDoctorObj.name : "";
+
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/createAppointment`,
@@ -309,10 +317,11 @@ function page() {
           },
           body: JSON.stringify({
             disease,
-            doctor: selectedDoctor,
+            // doctor: selectedDoctor,
+            doctor: doctorName,
             appointmentDate,
             appointmentTime,
-            department
+            department,
           }),
         }
       );
@@ -381,34 +390,36 @@ function page() {
       }
       const data = await response.json();
       const doctors = data.filter(
-        (user) => 
-          user.role === "Doctor" && 
-          user.email !== userEmailFromGoogle && 
-          user.email !== userEmailFromLoginPage && 
+        (user) =>
+          user.role === "Doctor" &&
+          user.email !== userEmailFromGoogle &&
+          user.email !== userEmailFromLoginPage &&
           user.department
       );
       setDoctors(doctors);
       setFilteredDoctors(doctors);
+      setImageName(doctors.filename);
+      setImagePath(doctors.path);
     } catch (error) {
       console.error("Failed to fetch appointments:", error);
-      setDoctors([]); 
-      setFilteredDoctors([]); 
+      setDoctors([]);
+      setFilteredDoctors([]);
     } finally {
       setLoading(false);
     }
   };
- 
+
   const handleDepartmentChange = (department) => {
     setDepartment(department);
-    if (department === ""){
+    if (department === "") {
       setFilteredDoctors(doctors.filter((doc) => doc.department));
     } else {
       const filtered = doctors.filter(
         (doc) => doc.department.toLowerCase() === department.toLowerCase()
-      )
+      );
       setFilteredDoctors(filtered);
     }
-  }
+  };
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -417,57 +428,57 @@ function page() {
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen);
   };
-  
+
   return (
     <>
-      <Header toggleSidebar={toggleSidebar}/>
+      <Header toggleSidebar={toggleSidebar} />
       <div className="app-bkng">
-      <Sidebar isOpen={isSidebarOpen} role="patient"/>
-      <main className={`main-container ${isSidebarOpen ? "show" : ""}`}>
-        <div className="prof-hdng">
-          <h3>Manage Appointment</h3>
-        </div>
-        <form onSubmit={handleSubmit}>
-          <div className="row app-frm">
-            <div className="col-md-4">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Enter your disease symptoms"
-                value={disease}
-                onChange={(e) => {
-                  setDisease(e.target.value);
-                }}
-                required
-              />
-            </div>
-            <div className="col-md-4">
-              <select
-                type="text"
-                className="form-control"
-                placeholder="Enter your department"
-                value={department}
-                onChange={(e) => {
-                  handleDepartmentChange(e.target.value);
-                }}
-                required
-              >
-              <option value="">Select Department</option>
-            {Array.from(
-          new Set(
-            doctors
-              .filter((doc) => doc.department) // Ensure only valid departments are listed
-              .map((doc) => doc.department)
-          )
-        ).map((department) => (
-          <option key={department} value={department}>
-            {department}
-          </option>
-        ))}
-              </select>
-            </div> 
-        {/* Department Filter with Icon */}
-        {/* <div className="col-md-4">
+        <Sidebar isOpen={isSidebarOpen} role="patient" />
+        <main className={`main-container ${isSidebarOpen ? "show" : ""}`}>
+          <div className="prof-hdng">
+            <h3>Manage Appointment</h3>
+          </div>
+          <form onSubmit={handleSubmit}>
+            <div className="row app-frm">
+              <div className="col-md-4">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Enter your disease symptoms"
+                  value={disease}
+                  onChange={(e) => {
+                    setDisease(e.target.value);
+                  }}
+                  required
+                />
+              </div>
+              <div className="col-md-4">
+                <select
+                  type="text"
+                  className="form-control"
+                  placeholder="Enter your department"
+                  value={department}
+                  onChange={(e) => {
+                    handleDepartmentChange(e.target.value);
+                  }}
+                  required
+                >
+                  <option value="">Select Department</option>
+                  {Array.from(
+                    new Set(
+                      doctors
+                        .filter((doc) => doc.department) // Ensure only valid departments are listed
+                        .map((doc) => doc.department)
+                    )
+                  ).map((department) => (
+                    <option key={department} value={department}>
+                      {department}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {/* Department Filter with Icon */}
+              {/* <div className="col-md-4">
           <select
             className="form-control"
             value={selectedDepartment}
@@ -488,7 +499,7 @@ function page() {
           </select>
         </div> */}
 
-            <div className="col-md-4">
+              {/* <div className="col-md-4">
               <select
                 // type="text"
                 className="form-control"
@@ -502,43 +513,51 @@ function page() {
                 <option value="">Select Doctor</option>
                 {Array.isArray(filteredDoctors) && filteredDoctors.map((doc) => (
                   <option key={doc._id} value={doc.name}>
-                   Dr. {doc.name.toUpperCase()}, {doc.image} ({doc.department})
+                   Dr. {doc.name.toUpperCase()} {doc.image} ({doc.department})
                   </option>
                 ))}
               </select>
+            </div> */}
+
+              <div className="col-md-4">
+                <DoctorSelect
+                  doctors={filteredDoctors}
+                  selectedDoctor={selectedDoctor}
+                  setSelectedDoctor={setSelectedDoctor}
+                />
+              </div>
+
+              <div className="col-md-4">
+                <input
+                  type="date"
+                  className="form-control"
+                  placeholder="Enter your appointment date"
+                  value={appointmentDate}
+                  onChange={(e) => {
+                    setAppointmentDate(e.target.value);
+                  }}
+                  min={new Date().toISOString().split("T")[0]}
+                  required
+                />
+              </div>
+              <div className="col-md-4">
+                <input
+                  type="time"
+                  className="form-control"
+                  placeholder="Enter Time"
+                  value={appointmentTime}
+                  onChange={(e) => {
+                    setAppointmentTime(e.target.value);
+                  }}
+                  required
+                />
+              </div>
+              <div className="col-md-4">
+                <button className="btn btn-primary app-sub">Submit</button>
+              </div>
             </div>
 
-            <div className="col-md-4">
-              <input
-                type="date"
-                className="form-control"
-                placeholder="Enter your appointment date"
-                value={appointmentDate}
-                onChange={(e) => {
-                  setAppointmentDate(e.target.value);
-                }}
-                min={new Date().toISOString().split("T")[0]}
-                required
-              />
-            </div>
-            <div className="col-md-4">
-              <input
-                type="time"
-                className="form-control"
-                placeholder="Enter Time"
-                value={appointmentTime}
-                onChange={(e) => {
-                  setAppointmentTime(e.target.value);
-                }}
-                required
-              />
-            </div>
-            <div className="col-md-4">
-              <button className="btn btn-primary app-sub">Submit</button>
-            </div>
-          </div>
-
-          {/* <input
+            {/* <input
           type="text"
           placeholder="Enter your allergies"
           value={allergies}
@@ -547,7 +566,7 @@ function page() {
           }}
         /> */}
 
-          {/* <input
+            {/* <input
           type="text"
           placeholder="Enter your appointment date"
           value={appointmentDate}
@@ -555,8 +574,8 @@ function page() {
             setAppointmentDate(e.target.value);
           }}
         /> */}
-        </form>
-        {/* <ul>
+          </form>
+          {/* <ul>
         {appointments.map((appointment) => (
           <li key={appointment._id}>
             Disease: {appointment.disease}
@@ -566,150 +585,150 @@ function page() {
           </li>
         ))}
       </ul> */}
-        {loading ? (
-          <div className="spinner-border" role="status">
-            <span className="sr-only"></span>
-          </div>
-        ) : (
-          <table className="appointments-table">
-            <thead>
-              <tr>
-                <th>Disease Symptoms</th>
-                <th>Doctor</th>
-                <th>Department</th>
-                <th>Appointment Date</th>
-                <th>Appointment Time (IST)</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {appointments.map((appointment) => (
-                <tr key={appointment._id}>
-                  <td>{appointment.disease}</td>
-                  <td>{appointment.doctor}</td>
-                  <td>{appointment.department}</td>
-                  <td>{formatDateTime(appointment.appointmentDate)}</td>
-                  <td>{appointment.appointmentTime}</td>
-                  <td className="action-symbol">
-                    <button
-                      onClick={() => openConfirmModal(appointment._id)}
-                      className="btn btn-outline-danger"
-                      data-bs-toggle="tooltip"
-                      data-bs-placement="bottom"
-                      title="Delete Appointment"
-                    >
-                      <i className="fa-solid fa-trash"></i>
-                    </button>
-                    <button
-                      onClick={() => handleModal(appointment._id)}
-                      className="btn btn-outline-primary"
-                      data-bs-toggle="tooltip"
-                      data-bs-placement="bottom"
-                      title="Reschedule Appointment"
-                    >
-                      <i className="fa-solid fa-calendar-days"></i>
-                    </button>
-                  </td>
-                  {/* <td>
+          {loading ? (
+            <div className="spinner-border" role="status">
+              <span className="sr-only"></span>
+            </div>
+          ) : (
+            <table className="appointments-table">
+              <thead>
+                <tr>
+                  <th>Disease Symptoms</th>
+                  <th>Doctor</th>
+                  <th>Department</th>
+                  <th>Appointment Date</th>
+                  <th>Appointment Time (IST)</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {appointments.map((appointment) => (
+                  <tr key={appointment._id}>
+                    <td>{appointment.disease}</td>
+                    <td>{appointment.doctor}</td>
+                    <td>{appointment.department}</td>
+                    <td>{formatDateTime(appointment.appointmentDate)}</td>
+                    <td>{appointment.appointmentTime}</td>
+                    <td className="action-symbol">
+                      <button
+                        onClick={() => openConfirmModal(appointment._id)}
+                        className="btn btn-outline-danger"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="bottom"
+                        title="Delete Appointment"
+                      >
+                        <i className="fa-solid fa-trash"></i>
+                      </button>
+                      <button
+                        onClick={() => handleModal(appointment._id)}
+                        className="btn btn-outline-primary"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="bottom"
+                        title="Reschedule Appointment"
+                      >
+                        <i className="fa-solid fa-calendar-days"></i>
+                      </button>
+                    </td>
+                    {/* <td>
                 <button onClick={() => handleModal(appointment._id)} className="appointment-button">
                   Edit appointment date
                 </button>
               </td> */}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-        {isModalOpen && (
-          <div
-            className="modal fade show"
-            id="exampleModal"
-            // tabindex="-1"
-            role="dialog"
-            aria-labelledby="exampleModalLabel"
-            aria-hidden="true"
-            style={{ display: "block" }}
-          >
-            <div className="modal-dialog" role="document">
-              <div className="modal-content">
-                <div className="modal-header">
-                  Please update the appointment Date & Time
-                </div>
-                <div className="modal-body">
-                  <div className="modal-input">
-                    <input
-                      type="date"
-                      className="form-control"
-                      placeholder="Enter your updated appointment date"
-                      value={modalAppointmentDate}
-                      onChange={(e) => {
-                        setModalAppointmentDate(e.target.value);
-                      }}
-                      min={new Date().toISOString().split("T")[0]}
-                    />
-                    <input
-                      type="Time"
-                      className="form-control"
-                      value={modalAppointmentTime}
-                      onChange={(e) => {
-                        setModalAppointmentTime(e.target.value);
-                      }}
-                    />
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          {isModalOpen && (
+            <div
+              className="modal fade show"
+              id="exampleModal"
+              // tabindex="-1"
+              role="dialog"
+              aria-labelledby="exampleModalLabel"
+              aria-hidden="true"
+              style={{ display: "block" }}
+            >
+              <div className="modal-dialog" role="document">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    Please update the appointment Date & Time
+                  </div>
+                  <div className="modal-body">
+                    <div className="modal-input">
+                      <input
+                        type="date"
+                        className="form-control"
+                        placeholder="Enter your updated appointment date"
+                        value={modalAppointmentDate}
+                        onChange={(e) => {
+                          setModalAppointmentDate(e.target.value);
+                        }}
+                        min={new Date().toISOString().split("T")[0]}
+                      />
+                      <input
+                        type="Time"
+                        className="form-control"
+                        value={modalAppointmentTime}
+                        onChange={(e) => {
+                          setModalAppointmentTime(e.target.value);
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="modal-footer">
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={closeModal}
+                    >
+                      Close
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={handleEdit}
+                    >
+                      Save Changes
+                    </button>
                   </div>
                 </div>
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={closeModal}
-                  >
-                    Close
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={handleEdit}
-                  >
-                    Save Changes
-                  </button>
+              </div>
+            </div>
+          )}
+          {isConfirmModalOpen && (
+            <div
+              className="modal fade show"
+              role="dialog"
+              style={{ display: "block" }}
+            >
+              <div className="modal-dialog" role="document">
+                <div className="modal-content">
+                  <div className="modal-header">Confirm Deletion</div>
+                  <div className="modal-body">
+                    Are you sure you want to delete this appointment?
+                  </div>
+                  <div className="modal-footer">
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => setIsConfirmModalOpen(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-danger"
+                      onClick={confirmDelete}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
-        {isConfirmModalOpen && (
-          <div
-            className="modal fade show"
-            role="dialog"
-            style={{ display: "block" }}
-          >
-            <div className="modal-dialog" role="document">
-              <div className="modal-content">
-                <div className="modal-header">Confirm Deletion</div>
-                <div className="modal-body">
-                  Are you sure you want to delete this appointment?
-                </div>
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => setIsConfirmModalOpen(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-danger"
-                    onClick={confirmDelete}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </main>
+          )}
+        </main>
       </div>
       <Footer />
       <ToastContainer />

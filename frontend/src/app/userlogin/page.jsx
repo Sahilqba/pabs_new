@@ -214,7 +214,7 @@ function page() {
                 <div className="register-link">
                   Don't have an account?{" "}
                   {loading ? (
-                    <span className="loader">Loading...</span> // Replace with your loader component
+                    <span className="loader">Loading...</span> 
                   ) : (
                     <Link
                       href="/userRegistration"
