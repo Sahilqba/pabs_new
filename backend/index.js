@@ -24,6 +24,16 @@ const { User} = require("./models/user");
  
 // Enable CORS
 // app.use(cors());
+
+const rateLimit = require("express-rate-limit");
+const limiter = rateLimit({
+    // 200 requests per minute
+    max: 200,    
+    windowMs: 60* 60 * 1000,  //1 hour in milliseconds
+    message: "Too many requests from this IP"
+});
+
+app.use(limiter);
  
 // CORS configuration
 const corsOptions = {
