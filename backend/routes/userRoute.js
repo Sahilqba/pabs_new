@@ -304,6 +304,30 @@ router.get('/doctorDepartment/:userId', userController.getDoctorDepartmentByUser
  */
 router.get('/user', userController.getUserbyId);
 
+
+/**
+ * @swagger
+ * /deleteDoctorImage/{id}:
+ *   delete:
+ *     summary: Delete doctor image
+ *     tags: [Doctor]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The user ID
+ *     responses:
+ *       200:
+ *         description: Appointment deleted successfully
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Appointment not found
+ *       500:
+ *         description: Internal server error
+ */
 router.delete('/deleteDoctorImage/:id', userController.deleteDoctorImage);
 
 module.exports = router;
