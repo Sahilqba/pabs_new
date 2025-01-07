@@ -79,7 +79,7 @@ function page() {
     setUserRole(role);
     setShowRoleModal(false);
     // You can now use the selectedRole state to capture the input
-    console.log("Selected Role:", role);
+    // console.log("Selected Role:", role);
 
     if (isGoogleLogin) {
       Cookies.set("role", role, { expires: 1, path: "/" });
@@ -123,7 +123,8 @@ function page() {
         setTimeout(() => {
           router.push(`/userProfile`);
         }, 2000);
-      } else {
+      }
+      else {
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.includes("application/json")) {
           const data = await response.json();

@@ -337,9 +337,9 @@ exports.getDoctorDepartmentByUserId = async (req, res) => {
     if (user.role !== 'Doctor') {
       return res.status(400).json({ message: 'User is not a doctor' });
   }
-  if (!user.department) {
-    return res.status(400).json({ message: 'No department selected' });
-}
+//   if (!user.department) {
+//     return res.status(400).json({ message: 'No department selected' });
+// }
     res.status(200).json(user);
   } catch (error) {
     res.status(400).send(error);
