@@ -379,13 +379,31 @@ const docApp = () => {
                           <span>Disease Symptoms:</span> {appointment.disease}
                         </p>
                         <div>
-                          <button onClick={() => handleModal(appointment._id)}>
+                          {/* <button onClick={() => handleModal(appointment._id)}>
                             Edit
-                          </button>
+                          </button> */}
                           <button
+                            onClick={() => handleModal(appointment._id)}
+                            className="btn btn-outline-primary"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="bottom"
+                            title="Reschedule Appointment"
+                          >
+                            <i className="fa-solid fa-calendar-days"></i>
+                          </button>
+                          {/* <button
                             onClick={() => openConfirmModal(appointment._id)}
                           >
                             Delete
+                          </button> */}
+                          <button
+                            onClick={() => openConfirmModal(appointment._id)}
+                            className="btn btn-outline-danger"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="bottom"
+                            title="Delete Appointment"
+                          >
+                            <i className="fa-solid fa-trash"></i>
                           </button>
                           {/* <button onClick={handleDeleteAppointment}>
                             Delete
