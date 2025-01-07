@@ -75,11 +75,12 @@ function page() {
         setTimeout(() => {
           router.push(`/userlogin`);
         }, 3000);
-      } else {
+      } 
+      else {
         const errorResult = await response.json();
         console.log(errorResult.error);
         console.error("Failed to create user:", errorResult.error);
-        toast.error(`Failed to create user: ${errorResult.error}`);
+        toast.error(`Failed to create user: ${errorResult.message}`);
       }
     } catch (error) {
       console.error("Error:", error);

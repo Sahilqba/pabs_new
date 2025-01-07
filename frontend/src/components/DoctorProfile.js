@@ -99,13 +99,20 @@ const DoctorProfile = () => {
 
     const formData = new FormData();
     formData.append("department", department);
-    formData.append("qualification", qualification);
-    formData.append("experianceyear", experianceyear);
-    formData.append("previousCompany", previousCompany);
+    // formData.append("qualification", qualification);
+    // formData.append("experianceyear", experianceyear);
+    // formData.append("previousCompany", previousCompany);
 
-    // if (image) {
-    //   formData.append("image", image);
-    // }
+    if (qualification) {
+      formData.append("qualification", qualification);
+    }
+    if (experianceyear) {
+      formData.append("experianceyear", experianceyear);
+    }
+    if (previousCompany) {
+      formData.append("previousCompany", previousCompany);
+    }
+    
 
     try {
       const response = await fetch(
@@ -335,7 +342,8 @@ const DoctorProfile = () => {
                   type="text"
                   className="form-control"
                   placeholder="Enter your Qualification*"
-                  value={qualification}
+                  // value={qualification}
+                  value={qualification || ""}
                   onChange={(e) => {
                     setQualification(e.target.value);
                   }}
@@ -346,8 +354,9 @@ const DoctorProfile = () => {
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="Enter your Experiance year*"
-                  value={experianceyear}
+                  placeholder="Enter your Experience year*"
+                  // value={experianceyear}
+                  value={experianceyear || ""}
                   onChange={(e) => {
                     setExperianceyear(e.target.value);
                   }}
@@ -359,7 +368,8 @@ const DoctorProfile = () => {
                   type="text"
                   className="form-control"
                   placeholder="Enter your Previous work place if any"
-                  value={previousCompany}
+                  // value={previousCompany}
+                  value={previousCompany || ""}
                   onChange={(e) => {
                     setpreviousCompany(e.target.value);
                   }}

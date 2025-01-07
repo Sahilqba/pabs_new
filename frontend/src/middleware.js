@@ -19,7 +19,8 @@ export function middleware(request) {
   if (
     (request.nextUrl.pathname === "/userProfile" ||
       request.nextUrl.pathname === "/appointmentBooking" ||
-      request.nextUrl.pathname === "/docAppointment") &&
+      request.nextUrl.pathname === "/docAppointment" ||
+      request.nextUrl.pathname === "/docPastApp") &&
     !token
   ) {
     console.log("No token found, redirecting to /userlogin");
@@ -43,5 +44,6 @@ export const config = {
     "/userRegistration",
     "/userRoleVanilla",
     "/docAppointment",
+    "/docPastApp",
   ],
 };

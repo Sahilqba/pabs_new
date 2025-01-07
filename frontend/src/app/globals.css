@@ -7,11 +7,11 @@
   --color4: #176B87;
   --black: #000000;
 }
-
+ 
 nextjs-portal {
   display: none;
 }
-
+ 
 body{
   overflow-x: hidden;
   /* padding: 10px; */
@@ -43,14 +43,14 @@ main.main-container {
 main.main-container.show {
   padding-left: 275px;
 }
-
+ 
 nav.navbar.navbar-expand-lg.navbar-dark {
   background: black;
 }
 i.bi.bi-person-fill {
   color: white;
 }
-
+ 
 .form-control {
   height: 50px;
   border-radius: 0 !important;
@@ -104,7 +104,7 @@ i.bi.bi-person-fill {
 .button-class{
   margin-top: 35px;
 }
-
+ 
 .hero-image img {
   width: 100%;
   /* min-height: 700px ; */
@@ -118,7 +118,7 @@ i.bi.bi-person-fill {
 .hero-buttons {
   gap: 10px;
 }
-
+ 
 .spinner-border {
   display: inline-block;
   width: 2rem;
@@ -129,13 +129,13 @@ i.bi.bi-person-fill {
   border-radius: 50%;
   animation: spinner-border 0.75s linear infinite;
 }
-
+ 
 @keyframes spinner-border {
   100% {
     transform: rotate(360deg);
   }
 }
-
+ 
 .flex-item-login {
   margin: 10px;
   padding: 20px;
@@ -154,12 +154,12 @@ i.bi.bi-person-fill {
 }
 /* footer */
 /* .ftr-sec {
-	background-color: #000;
-	padding: 6px;
-	color: wheat;
-	text-align: center;
+  background-color: #000;
+  padding: 6px;
+  color: wheat;
+  text-align: center;
 } */
-
+ 
 footer {
   background-color: black;
   color: white;
@@ -187,7 +187,7 @@ footer {
   gap: 10px;
   margin-top: 30px;
 }
-
+ 
 .btn-grp .btn , .app-sub  {
   width: 100%;
   height: 50px;
@@ -208,30 +208,30 @@ footer {
   margin: 6px 0 30px 0px;
   border-radius: 0 !important;
 }
-
+ 
 .register-link {
   margin: 10px  0 0 0;
 }
 .login-form h2 , .reg-form h2 {
   margin-bottom: 30px;
 }
-
+ 
 /* spinner */
 .spinner-border {
   --bs-spinner-width: 120px;
   --bs-spinner-height: 120px;
 }
-
+ 
 /* css appoinment table */
 .input-row {
   display: flex;
   gap: 10px; /* Adjust the gap between inputs as needed */
 }
-
+ 
 .input-row input {
   flex: 1; /* Make inputs take equal space */
 }
-
+ 
 .appointments-table {
   width: 100%;
   border-collapse: collapse;
@@ -239,20 +239,20 @@ footer {
   font-size: 18px;
   text-align: left;
 }
-
+ 
 .appointments-table th, .appointments-table td {
   padding: 12px 15px;
   border: 1px solid #ddd;
 }
-
+ 
 .appointments-table th {
   background-color: #f4f4f4;
 }
-
+ 
 .appointments-table tr:nth-child(even) {
   background-color: #f9f9f9;
 }
-
+ 
 .appointment-button {
   display: inline-block;
   padding: 10px 20px;
@@ -265,14 +265,14 @@ footer {
   margin-top: 15px;
   width: 15%;
 }
-
+ 
 .appointment-button:hover {
   background-color: #0056b3;
 }
 .prof-hdng {
   margin: 15px 15px 15px 5px;
 }
-
+ 
 .prof-hdng h3 {
   margin: 0;
   line-height: 40px;
@@ -286,7 +286,7 @@ footer {
 }
 /* icon */
 .action-symbol {display: flex;gap: 7px;}
-
+ 
 .action-symbol button {
   width: 50px;
   height: 50px;
@@ -298,18 +298,18 @@ footer {
 .appointments-table.app-hist th:last-child {
   width: auto;
 }
-
+ 
 .accordion-button {
-  font-size: 25px !important; 
+  font-size: 25px !important;
   color: var(--black) !important;
   line-height: 30px !important;
 }
-
+ 
 th {
   color: var(--black);
   font-size: 18px;
 }
-
+ 
 .modal-header {
   font-size: 20px;
   line-height: 30px;
@@ -321,7 +321,7 @@ th {
   font-size: 18px;
   line-height: 25px;
 }
-
+ 
 .hero-buttons a {
   height: 50px;
   width: 100%;
@@ -340,7 +340,7 @@ th {
   margin: 15px 0 30px 0;
 } */
  /* svg G */
-
+ 
 svg {
   height: 33px;
   width: 50px;
@@ -358,7 +358,7 @@ svg {
   font-size: 14px;
   font-weight: bold;
 }
-
+ 
 .separator::before,
 .separator::after {
   content: "";
@@ -382,9 +382,9 @@ svg {
   top: 15px;
   transition: color 0.3s ease;
 }
-
+ 
 .custom-close-btn:hover {color: #ff0000;}
-
+ 
 /* sidebar */
 .sidebar {
   width: 250px;
@@ -420,15 +420,15 @@ svg {
     width: 33.3% !important;
     border-radius: 0 !important;
   }
-
+ 
 /* .doc-dept {display: flex;gap: 12px;} */
-
+ 
 button.btn.btn-primary.dept-btn {
     height: 50px;
     border-radius: 0;
     width: 10%;
 }
-
+ 
 .hamburger-btn {
   background: transparent;
   border: none;
@@ -449,34 +449,34 @@ button.btn.btn-primary.dept-btn {
   padding: 20px; /* Optional: Adds padding around the list */
   background-color: #f9f9f9; /* Light background for the container */
 }
-
+ 
 .appointment-card {
   padding: 15px;
   border-bottom: 1px solid #ccc; /* Adds a line after each card */
-  background-color: #ffffff; 
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
-  border-radius: 5px; 
+  background-color: #ffffff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
 }
-
-
+ 
+ 
 .appointment-card:nth-child(even) {
-  background-color: #f0f8ff; 
+  background-color: #f0f8ff;
 }
-
-
+ 
+ 
 .appointment-card:hover {
   transform: scale(1.02);
   transition: transform 0.2s ease-in-out;
 }
-
-
+ 
+ 
 .appointment-card h3 {
-	margin: 0 0 10px;
-	color: #333;
-	font-size: 40px;
-	font-weight: 600;
+  margin: 0 0 10px;
+  color: #333;
+  font-size: 40px;
+  font-weight: 600;
 }
-
+ 
 .appointment-card p {
   margin: 5px 0;
   color: #555;
@@ -489,35 +489,35 @@ button.btn.btn-primary.dept-btn {
 .appointment-details {
   padding: 10px 0;
 }
-
+ 
 .appointment-details:not(:last-child) {
-  border-bottom: 1px solid #ddd; 
+  border-bottom: 1px solid #ddd;
   /* margin-bottom: 10px; */
 }
 .appointment-details h4 {
-	/* color: #3f3f95; */
-	font-weight: 600;
+  /* color: #3f3f95; */
+  font-weight: 600;
 }
 .doc-app h2 {
   padding: 15px 0px;
 }
-
+ 
 i.bi.bi-power {
   padding-right: 14px;
   color: white;
   font-size: 21px;
 }
-
+ 
 i.bi.bi-power:hover {
   color: #bcb7b7;
 }
-
-
+ 
+ 
 /* Image upload section */
 .mb-3 {
   margin-bottom: 20px;
 }
-
+ 
 .mb-3 img {
   max-width: 100px;
   max-height: 100px;
@@ -525,15 +525,15 @@ i.bi.bi-power:hover {
   border-radius: 50%;
   border: 2px solid #ddd;
 }
-
+ 
 .custom-select {
   position: relative;
 }
-
+ 
 .custom-select .form-control {
   padding: 10px;
 }
-
+ 
 .doctor-images {
   display: none;
   position: absolute;
@@ -544,17 +544,17 @@ i.bi.bi-power:hover {
   border: 1px solid #ccc;
   z-index: 1000;
 }
-
+ 
 .custom-select:hover .doctor-images {
   display: block;
 }
-
+ 
 .doctor-option {
   display: flex;
   align-items: center;
   padding: 5px;
 }
-
+ 
 .doctor-option img {
   /* width: 50px;
   height: 50px; */
@@ -635,7 +635,7 @@ img.doctor-image {
     flex-direction: column;
     z-index: 1000; /* Ensure it's above other elements */
   }
-  
+ 
   .menu-item {
     padding: 8px 12px;
     border: none;
@@ -644,7 +644,7 @@ img.doctor-image {
     cursor: pointer;
     font-size: 14px;
   }
-  
+ 
   .menu-item:hover {
     background-color: #f0f0f0;
   }
