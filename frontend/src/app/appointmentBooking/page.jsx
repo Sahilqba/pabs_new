@@ -62,12 +62,21 @@ function page() {
       }
 
       const data = await response.json();
-      const sortedAppointments = data.sort((a, b) => {
+      const now = new Date(); // Current date and time
+
+    // Filter and sort appointments
+    const filteredAppointments = data
+      .filter((appointment) => {
+        const appointmentDateTime = new Date(
+          `${appointment.appointmentDate}T${appointment.appointmentTime}`
+        );
+        return appointmentDateTime >= now; // Include only future or current appointments
+      }).sort((a, b) => {
         const dateA = new Date(`${a.appointmentDate}T${a.appointmentTime}`);
         const dateB = new Date(`${b.appointmentDate}T${b.appointmentTime}`);
         return dateA - dateB;
       });
-      setAppointments(sortedAppointments);
+      setAppointments(filteredAppointments);
     } catch (error) {
       console.error("Failed to fetch appointments:", error);
     } finally {

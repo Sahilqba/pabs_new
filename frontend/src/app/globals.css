@@ -278,7 +278,12 @@ footer {
   line-height: 40px;
   font-size: 30px;
 }
-
+.doc-panel .prof-hdng h3 {
+  margin: 0;
+  line-height: 40px;
+  font-size: 30px;
+  text-align: center;
+}
 /* icon */
 .action-symbol {display: flex;gap: 7px;}
 
@@ -412,11 +417,11 @@ svg {
 /* user profile doc */
 .dept-sel {
     height: 50px;
-    width: 30% !important;
+    width: 33.3% !important;
     border-radius: 0 !important;
   }
 
-.doc-dept {display: flex;gap: 12px;}
+/* .doc-dept {display: flex;gap: 12px;} */
 
 button.btn.btn-primary.dept-btn {
     height: 50px;
@@ -567,12 +572,17 @@ img.doctor-image {
   border-radius: 11px;
 }
 /* added css */
-.prof-main {
+/* .prof-main {
   display: flex;
   justify-content: space-between;
   padding: 15px 0px;
+} */
+.prof-main {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  gap: 25px;
 }
-
   .profile-picture-container {
     text-align: center;
   }
@@ -581,8 +591,8 @@ img.doctor-image {
     display: inline-block;
   }
   .avatar {
-    width: 150px;
-    height: 150px;
+    width: 200px;
+    height: 200px;
     border-radius: 50%;
     object-fit: cover;
   }
