@@ -19,6 +19,9 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  qualification: String,
+  experianceyear: String,
+  previousCompany: String,
 });
 
 const appointmentSchema = new mongoose.Schema({

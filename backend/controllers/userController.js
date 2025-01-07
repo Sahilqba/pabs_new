@@ -269,7 +269,7 @@ exports.getUsers = async (req, res) => {
 exports.updateDepartment = [
   upload.single('image'), // Middleware to handle file upload
   async (req, res) => {
-    const { department } = req.body;
+    const { department, qualification, experianceyear, previousCompany } = req.body;
     const image = req.file; // Access the uploaded file
 
     const authHeader = req.headers.authorization;
@@ -285,7 +285,7 @@ exports.updateDepartment = [
     try {
       const decoded = jwt.verify(token, secretKey);
       const { id } = req.params;
-      const updateData = { department };
+      const updateData = { department, qualification, experianceyear, previousCompany  };
       if (image) {
         // updateData.image = image.path; // Save the file path or handle the file as needed
         updateData.filename = image.filename; // Save the original file name
