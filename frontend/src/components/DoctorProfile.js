@@ -173,7 +173,7 @@ const DoctorProfile = () => {
   const handleUpload = async (file) => {
     const formData = new FormData();
     formData.append("image", file);
-
+    console.log("File:", file);
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/updateDepartment/${userIdinDb}`,
@@ -188,6 +188,7 @@ const DoctorProfile = () => {
 
       if (response.ok) {
         const data = await response.json();
+        console.log("Image data path:", data.path);
         toast.success("Profile picture updated successfully.");
         setImagePath(data.path);
         setImageName(data.filename);
