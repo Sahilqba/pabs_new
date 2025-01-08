@@ -188,7 +188,7 @@ const DoctorProfile = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data.path)
+        console.log(data)
         toast.success("Profile picture updated successfully.");
         setImagePath(data.path);
         setImageName(data.filename);
@@ -225,11 +225,7 @@ const DoctorProfile = () => {
         setImagePath("");
         setImageName("");
         setMenuOpen(false)
-      } else if (response.status === 401) {
-        toast.warning(
-          "Token has expired. Please log in again and try rescheduling."
-        );
-      }else {
+      } else {
         toast.error("Failed to delete picture.");
       }
     } catch (error) {

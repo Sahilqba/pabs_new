@@ -247,7 +247,6 @@ exports.updateDepartment = [
       if (result) {
         res.status(200).json({
           message: "Department and image updated successfully",
-          path: image.path,
           user: result,
         });
       } else {
