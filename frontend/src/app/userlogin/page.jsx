@@ -232,7 +232,7 @@ function page() {
               <div className="alternate-signin">
                 <button
                   onClick={handleGoogleLogin}
-                  className="btn btn-secondary"
+                  className="btn"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

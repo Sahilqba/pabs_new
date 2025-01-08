@@ -111,7 +111,7 @@ const DoctorProfile = () => {
     if (previousCompany) {
       formData.append("previousCompany", previousCompany);
     }
-    
+    console.log(formData)
 
     try {
       const response = await fetch(
@@ -128,6 +128,7 @@ const DoctorProfile = () => {
 
       if (response.ok) {
         const data = await response.json();
+        console.log(data)
         toast.success("Department set successfully");
         // setImageName(data.image);
         fetchDepartment(userIdfetched);
@@ -187,6 +188,7 @@ const DoctorProfile = () => {
 
       if (response.ok) {
         const data = await response.json();
+        console.log(data.path)
         toast.success("Profile picture updated successfully.");
         setImagePath(data.path);
         setImageName(data.filename);
@@ -223,7 +225,11 @@ const DoctorProfile = () => {
         setImagePath("");
         setImageName("");
         setMenuOpen(false)
-      } else {
+      } else if (response.status === 401) {
+        toast.warning(
+          "Token has expired. Please log in again and try rescheduling."
+        );
+      }else {
         toast.error("Failed to delete picture.");
       }
     } catch (error) {
