@@ -163,29 +163,17 @@ const docApp = () => {
             {!loading && appointments?.length === 0 && (
               <p>No appointments history found.</p>
             )}
-            {/* {!loading &&
-              appointments?.map((appointment) => (
-                <div key={appointment._id} className="appointment-card">
-                  <h3>{userData[appointment.userId]?.name || "Unknown"}</h3>
-                  <h3>{appointment.patientName}</h3>
-                  <p>
-                    <span>Appointment Date & Time:</span>{" "}
-                    {formatDateTime(appointment.appointmentDate)}, {appointment.appointmentTime}
-                  </p>
-                  <p>
-                    <span>Disease Symptoms:</span> {appointment.disease}
-                  </p>
-                </div>
-              ))} */}
               {!loading &&
             Object.entries(groupAppointmentsByUser(appointments)).map(
-              ([userId, userAppointments]) => (
-                <div key={userId} className="appointment-card">
-                  <h3>{userData[userId]?.name || "Unknown"}</h3>
-                  {userAppointments.map((appointment, index) => (
+              ([userId, userAppointments], index) => (
+                <div key={userId}>
+                    <h3>Patient {index + 1}: {userData[userId]?.name || "Unknown"}</h3>
+                    <div className="appointment-card">
+                  {/* <h3>{userData[userId]?.name || "Unknown"}</h3> */}
+                  {userAppointments.map((appointment, appointmentIndex) => (
                     <div key={appointment._id} className="appointment-details">
                       {userAppointments.length > 1 && (
-                        <h4>Appointment {index + 1}:</h4>
+                        <h4>Appointment {appointmentIndex + 1}:</h4>
                       )}
                       <p>
                         <span>Appointment Date & Time:</span>{" "}
@@ -197,6 +185,7 @@ const docApp = () => {
                       </p>
                     </div>
                   ))}
+                </div>
                 </div>
               )
             )}

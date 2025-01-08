@@ -20,7 +20,6 @@ const DoctorProfile = () => {
   const [qualification, setQualification] = useState("");
   const [experianceyear, setExperianceyear] = useState("");
   const [previousCompany, setpreviousCompany] = useState("");
-
   const [userName, setUserName] = useState(null);
   const userIdfetched = Cookies.get("userId");
   const jwtToken = localStorage.getItem("jwtToken");
@@ -28,7 +27,7 @@ const DoctorProfile = () => {
   const jwtCookie = Cookies.get("jwtCookie");
   const [menuOpen, setMenuOpen] = useState(false);
   const [role, setRole] = useState(null);
-
+  const [modal, setModal] = useState(false);
   const toggleMenu = () => {
     console.log("Menu toggled!");
     setMenuOpen(!menuOpen);
@@ -185,6 +184,7 @@ const DoctorProfile = () => {
         setImagePath(data.path);
         setImageName(data.filename);
         fetchProfilePicture(userIdfetched);
+        setMenuOpen(false);
       } else if (response.status === 401) {
         toast.warning(
           "Token has expired. Please log in again and try rescheduling."
@@ -215,6 +215,7 @@ const DoctorProfile = () => {
         toast.success("Profile picture deleted.");
         setImagePath("");
         setImageName("");
+        setMenuOpen(false)
       } else {
         toast.error("Failed to delete picture.");
       }
@@ -228,63 +229,70 @@ const DoctorProfile = () => {
   }, []);
   return (
     <>
-      <Header toggleSidebar={toggleSidebar} />
-      <div className="doc-panel">
-        <Sidebar isOpen={isSidebarOpen} role="doctor" />
-        <main className={`main-container ${isSidebarOpen ? "show" : ""}`}>
-          <div className="prof-main">
-            <div className="prof-hdng">
-              <h3>Hi Dr. {userName}, Welcome.</h3>
-            </div>
-            <div className="profile-picture-container">
-              <div className="avatar-wrapper">
-                {imagePath ? (
-                  <img
-                    src={`${process.env.NEXT_PUBLIC_API_URL}/${imagePath}`}
-                    alt="Profile"
-                    className="avatar"
-                  />
-                ) : (
-                  <div className="avatar-placeholder">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-person-fill"
-                      viewBox="0 0 16 16"
-                    >
-                      <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
-                    </svg>
-                  </div>
-                )}
-                <div
-                  className="menu-trigger"
+    <Header toggleSidebar={toggleSidebar} />
+    <div className="doc-panel">
+      <Sidebar isOpen={isSidebarOpen} role="doctor" />
+      <main className={`main-container ${isSidebarOpen ? "show" : ""}`}>
+        {/* <div className="prof-hdng">
+        <h3>Hi Dr. {userName}, Welcome.</h3>
+        </div> */}
+        <div className="row justify-content-center">
+         <div className="col-md-5"> 
+        <div className="doc-details-card">
+            <div className="profile-picture-container text-center">
+              {imagePath ? (
+                <img
+                  src={`${process.env.NEXT_PUBLIC_API_URL}/${imagePath}`}
+                  alt="Profile"
+                  className="avatar rounded-circle"
                   onClick={toggleMenu}
-                  style={{ cursor: "pointer" }}
+                  aria-haspopup="true"
+                  aria-expanded={menuOpen}
+                />
+              ) : (
+                <div
+                  className="avatar-placeholder rounded-circle bg-secondary d-flex align-items-center justify-content-center"
+                  aria-label="Default profile picture"
+                  onClick={toggleMenu} 
+                  aria-haspopup="true"
+                  aria-expanded={menuOpen}
                 >
-                  ...
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="32"
+                    height="32"
+                    fill="currentColor"
+                    className="bi bi-person-fill"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                  </svg>
                 </div>
-              </div>
+              )}
+              {/* <div
+                className="menu-trigger"
+                onClick={toggleMenu}
+                aria-haspopup="true"
+                aria-expanded={menuOpen}
+              >
+                ...
+              </div> */}
               {menuOpen && (
-                <div className="menu">
+                <div className="menu position-absolute bg-light border shadow-sm">
                   <button
-                    className="menu-item"
+                    className="menu-item btn btn-sm btn-link text-start"
                     onClick={() =>
                       document.getElementById("file-input").click()
                     }
                   >
                     Upload Picture
                   </button>
-                  <button className="menu-item" onClick={handleDelete}>
+                  <button
+                    className="menu-item btn btn-sm btn-link text-start"
+                    onClick={handleDelete}
+                  >
                     Delete Picture
                   </button>
-                  {/* <button
-                    className="menu-item"
-                    onClick={() => setPreviewImage(imagePath)}
-                  >
-                    Preview Picture
-                  </button> */}
                 </div>
               )}
             </div>
@@ -295,29 +303,16 @@ const DoctorProfile = () => {
               style={{ display: "none" }}
               onChange={(e) => handleUpload(e.target.files[0])}
             />
-          </div>
-          {/* {previewImage && (
-              <div className="modal">
-                <div className="modal-content">
-                  <img
-                    src={`${process.env.NEXT_PUBLIC_API_URL}/${previewImage}`}
-                    alt="Preview"
-                  />
-                  <button
-                    className="close-btn"
-                    onClick={() => setPreviewImage(null)}
-                  >
-                    Close
-                  </button>
-                </div>
-              </div>
-            )} */}
-          <form>
-            <div className="doc-dept">
-                <div className="doc-sel">
+         
+          <div className="prof-hdng">
+           <h3> Dr. {userName}</h3>
+          </div>  
+          <div className="doc-dept">
+           <div className="row">
+            <div className="col-md-12">
               <select
-                type="text"
-                className="form-select dept-sel"
+                // type="text"
+                className="form-select dept-sel doc-inp w-100 "
                 value={department}
                 onChange={(e) => setDepartment(e.target.value)}
                 required
@@ -329,57 +324,56 @@ const DoctorProfile = () => {
                 <option value="Cardiology">Cardiology</option>
                 <option value="Others">Others</option>
               </select>
-              </div>
-              <div className="col-md-4">
+            </div>
+              <div className="col-md-12">
                 <input
                   type="text"
-                  className="form-control"
+                  className="form-control doc-inp"
                   placeholder="Enter your Qualification*"
                   value={qualification}
-                  onChange={(e) => {
-                    setQualification(e.target.value);
-                  }}
+                  onChange={(e) => setQualification(e.target.value)}
                   required
                 />
               </div>
-              <div className="col-md-4">
+              <div className="col-md-12">
                 <input
                   type="text"
-                  className="form-control"
-                  placeholder="Enter your Experiance year*"
+                  className="form-control doc-inp"
+                  placeholder="Enter your Experience year*"
                   value={experianceyear}
-                  onChange={(e) => {
-                    setExperianceyear(e.target.value);
-                  }}
+                  onChange={(e) => setExperianceyear(e.target.value)}
                   required
                 />
               </div>
-              <div className="col-md-4">
+              <div className="col-md-12">
                 <input
                   type="text"
-                  className="form-control"
-                  placeholder="Enter your Previous work place if any"
+                  className="form-control doc-inp"
+                  placeholder="Enter your Previous workplace (if any)"
                   value={previousCompany}
-                  onChange={(e) => {
-                    setpreviousCompany(e.target.value);
-                  }}
+                  onChange={(e) => setpreviousCompany(e.target.value)}
                 />
               </div>
-              
+              <div className="col-md-12">
               <button
-                className="btn btn-primary dept-btn"
-                type="button"
-                onClick={handleSubmit}
-              >
-                Submit
-              </button>
+              className="btn btn-primary dept-btn w-100 doc-inp"
+              type="button"
+              onClick={handleSubmit}
+            >
+              Submit
+            </button>
+              </div>
             </div>
-          </form>
-        </main>
-      </div>
-      <Footer />
-      <ToastContainer />
-    </>
+          </div>
+        </div>
+        </div>
+        </div>
+      </main>
+    </div>
+    <Footer />
+    <ToastContainer />
+  </>
+  
   );
 };
 export default DoctorProfile;

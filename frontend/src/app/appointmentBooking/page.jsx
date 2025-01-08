@@ -614,7 +614,7 @@ function page() {
                 {appointments.map((appointment) => (
                   <tr key={appointment._id}>
                     <td>{appointment.disease}</td>
-                    <td>{appointment.doctor}</td>
+                    <td>Dr. {appointment.doctor.toUpperCase()}</td>
                     <td>{appointment.department}</td>
                     <td>{formatDateTime(appointment.appointmentDate)}</td>
                     <td>{appointment.appointmentTime}</td>
