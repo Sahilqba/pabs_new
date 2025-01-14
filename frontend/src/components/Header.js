@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 function Header({toggleSidebar}) {
   const router = useRouter();
+    const [loading, setLoading] = React.useState(false);
   useEffect(() => {
     // Dynamically load Bootstrap's JS bundle
     import("bootstrap/dist/js/bootstrap.bundle.min").then(() => {
@@ -16,12 +17,14 @@ function Header({toggleSidebar}) {
     });
   }, []);
   const handleLogout = async () => {
+    setLoading(true);
     try {
       const response = await fetch("http://localhost:8080/logout", {
         method: "GET",
         credentials: "include",
       });
       if (response.ok) {
+        setLoading(false);
         localStorage.removeItem("jwtToken");
         localStorage.removeItem("role");
         localStorage.removeItem("userName");
@@ -38,21 +41,22 @@ function Header({toggleSidebar}) {
         await router.push("/userlogin");
       } else {
         console.error("Logout failed");
+        setLoading(false);
       }
     } catch (error) {
       console.error("Logout failed:", error);
+      setLoading(false);
     }
   };
-  // useEffect(() => {
-  //   import("bootstrap/dist/js/bootstrap.bundle").catch(console.error);
-  // }, []);
-  // const handleProfileClick = (e) => {
-  //   e.preventDefault();
-  //   router.push("/user/profile");
-  // };
+
   return (
     <>
       <nav className="navbar navbar-expand-lg navbar-dark">
+      {loading ? (
+            <div className="spinner-border" role="status">
+              <span className="sr-only"></span>
+            </div>
+          ) : (
         <div className="container-fluid">
           <div className="hmbrgr-drpdwn">
           <a className="navbar-brand">
@@ -76,28 +80,6 @@ function Header({toggleSidebar}) {
           </button>
           <div className="collapse navbar-collapse" id="navbarNavDropdown">
             <ul className="navbar-nav ms-auto">
-              {/* <li className="nav-item dropdown">
-                <button
-                  className="nav-link"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  <i className="bi bi-person-fill"></i>
-                </button>
-                <ul className="dropdown-menu drpdwn-sec">
-                  <li>
-                    <a
-                      className="dropdown-item"
-                      href="#"
-                      onClick={handleLogout}
-                    >
-                      <i className="bi bi-box-arrow-right"></i>
-                      <span>Logout</span>
-                    </a>
-                  </li>
-                </ul>
-              </li> */}
               <li className="nav-item dropdown">
               <a
                   className="nav-link"
@@ -106,21 +88,6 @@ function Header({toggleSidebar}) {
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-    {/* <i className="bi bi-person-fill"></i> */}
-  {/* </a> */}
-  {/* <ul className="dropdown-menu drpdwn-sec" aria-labelledby="navbarDropdown">
-    <li>
-      <button
-        className="dropdown-item"
-        onClick={handleLogout}
-        style={{ background: "none", border: "none", color: "inherit" }}
-      >
-        <i className="bi bi-box-arrow-right"></i>
-        <span>Logout</span>
-      </button>
-    </li>
-  </ul> */}
-{/* </li> */}
                   <i className="bi bi-power" onClick={handleLogout} title="Logout"></i>
                 </a>
               </li>
@@ -128,6 +95,7 @@ function Header({toggleSidebar}) {
           </div>
           </div>
         </div>
+          )}
       </nav>
     </>
   );

@@ -747,3 +747,9 @@ button.menu-item.btn.btn-sm.btn-link.text-start {
 .avatar-placeholder{
   background-color: #e9e9e9 !important;
 }
+
+/* New css*/
+#phone {
+	width: 100%;
+	height: 50px;
+}

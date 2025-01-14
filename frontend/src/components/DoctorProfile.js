@@ -146,8 +146,8 @@ const DoctorProfile = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
-        toast.success("Form filled Successfully");
+        console.log(data)
+        toast.success("Information set successfully");
         // setImageName(data.image);
         fetchDepartment(userIdfetched);
       } else if (response.status === 401) {

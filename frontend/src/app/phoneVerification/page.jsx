@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import "bootstrap/dist/css/bootstrap.css";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
@@ -17,63 +18,166 @@ function page() {
   const [showRoleModal, setShowRoleModal] = useState(false);
   const [verificationSid, setVerificationSid] = useState("");
   const [otp, setOtp] = useState("");
+  const [contactNumberValid, setContactNumberValid] = useState(true);
   const jwtToken = localStorage.getItem("jwtToken");
   const sendOtp = async (e) => {
+    // setLoading(true);
     e.preventDefault();
+    const form = e.currentTarget;
+    if (!form.checkValidity() || !contactNumber) {
+      e.stopPropagation();
+      setFormValidated(true);
+      setContactNumberValid(!!contactNumber);
+      toast.error("Please enter the values.");
+      return;
+    }
+    setFormValidated(true);
+    setContactNumberValid(true);
     setShowRoleModal(true);
     console.log("email", email);
     Cookies.set("emailfromPhoneVerification", email, { expires: 1, path: "/" });
     Cookies.set("rolefromPhoneVerification", role, { expires: 1, path: "/" });
+  
     try {
-      const formattedNumber = `+${contactNumber}`;
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/sendOtp`,
+      // First API call to get user ID from email
+      const additionalResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/getuserIdfromEmail`,
         {
           method: "POST",
           headers: {
-            // Authorization: `Bearer ${jwtToken}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ contactNumber: formattedNumber }),
+          body: JSON.stringify({ email: email, role: role }),
         }
       );
-
-      if (response.ok) {
-        const data = await response.json();
-        setVerificationSid(data.sid);
-        toast.success("OTP sent to your contact number");
-        // Additional API call
-        const additionalResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/getuserIdfromEmail`,
-          {
-            method: "POST",
-            headers: {
-              // Authorization: `Bearer ${jwtToken}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email: email, role: role }),
-          }
-        );
-        if (additionalResponse.ok) {
-          const additionalData = await additionalResponse.json();
-          console.log("Additional API call successful:", additionalData);
-          Cookies.set(
-            "userIdfromPhoneVerification",
-            additionalData.user[0]._id,
-            { expires: 1, path: "/" }
+  
+      if (additionalResponse.ok) {
+        setLoading(false);
+        const additionalData = await additionalResponse.json();
+        console.log("Additional API call successful:", additionalData);
+        Cookies.set("userIdfromPhoneVerification", additionalData.user[0]._id, { expires: 1, path: "/" });
+  
+        // Check if role matches
+        if (role === additionalData.user[0].role) {
+          // Second API call to send OTP
+          const formattedNumber = `+${contactNumber}`;
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/sendOtp`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ contactNumber: formattedNumber, email, role }),
+            }
           );
+  
+          if (response.ok) {
+            const data = await response.json();
+            setVerificationSid(data.sid);
+            toast.success("OTP sent to your contact number");
+            setLoading(false);
+          } else if (response.status === 400) {
+            setShowRoleModal(false);
+            toast.error("Incorrect Contact number, email, or role.");
+            setLoading(false);
+          } else {
+            console.error("Failed to send OTP");
+            setLoading(false);
+          }
         } else {
-          console.error("Failed to make additional API call");
+          toast.error("Invalid credentials: role does not match");
+          setLoading(false);
         }
-      } else {
-        console.error("Failed to send OTP");
+      } else if (additionalResponse.status === 401) {
+        setShowRoleModal(false);
+        toast.error("Incorrect Contact number, email, or role.");
+        setLoading(false);
+      }
+      else {
+        console.error("Failed to make additional API call");
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error sending OTP:", error);
+      setLoading(false);
     }
   };
 
+//   const sendOtp = async (e) => {
+//     e.preventDefault();
+//     //
+//     const form = e.currentTarget;
+//     if (!form.checkValidity() || !contactNumber) {
+//       e.stopPropagation();
+//       setFormValidated(true);
+//       setContactNumberValid(!!contactNumber);
+//       toast.error("Please enter the values.");
+//       return;
+//     }
+//     setFormValidated(true);
+//     setContactNumberValid(true);
+//     //
+//     setShowRoleModal(true);
+//     console.log("email", email);
+//     Cookies.set("emailfromPhoneVerification", email, { expires: 1, path: "/" });
+//     Cookies.set("rolefromPhoneVerification", role, { expires: 1, path: "/" });
+//     try {
+//       const formattedNumber = `+${contactNumber}`;
+//       const response = await fetch(
+//         `${process.env.NEXT_PUBLIC_API_URL}/sendOtp`,
+//         {
+//           method: "POST",
+//           headers: {
+//             // Authorization: `Bearer ${jwtToken}`,
+//             "Content-Type": "application/json",
+//           },
+//           body: JSON.stringify({ contactNumber: formattedNumber, email, role }),
+//         }
+//       );
+
+//       if (response.ok) {
+//         const data = await response.json();
+//         setVerificationSid(data.sid);
+//         toast.success("OTP sent to your contact number");
+//         // Additional API call
+//         const additionalResponse = await fetch(
+//           `${process.env.NEXT_PUBLIC_API_URL}/getuserIdfromEmail`,
+//           {
+//             method: "POST",
+//             headers: {
+//               // Authorization: `Bearer ${jwtToken}`,
+//               "Content-Type": "application/json",
+//             },
+//             body: JSON.stringify({ email: email, role: role }),
+//           }
+//         );
+//         if (additionalResponse.ok) {
+//           const additionalData = await additionalResponse.json();
+//           console.log("Additional API call successful:", additionalData);
+//           Cookies.set(
+//             "userIdfromPhoneVerification",
+//             additionalData.user[0]._id,
+//             { expires: 1, path: "/" }
+//           );
+//         } else {
+//           console.error("Failed to make additional API call");
+//         }
+//       }else if (response.status === 400) {
+//         setShowRoleModal(false);
+//         toast.error("Incorrect Contact number, email, or role.");
+//       } 
+//       else {
+//         console.error("Failed to send OTP");
+//       }
+//     } catch (error) {
+//       console.error("Error sending OTP:", error);
+//     }
+//   };
+
+
   const verifyOtp = async () => {
+    setLoading(true);
     try {
       const response = await fetch("http://localhost:8080/verifyOtp", {
         method: "POST",
@@ -85,14 +189,20 @@ function page() {
       });
 
       if (response.ok) {
+        setLoading(false);
         toast.success("OTP verified successfully");
         router.push("/updatePassword");
       } else {
         console.error("Failed to verify OTP");
-        toast.error("Time limit execeeded. Please try again");
+        toast.error("Failed to verify OTP");
+        setLoading(false);
+        // Cookies.remove("userIdfromPhoneVerification", { path: "/" });
+        // Cookies.remove("emailfromPhoneVerification", { path: "/" });
+        // Cookies.remove("rolefromPhoneVerification", { path: "/" });
       }
     } catch (error) {
       console.error("Error verifying OTP:", error);
+      setLoading(false);
     }
   };
   return (
@@ -122,6 +232,9 @@ function page() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
+                <div className="invalid-feedback">
+                  Please provide a valid email address.
+                </div>
               </div>
               <div className="mb-3">
                 <select
@@ -136,10 +249,13 @@ function page() {
                   <option value="Doctor">Doctor</option>
                   <option value="Patient">Patient</option>
                 </select>
+                <div className="invalid-feedback">
+                  Please provide a valid role.
+                </div>
               </div>
               <div className="mb-3">
                 <PhoneInput
-                  country={"in"} // Set default country
+                  country={"in"}
                   value={contactNumber}
                   onChange={(phone) => setContactNumber(phone)}
                   inputProps={{
@@ -150,6 +266,9 @@ function page() {
                     id: "phone",
                   }}
                 />
+                <div className="invalid-feedback">
+                  Please provide a valid phone number.
+                </div>
               </div>
               <div className="btn-grp">
                 <button type="submit" className="btn btn-primary">
@@ -171,7 +290,7 @@ function page() {
               >
                 <div className="modal-content">
                   <div className="modal-header">
-                    <h5 className="modal-title">Select Your Role</h5>
+                    <h5 className="modal-title">OTP verification</h5>
                     <button
                       type="button"
                       className="custom-close-btn"
@@ -197,7 +316,7 @@ function page() {
                       required
                     />
                     <button
-                      className="btn btn-secondary mdl-btn m-2"
+                      className="btn btn-primary mdl-btn m-2"
                       onClick={verifyOtp}
                     >
                       Submit OTP
