@@ -21,7 +21,12 @@ const jwt = require("jsonwebtoken");
 const path = require('path');
 const secretKey = process.env.SECRET_KEY;
 const { User} = require("./models/user");
- 
+const twilio = require('twilio');
+const { parsePhoneNumberFromString } = require('libphonenumber-js');
+const accountSid = process.env.TWILIO_ACCOUNT_SID; // Add your Twilio Account SID here
+const authToken = process.env.TWILIO_AUTH_TOKEN; // Add your Twilio Auth Token here
+const verifyServiceSid = process.env.TWILIO_VERIFY_SERVICE_SID; // Add your Twilio Verify Service SID here
+const client = twilio(accountSid, authToken);
 // Enable CORS
 // app.use(cors());
 
@@ -178,6 +183,55 @@ app.get("/logout", (req, res) => {
       res.status(200).json({ message: "Logged out successfully" });
     });
   });
+});
+
+// Endpoint to send OTP
+app.post("/sendOtp", (req, res) => {
+  // const authHeader = req.headers.authorization;
+  // if (!authHeader) {
+  //   return res.status(401).send("Unauthorized");
+  // }
+  const { contactNumber } = req.body;
+  const phoneNumber = parsePhoneNumberFromString(contactNumber, 'US'); // Replace 'US' with the default country code if needed
+
+  if (!phoneNumber || !phoneNumber.isValid()) {
+    return res.status(400).send({ error: "Invalid phone number" });
+  }
+
+  const formattedNumber = phoneNumber.number; // Get the number in E.164 format
+
+  client.verify.v2.services(verifyServiceSid)
+    .verifications
+    .create({to: formattedNumber, channel: 'sms'})
+    .then(verification => res.status(200).send({ sid: verification.sid }))
+    .catch(err => {
+      console.error("Error sending OTP:", err.message, err.stack);
+      res.status(500).send({ error: "Failed to send OTP" });
+    });
+});
+
+// Endpoint to verify OTP
+app.post("/verifyOtp", (req, res) => {
+  // const authHeader = req.headers.authorization;
+  // console.log(`Auth header: ${authHeader}`);
+  // if (!authHeader) {
+  //   return res.status(401).send("Unauthorized");
+  // }
+  const { sid, token } = req.body;
+  client.verify.v2.services(verifyServiceSid)
+    .verificationChecks
+    .create({verificationSid: sid, code: token})
+    .then(verification_check => {
+      if (verification_check.status === 'approved') {
+        res.status(200).send({ message: "OTP verified successfully" });
+      } else {
+        res.status(400).send({ error: "Invalid OTP" });
+      }
+    })
+    .catch(err => {
+      console.error("Error verifying OTP:", err);
+      res.status(500).send({ error: "Failed to verify OTP" });
+    });
 });
 
 // Serve Swagger UI

@@ -269,6 +269,11 @@ footer {
 .appointment-button:hover {
   background-color: #0056b3;
 }
+.blurred {
+  background-color: lightgrey; 
+  opacity: 0.4;
+  /* cursor: not-allowed; */
+}
 .prof-hdng {
   margin: 15px 15px 15px 5px;
 }
@@ -317,6 +322,14 @@ th {
 .dropdown-item span {
   margin-left: 10px;
 }
+.dropdown-img {
+  display: flex;
+  align-items: center;
+}
+
+.dropdown-img span {
+  white-space: normal;
+}
 .no-booking p {
   font-size: 18px;
   line-height: 25px;
@@ -348,7 +361,12 @@ svg {
 .alternate-signin .btn {
   width: 100%;
   margin: 15px 0;
-  border-radius: 0;
+  border-radius: 10px;
+  border: 1px solid #9f9fb4
+}
+
+.alternate-signin .btn:hover {
+  border-color: #1b1b26;
 }
 .separator {
   display: flex;
@@ -416,7 +434,7 @@ svg {
 }
 /* user profile doc */
 .dept-sel {
-    height: 50px;
+    /* height: 50px; */
     width: 33.3% !important;
     border-radius: 0 !important;
   }
@@ -453,28 +471,29 @@ button.btn.btn-primary.dept-btn {
 .appointment-card {
   padding: 15px;
   border-bottom: 1px solid #ccc; /* Adds a line after each card */
-  background-color: #ffffff;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
+  background-color: #ffffff; 
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+  border-radius: 5px; 
+  margin: 15px 0;
 }
- 
- 
-.appointment-card:nth-child(even) {
-  background-color: #f0f8ff;
-}
- 
- 
-.appointment-card:hover {
+
+
+/* .appointment-card:nth-child(even) {
+  background-color: #f0f8ff; 
+} */
+
+
+/* .appointment-card:hover {
   transform: scale(1.02);
   transition: transform 0.2s ease-in-out;
-}
- 
- 
-.appointment-card h3 {
-  margin: 0 0 10px;
-  color: #333;
-  font-size: 40px;
-  font-weight: 600;
+} */
+
+
+.appointments-list h3 {
+	margin: 0 0 10px;
+	color: #333;
+	font-size: 40px;
+	font-weight: 600;
 }
  
 .appointment-card p {
@@ -487,12 +506,24 @@ button.btn.btn-primary.dept-btn {
   font-weight: 600;
 }
 .appointment-details {
-  padding: 10px 0;
+  padding: 10px 0 10px 10px;
+  position: relative;
+  padding-right: 120px;
+  border-left: 0px solid #000;
+  transition: 0.3s;
 }
- 
+.appointment-details:hover {
+  border-width: 5px;
+}
+
+.appointment-details .action-symbol {
+  position: absolute;
+  right: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+}
 .appointment-details:not(:last-child) {
-  border-bottom: 1px solid #ddd;
-  /* margin-bottom: 10px; */
+  border-bottom: 1px solid #ddd; 
 }
 .appointment-details h4 {
   /* color: #3f3f95; */
@@ -501,7 +532,10 @@ button.btn.btn-primary.dept-btn {
 .doc-app h2 {
   padding: 15px 0px;
 }
- 
+/* .doc-app-hdng {
+  display: flex;
+  justify-content: space-between;
+} */
 i.bi.bi-power {
   padding-right: 14px;
   color: white;
@@ -591,9 +625,9 @@ img.doctor-image {
     display: inline-block;
   }
   .avatar {
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
+    width: 100%;
+    height: 100%;
+    /* border-radius: 50%; */
     object-fit: cover;
   }
   /* .avatar-image,
@@ -614,8 +648,8 @@ img.doctor-image {
   }
   .menu-trigger {
     position: absolute;
-    bottom: 0;
-    right: 0;
+    bottom: 47%;
+    right: 45%;
     background-color: #fff;
     border: 1px solid #ccc;
     border-radius: 50%;
@@ -624,8 +658,8 @@ img.doctor-image {
   }
   .menu {
     position: absolute;
-    /* top: 40px;  */
-    right: 15px;
+    top: 20px; 
+    right: -179px;
     background-color: white;
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -674,3 +708,39 @@ img.doctor-image {
     border-radius: 4px;
     cursor: pointer;
   }
+
+
+  /* doc profile card */
+  .profile-picture-container {
+    width: 152px !important;
+    height: 152px;
+    display: block;
+    margin: 0 auto;
+    position: relative;
+    filter: drop-shadow(1px 6px 7px #423bb0);
+    cursor: pointer;
+    transition: 0.5s;
+}
+.profile-picture-container:hover {
+  transform: scale(1.06);
+  filter: drop-shadow(1px 0px 7px #423bb0);
+}
+  .doc-details-card {
+    margin: 60px 0;
+    padding: 25px 20px;
+    border-radius: 15px;
+    box-shadow: 0px 2px 16px 2px #ededed;
+}
+.doc-inp {
+  margin: 10px 0px;
+  height: 60px !important;
+  font-size: 20px !important;
+  line-height: 30px !important;
+  border-radius: 10px !important;
+}
+button.menu-item.btn.btn-sm.btn-link.text-start {
+  text-decoration: none;
+  font-size: 19px;
+  line-height: 34px;
+  color: black;
+}

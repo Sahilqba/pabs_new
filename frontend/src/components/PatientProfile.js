@@ -71,6 +71,11 @@ const PatientProfile = () => {
       fetchAppointments(userIdfetched);
     }
   }, [userIdfetched]);
+  const isPastAppointment = (appointmentDate, appointmentTime) => {
+    const appointmentDateTime = new Date(`${appointmentDate}T${appointmentTime}`);
+    const now = new Date();
+    return appointmentDateTime < now;
+  };
   const formatDateTime = (isoString) => {
     if (!isoString) return "";
     const dateObj = new Date(isoString);
@@ -137,15 +142,23 @@ const PatientProfile = () => {
                           <tr>
                             <th>Disease Symptoms</th>
                             <th>Doctor</th>
+                            <th>Department</th>
                             <th>Appointment Date</th>
                             <th>Appointment Time(IST)</th>
                           </tr>
                         </thead>
                         <tbody>
                           {appointments.map((appointment) => (
-                            <tr key={appointment._id}>
+                            <tr key={appointment._id}
+                            className={isPastAppointment(
+                              appointment.appointmentDate,
+                              appointment.appointmentTime
+                            )
+                              ? "blurred"
+                              : ""}>
                               <td>{appointment.disease}</td>
                               <td>Dr. {appointment.doctor.toUpperCase()}</td>
+                              <td>{appointment.department}</td>
                               <td>
                                 {formatDateTime(appointment.appointmentDate)}
                               </td>

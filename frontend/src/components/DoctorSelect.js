@@ -58,6 +58,7 @@ const DoctorSelect = ({ doctors, selectedDoctor, setSelectedDoctor }) => {
               className="dropdown-item doctor-option"
               onClick={() => handleSelectDoctor(doc._id)}
             >
+              <div className="dropdown-img">
               <img
                 src={`${process.env.NEXT_PUBLIC_API_URL}/${doc.path}`}
                 alt={doc.name}
@@ -66,6 +67,7 @@ const DoctorSelect = ({ doctors, selectedDoctor, setSelectedDoctor }) => {
               <span>
                 Dr. {doc.name.toUpperCase()} ({doc.department})
               </span>
+              </div>
             </div>
           ))}
         </div>

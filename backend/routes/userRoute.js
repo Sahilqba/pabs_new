@@ -330,4 +330,8 @@ router.get('/user', userController.getUserbyId);
  */
 router.delete('/deleteDoctorImage/:id', userController.deleteDoctorImage);
 
+router.patch('/updatePassword/:id', userController.updatePassword);
+
+router.post('/getuserIdfromEmail', userController.userIdfromEmail);
+
 module.exports = router;

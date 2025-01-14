@@ -27,6 +27,12 @@ function page() {
     router.push("/userRegistration").finally(() => setIsLoading(false)); // Hide loader after navigation
   };
 
+  const handlePhoneVerificationClick = (e) => {
+    e.preventDefault();
+    setLoading(true); // Show loader
+    router.push("/phoneVerification").finally(() => setIsLoading(false)); // Hide loader after navigation
+  }
+
   const validatePassword = (value) => {
     const pattern = /^(?=.*[a-zA-Z])(?=.*\d)[A-Za-z\d]{5,10}$/;
     if (!value) {
@@ -225,14 +231,29 @@ function page() {
                     </Link>
                   )}
                 </div>
+                <div className="register-link">
+                  Forgot password?{" "}
+                  {loading ? (
+                    <span className="loader">Loading...</span> 
+                  ) : (
+                    <Link
+                      href="/phoneVerification"
+                      className="sign-up-link"
+                      onClick={handlePhoneVerificationClick}
+                    >
+                      Forgot password?
+                    </Link>
+                  )}
+                </div>
               </div>
+              
               <div className="separator">
                 <span>OR</span>
               </div>
               <div className="alternate-signin">
                 <button
                   onClick={handleGoogleLogin}
-                  className="btn btn-secondary"
+                  className="btn"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
