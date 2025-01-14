@@ -28,6 +28,8 @@ const DoctorProfile = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [role, setRole] = useState(null);
   const [modal, setModal] = useState(false);
+  const [errors, setErrors] = useState({});
+
   const toggleMenu = () => {
     console.log("Menu toggled!");
     setMenuOpen(!menuOpen);
@@ -74,7 +76,6 @@ const DoctorProfile = () => {
       setQualification(data.qualification);
       setExperianceyear(data.experianceyear);
       setpreviousCompany(data.previousCompany);
-
     } catch (error) {
       console.error("Failed to fetch department:", error);
     } finally {
@@ -89,10 +90,27 @@ const DoctorProfile = () => {
     }
   }, [userIdfetched]);
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!department) newErrors.department = "Please select your department.";
+    if (!qualification) newErrors.qualification = "Qualification is required.";
+    if (!experianceyear)
+      newErrors.experianceyear = "Please select your experience.";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; // Return true if no errors
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!department) {
-      toast.error("Please select your department.");
+    // if (!department || !qualification || !experianceyear) {
+    //   toast.error("Please fill the required fields.");
+    //   return;
+    // }
+
+    if (!validateForm()) {
+      toast.error("Please fill out all required fields.");
       return;
     }
 
@@ -111,7 +129,7 @@ const DoctorProfile = () => {
     if (previousCompany) {
       formData.append("previousCompany", previousCompany);
     }
-    console.log(formData)
+    console.log(formData);
 
     try {
       const response = await fetch(
@@ -128,8 +146,8 @@ const DoctorProfile = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data)
-        toast.success("Department set successfully");
+        console.log(data);
+        toast.success("Form filled Successfully");
         // setImageName(data.image);
         fetchDepartment(userIdfetched);
       } else if (response.status === 401) {
@@ -188,7 +206,7 @@ const DoctorProfile = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data)
+        console.log(data);
         toast.success("Profile picture updated successfully.");
         setImagePath(data.path);
         setImageName(data.filename);
@@ -224,7 +242,7 @@ const DoctorProfile = () => {
         toast.success("Profile picture deleted.");
         setImagePath("");
         setImageName("");
-        setMenuOpen(false)
+        setMenuOpen(false);
       } else {
         toast.error("Failed to delete picture.");
       }
@@ -238,47 +256,47 @@ const DoctorProfile = () => {
   }, []);
   return (
     <>
-    <Header toggleSidebar={toggleSidebar} />
-    <div className="doc-panel">
-      <Sidebar isOpen={isSidebarOpen} role="doctor" />
-      <main className={`main-container ${isSidebarOpen ? "show" : ""}`}>
-        {/* <div className="prof-hdng">
+      <Header toggleSidebar={toggleSidebar} />
+      <div className="doc-panel">
+        <Sidebar isOpen={isSidebarOpen} role="doctor" />
+        <main className={`main-container ${isSidebarOpen ? "show" : ""}`}>
+          {/* <div className="prof-hdng">
         <h3>Hi Dr. {userName}, Welcome.</h3>
         </div> */}
-        <div className="row justify-content-center">
-         <div className="col-md-5"> 
-        <div className="doc-details-card">
-            <div className="profile-picture-container text-center">
-              {imagePath ? (
-                <img
-                  src={`${process.env.NEXT_PUBLIC_API_URL}/${imagePath}`}
-                  alt="Profile"
-                  className="avatar rounded-circle"
-                  onClick={toggleMenu}
-                  aria-haspopup="true"
-                  aria-expanded={menuOpen}
-                />
-              ) : (
-                <div
-                  className="avatar-placeholder rounded-circle bg-secondary d-flex align-items-center justify-content-center"
-                  aria-label="Default profile picture"
-                  onClick={toggleMenu} 
-                  aria-haspopup="true"
-                  aria-expanded={menuOpen}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="32"
-                    height="32"
-                    fill="currentColor"
-                    className="bi bi-person-fill"
-                    viewBox="0 0 16 16"
-                  >
-                    <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
-                  </svg>
-                </div>
-              )}
-              {/* <div
+          <div className="row justify-content-center">
+            <div className="col-md-5">
+              <div className="doc-details-card">
+                <div className="profile-picture-container text-center">
+                  {imagePath ? (
+                    <img
+                      src={`${process.env.NEXT_PUBLIC_API_URL}/${imagePath}`}
+                      alt="Profile"
+                      className="avatar rounded-circle"
+                      onClick={toggleMenu}
+                      aria-haspopup="true"
+                      aria-expanded={menuOpen}
+                    />
+                  ) : (
+                    <div
+                      className="avatar-placeholder rounded-circle d-flex align-items-center justify-content-center"
+                      aria-label="Default profile picture"
+                      onClick={toggleMenu}
+                      aria-haspopup="true"
+                      aria-expanded={menuOpen}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="32"
+                        height="32"
+                        fill="currentColor"
+                        className="bi bi-person-fill"
+                        viewBox="0 0 16 16"
+                      >
+                        <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                      </svg>
+                    </div>
+                  )}
+                  {/* <div
                 className="menu-trigger"
                 onClick={toggleMenu}
                 aria-haspopup="true"
@@ -286,103 +304,132 @@ const DoctorProfile = () => {
               >
                 ...
               </div> */}
-              {menuOpen && (
-                <div className="menu position-absolute bg-light border shadow-sm">
-                  <button
-                    className="menu-item btn btn-sm btn-link text-start"
-                    onClick={() =>
-                      document.getElementById("file-input").click()
-                    }
-                  >
-                    Upload Picture
-                  </button>
-                  <button
-                    className="menu-item btn btn-sm btn-link text-start"
-                    onClick={handleDelete}
-                  >
-                    Delete Picture
-                  </button>
+                  {menuOpen && (
+                    <div className="menu position-absolute bg-light border shadow-sm">
+                      <button
+                        className="menu-item btn btn-sm btn-link text-start"
+                        onClick={() =>
+                          document.getElementById("file-input").click()
+                        }
+                      >
+                        Upload Picture
+                      </button>
+                      <button
+                        className="menu-item btn btn-sm btn-link text-start"
+                        onClick={handleDelete}
+                      >
+                        Delete Picture
+                      </button>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-            <input
-              id="file-input"
-              type="file"
-              accept="image/*"
-              style={{ display: "none" }}
-              onChange={(e) => handleUpload(e.target.files[0])}
-            />
-         
-          <div className="prof-hdng">
-           <h3> Dr. {userName}</h3>
-          </div>  
-          <div className="doc-dept">
-           <div className="row">
-            <div className="col-md-12">
-              <select
-                // type="text"
-                className="form-select dept-sel doc-inp w-100 "
-                value={department}
-                onChange={(e) => setDepartment(e.target.value)}
-                required
-              >
-                <option value="">Select your Department</option>
-                <option value="GeneralPhysician">General Physician</option>
-                <option value="Orthopedic">Orthopedic</option>
-                <option value="Neurology">Neurology</option>
-                <option value="Cardiology">Cardiology</option>
-                <option value="Others">Others</option>
-              </select>
-            </div>
-              <div className="col-md-12">
                 <input
-                  type="text"
-                  className="form-control doc-inp"
-                  placeholder="Enter your Qualification*"
-                  value={qualification}
-                  onChange={(e) => setQualification(e.target.value)}
-                  required
+                  id="file-input"
+                  type="file"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={(e) => handleUpload(e.target.files[0])}
                 />
-              </div>
-              <div className="col-md-12">
-                <input
-                  type="text"
-                  className="form-control doc-inp"
-                  placeholder="Enter your Experience year*"
-                  value={experianceyear}
-                  onChange={(e) => setExperianceyear(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="col-md-12">
-                <input
-                  type="text"
-                  className="form-control doc-inp"
-                  placeholder="Enter your Previous workplace (if any)"
-                  value={previousCompany}
-                  onChange={(e) => setpreviousCompany(e.target.value)}
-                />
-              </div>
-              <div className="col-md-12">
-              <button
-              className="btn btn-primary dept-btn w-100 doc-inp"
-              type="button"
-              onClick={handleSubmit}
-            >
-              Submit
-            </button>
+
+                <div className="prof-hdng">
+                  <h3> Dr. {userName}</h3>
+                </div>
+                <div className="doc-dept">
+                  <div className="row">
+                    <div className="col-md-12">
+                      <select
+                        // type="text"
+                        className={`form-select dept-sel doc-inp w-100 ${
+                          errors.department ? "is-invalid" : ""
+                        }`}
+                        value={department}
+                        onChange={(e) => setDepartment(e.target.value)}
+                      >
+                        <option value="">Select your Department</option>
+                        <option value="GeneralPhysician">
+                          General Physician
+                        </option>
+                        <option value="Orthopedic">Orthopedic</option>
+                        <option value="Neurology">Neurology</option>
+                        <option value="Cardiology">Cardiology</option>
+                        <option value="Others">Others</option>
+                      </select>
+                      {errors.department && (
+                        <div className="invalid-feedback">
+                          {errors.department}
+                        </div>
+                      )}
+                    </div>
+                    <div className="col-md-12">
+                      <input
+                        type="text"
+                        className={`form-control doc-inp ${
+                          errors.qualification ? "is-invalid" : ""
+                        }`}
+                        placeholder="Enter your Qualification*"
+                        value={qualification}
+                        onChange={(e) => setQualification(e.target.value)}
+                      />
+                      {errors.qualification && (
+                        <div className="invalid-feedback">
+                          {errors.qualification}
+                        </div>
+                      )}
+                    </div>
+                    <div className="col-md-12">
+                      <select
+                        className={`form-select dept-sel doc-inp w-100 ${
+                          errors.experianceyear ? "is-invalid" : ""
+                        }`}
+                        value={experianceyear}
+                        onChange={(e) => {
+                          setExperianceyear(e.target.value);
+                          console.log(
+                            "Selected Experience Year:",
+                            e.target.value
+                          ); // Debugging
+                        }}
+                      >
+                        <option value="">Select your Experience Year</option>
+                        <option value="0-1year">0-1 year</option>
+                        <option value="2-5years">2-5 years</option>
+                        <option value="6-10years">6-10 years</option>
+                        <option value="10+years">10+ years</option>
+                      </select>
+                      {errors.experianceyear && (
+                        <div className="invalid-feedback">
+                          {errors.experianceyear}
+                        </div>
+                      )}
+                    </div>
+                    <div className="col-md-12">
+                      <input
+                        type="text"
+                        className="form-control doc-inp"
+                        placeholder="Enter your Previous workplace (if any)"
+                        value={previousCompany}
+                        onChange={(e) => setpreviousCompany(e.target.value)}
+                      />
+                    </div>
+                    <div className="col-md-12">
+                      <button
+                        className="btn btn-primary dept-btn w-100 doc-inp"
+                        type="button"
+                        onClick={handleSubmit}
+                      >
+                        Submit
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        </div>
-        </div>
-      </main>
-    </div>
-    <Footer />
-    <ToastContainer />
-  </>
-  
+        </main>
+      </div>
+      <Footer />
+      <ToastContainer />
+    </>
   );
 };
 export default DoctorProfile;
