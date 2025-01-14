@@ -191,7 +191,10 @@ app.post("/sendOtp", (req, res) => {
   // if (!authHeader) {
   //   return res.status(401).send("Unauthorized");
   // }
-  const { contactNumber } = req.body;
+  const { contactNumber, email, role } = req.body;
+  if (!contactNumber || !email || !role) {
+    return res.status(400).send({ error: "Contact number, email, and role are required" });
+  }
   const phoneNumber = parsePhoneNumberFromString(contactNumber, 'US'); // Replace 'US' with the default country code if needed
 
   if (!phoneNumber || !phoneNumber.isValid()) {
@@ -203,7 +206,7 @@ app.post("/sendOtp", (req, res) => {
   client.verify.v2.services(verifyServiceSid)
     .verifications
     .create({to: formattedNumber, channel: 'sms'})
-    .then(verification => res.status(200).send({ sid: verification.sid }))
+    .then(verification => res.status(200).send({ sid: verification.sid, email, role }))
     .catch(err => {
       console.error("Error sending OTP:", err.message, err.stack);
       res.status(500).send({ error: "Failed to send OTP" });

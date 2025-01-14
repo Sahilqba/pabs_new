@@ -2,6 +2,7 @@
 import React from "react";
 import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
+import "bootstrap/dist/css/bootstrap.css";
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
@@ -27,6 +28,7 @@ function page() {
     const userIdfromPhoneVerification = Cookies.get(
       "userIdfromPhoneVerification"
     );
+    setLoading(true);
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/updatePassword/${userIdfromPhoneVerification}`,
@@ -41,15 +43,26 @@ function page() {
       );
 
       if (response.ok) {
+        setLoading(false);
         const data = await response.json();
         setVerificationSid(data.sid);
         toast.success("Password update successfully");
         router.push("/userlogin");
-      } else {
+        Cookies.remove("userIdfromPhoneVerification", { path: "/" });
+        Cookies.remove("emailfromPhoneVerification", { path: "/" });
+        Cookies.remove("rolefromPhoneVerification", { path: "/" });
+      } else if (response.status === 400) {
+        toast.error("Password is required");
+        setLoading(false);
+      } 
+      else {
         console.error("Failed to send OTP");
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error sending OTP:", error);
+      toast.error(error);
+      setLoading(false);
     }
   };
 
@@ -86,11 +99,6 @@ function page() {
                   onChange={handlePasswordChange}
                   required
                 />
-                {/* {passwordError ? (
-                  <div className="invalid-feedback">{passwordError}</div>
-                ) : password ? (
-                  <div className="valid-feedback">Password looks good!</div>
-                ) : null} */}
               </div>
               <div className="btn-grp">
                 <button type="submit" className="btn btn-primary">
@@ -99,57 +107,6 @@ function page() {
               </div>
             </form>
           )}
-          {/* Bootstrap Modal */}
-          {/* {showRoleModal && (
-            <div
-              className="modal fade show d-block"
-              tabIndex="-1"
-              role="dialog"
-            >
-              <div
-                className="modal-dialog modal-dialog-centered"
-                role="document"
-              >
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <h5 className="modal-title">Select Your Role</h5>
-                    <button
-                      type="button"
-                      className="custom-close-btn"
-                      data-bs-dismiss="modal"
-                      aria-label="Close"
-                      onClick={() => {
-                        setShowRoleModal(false);
-                        setLoading(false);
-                      }}
-                    >
-                      <span>&times;</span>
-                    </button>
-                  </div>
-                  <div className="modal-body">
-                    <p>Please enter the otp:</p>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="otp"
-                      placeholder="OTP*"
-                      value={otp}
-                    //   onChange={(e) => setOtp(e.target.value)}
-                      required
-                    />
-                    <button
-                      className="btn btn-secondary mdl-btn m-2"
-                    //   onClick={verifyOtp}
-                    >
-                      Submit OTP
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )} */}
-
-          {/* Modal Backdrop */}
           {showRoleModal && <div className="modal-backdrop fade show"></div>}
         </div>
       </div>

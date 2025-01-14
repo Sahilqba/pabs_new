@@ -405,7 +405,7 @@ exports.userIdfromEmail = async (req, res) => {
   const { email, role } = req.body;
   try {
     const user = await User.find({ email, role });
-    if (user) {
+    if (user && user.length > 0) {
       res.status(200).json({ user });
     } else {
       res.status(401).send("Invalid user");
