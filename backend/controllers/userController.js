@@ -1,19 +1,18 @@
-
-const multer = require('multer');
-const path = require('path');
+const multer = require("multer");
+const path = require("path");
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+    cb(null, "uploads/");
   },
   filename: (req, file, cb) => {
-    cb(null, file.originalname); 
+    cb(null, file.originalname);
   },
 });
 const upload = multer({ storage: storage });
 const bcrypt = require("bcrypt");
 const { User, Appointment, LoginUser } = require("../models/user");
 const jwt = require("jsonwebtoken");
-require("dotenv").config(); 
+require("dotenv").config();
 const secretKey = process.env.SECRET_KEY;
 
 exports.createUser = async (req, res) => {
@@ -60,7 +59,8 @@ exports.createAppointment = async (req, res) => {
 
   try {
     const decoded = jwt.verify(token, secretKey);
-    const { disease, appointmentDate, appointmentTime, doctor, department } = req.body;
+    const { disease, appointmentDate, appointmentTime, doctor, department } =
+      req.body;
     const existingAppointment = await Appointment.findOne({
       userId: decoded.id,
       appointmentDate,
@@ -74,7 +74,13 @@ exports.createAppointment = async (req, res) => {
           "An appointment with the same date & time already exists for this user"
         );
     }
-    if (!disease || !appointmentDate || !appointmentTime || !doctor || !department) {
+    if (
+      !disease ||
+      !appointmentDate ||
+      !appointmentTime ||
+      !doctor ||
+      !department
+    ) {
       return res
         .status(400)
         .json({ error: "All fields are required to book an appointment" });
@@ -85,15 +91,13 @@ exports.createAppointment = async (req, res) => {
       appointmentDate,
       appointmentTime,
       doctor,
-      department
+      department,
     });
 
     await appointment.save();
-    
+
     res.status(201).send(appointment);
-  } catch (
-    err
-  ) {
+  } catch (err) {
     if (err.name === "TokenExpiredError") {
       return res.status(401).send("Token has expired");
     }
@@ -217,11 +221,11 @@ exports.getUsers = async (req, res) => {
   }
 };
 
-
 exports.updateDepartment = [
-  upload.single('image'), // Middleware to handle file upload
+  upload.single("image"), // Middleware to handle file upload
   async (req, res) => {
-    const { department, qualification, experianceyear, previousCompany } = req.body;
+    const { department, qualification, experianceyear, previousCompany } =
+      req.body;
     const image = req.file; // Access the uploaded file
 
     const authHeader = req.headers.authorization;
@@ -237,13 +241,20 @@ exports.updateDepartment = [
     try {
       const decoded = jwt.verify(token, secretKey);
       const { id } = req.params;
-      const updateData = { department, qualification, experianceyear, previousCompany  };
+      const updateData = {
+        department,
+        qualification,
+        experianceyear,
+        previousCompany,
+      };
       if (image) {
-        updateData.filename = image.filename; 
-        updateData.path = image.path; 
-        updateData.createdAt = image.createdAt; 
+        updateData.filename = image.filename;
+        updateData.path = image.path;
+        updateData.createdAt = image.createdAt;
       }
-      const result = await User.findByIdAndUpdate(id, updateData, { new: true });
+      const result = await User.findByIdAndUpdate(id, updateData, {
+        new: true,
+      });
       if (result) {
         res.status(200).json({
           message: "Department and image updated successfully",
@@ -258,11 +269,11 @@ exports.updateDepartment = [
       }
       res.status(400).send(err);
     }
-  }
+  },
 ];
 
 exports.doctorAppointments = async (req, res) => {
-  const { doctor} = req.body;
+  const { doctor } = req.body;
   try {
     const user = await Appointment.find({ doctor });
     if (user) {
@@ -285,22 +296,21 @@ exports.getDoctorDepartmentByUserId = async (req, res) => {
     if (!user) {
       return res.status(404).send("No user found");
     }
-    if (user.role !== 'Doctor') {
-      return res.status(400).json({ message: 'User is not a doctor' });
-  }
-//   if (!user.department) {
-//     return res.status(400).json({ message: 'No department selected' });
-// }
+    if (user.role !== "Doctor") {
+      return res.status(400).json({ message: "User is not a doctor" });
+    }
+    //   if (!user.department) {
+    //     return res.status(400).json({ message: 'No department selected' });
+    // }
     res.status(200).json(user);
   } catch (error) {
     res.status(400).send(error);
   }
 };
 
-
 exports.getUserbyId = async (req, res) => {
   try {
-    const userIds = req.query.userIds.split(',');
+    const userIds = req.query.userIds.split(",");
     const users = await User.find({ _id: { $in: userIds } });
     if (!users.length) {
       return res.status(404).send("No users found for the provided IDs");
@@ -317,24 +327,24 @@ exports.deleteDoctorImage = async (req, res) => {
   if (!authHeader) {
     return res.status(401).send("Unauthorized");
   }
- 
+
   const token = authHeader.split(" ")[1];
   if (!token) {
     return res.status(401).send("Unauthorized");
   }
- 
+
   try {
     const decoded = jwt.verify(token, secretKey);
     const { id } = req.params;
-    const result =         await User.updateOne(
+    const result = await User.updateOne(
       { _id: id },
       {
-          $unset: {
-              filename: "",
-              path: ""
-          }
+        $unset: {
+          filename: "",
+          path: "",
+        },
       }
-  );
+    );
     if (result) {
       res.status(200).json({ message: "Image deleted successfully" });
     } else {
@@ -347,6 +357,60 @@ exports.deleteDoctorImage = async (req, res) => {
     res.status(500).send(err.message);
   }
 };
- 
 
- 
+exports.updatePassword = async (req, res) => {
+  const { password } = req.body;
+
+  // const authHeader = req.headers.authorization;
+  // if (!authHeader) {
+  //   return res.status(401).send("Unauthorized");
+  // }
+
+  // const token = authHeader.split(" ")[1];
+  // if (!token) {
+  //   return res.status(401).send("Unauthorized");
+  // }
+  if (!password) {
+    return res.status(400).json({ error: "Password is required" });
+  }
+
+  try {
+    const { id } = req.params;
+    // const decoded = jwt.verify(token, secretKey);
+    // Hash the password before updating
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const result = await User.findByIdAndUpdate(
+      id,
+      { password: hashedPassword },
+      { new: true }
+    );
+    if (result) {
+      res.status(200).json({
+        message: "Password updated successfully",
+        User: result,
+      });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).send("Token has expired");
+    }
+    res.status(400).send(err);
+  }
+};
+
+exports.userIdfromEmail = async (req, res) => {
+  const { email, role } = req.body;
+  try {
+    const user = await User.find({ email, role });
+    if (user) {
+      res.status(200).json({ user });
+    } else {
+      res.status(401).send("Invalid user");
+    }
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};

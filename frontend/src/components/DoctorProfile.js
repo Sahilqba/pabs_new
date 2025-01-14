@@ -191,7 +191,7 @@ const DoctorProfile = () => {
   const handleUpload = async (file) => {
     const formData = new FormData();
     formData.append("image", file);
-
+    console.log("File:", file);
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/updateDepartment/${userIdinDb}`,
