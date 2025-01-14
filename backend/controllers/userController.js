@@ -360,24 +360,12 @@ exports.deleteDoctorImage = async (req, res) => {
 
 exports.updatePassword = async (req, res) => {
   const { password } = req.body;
-
-  // const authHeader = req.headers.authorization;
-  // if (!authHeader) {
-  //   return res.status(401).send("Unauthorized");
-  // }
-
-  // const token = authHeader.split(" ")[1];
-  // if (!token) {
-  //   return res.status(401).send("Unauthorized");
-  // }
   if (!password) {
     return res.status(400).json({ error: "Password is required" });
   }
 
   try {
     const { id } = req.params;
-    // const decoded = jwt.verify(token, secretKey);
-    // Hash the password before updating
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     const result = await User.findByIdAndUpdate(

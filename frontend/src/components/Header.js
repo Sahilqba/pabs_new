@@ -4,6 +4,9 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 // import "bootstrap/dist/js/bootstrap.bundle.min";
 import { useRouter } from "next/navigation";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
 function Header({toggleSidebar}) {
   const router = useRouter();
@@ -17,14 +20,16 @@ function Header({toggleSidebar}) {
     });
   }, []);
   const handleLogout = async () => {
-    setLoading(true);
+    // setLoading(true);
     try {
+    setLoading(true);
       const response = await fetch("http://localhost:8080/logout", {
         method: "GET",
         credentials: "include",
       });
       if (response.ok) {
         setLoading(false);
+        toast.success("Logging you out...");
         localStorage.removeItem("jwtToken");
         localStorage.removeItem("role");
         localStorage.removeItem("userName");
@@ -97,6 +102,8 @@ function Header({toggleSidebar}) {
         </div>
           )}
       </nav>
+            <ToastContainer />
+      
     </>
   );
 }

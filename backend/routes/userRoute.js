@@ -330,8 +330,66 @@ router.get('/user', userController.getUserbyId);
  */
 router.delete('/deleteDoctorImage/:id', userController.deleteDoctorImage);
 
+/**
+ * @swagger
+ * /updatePassword/{id}:
+ *   patch:
+ *     summary: Update password
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The user ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password updated successfully
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Appointment not found
+ *       400:
+ *         description: Bad request
+ */
 router.patch('/updatePassword/:id', userController.updatePassword);
 
+
+/**
+ * @swagger
+ * /getuserIdfromEmail:
+ *   post:
+ *     summary: View user's id from email
+ *     tags: [User]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User id retrieved successfully
+ *       401:
+ *         description: Invalid user
+ *       400:
+ *         description: Bad request
+ */
 router.post('/getuserIdfromEmail', userController.userIdfromEmail);
 
 module.exports = router;

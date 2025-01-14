@@ -43,10 +43,10 @@ function page() {
       );
 
       if (response.ok) {
+        toast.success("Password updated successfully");
         setLoading(false);
         const data = await response.json();
         setVerificationSid(data.sid);
-        toast.success("Password update successfully");
         router.push("/userlogin");
         Cookies.remove("userIdfromPhoneVerification", { path: "/" });
         Cookies.remove("emailfromPhoneVerification", { path: "/" });

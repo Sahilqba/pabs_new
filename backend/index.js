@@ -33,7 +33,7 @@ const client = twilio(accountSid, authToken);
 const rateLimit = require("express-rate-limit");
 const limiter = rateLimit({
     // 200 requests per hour
-    max: 200,    
+    max: 2000,    
     windowMs: 60* 60 * 1000,  //1 hour in milliseconds
     message: "Too many requests from this IP"
 });

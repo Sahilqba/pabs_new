@@ -21,7 +21,7 @@ const PatientProfile = () => {
   const jwtCookie = Cookies.get("jwtCookie");
   const [loading, setLoading] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  
+
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen);
   };
@@ -72,7 +72,9 @@ const PatientProfile = () => {
     }
   }, [userIdfetched]);
   const isPastAppointment = (appointmentDate, appointmentTime) => {
-    const appointmentDateTime = new Date(`${appointmentDate}T${appointmentTime}`);
+    const appointmentDateTime = new Date(
+      `${appointmentDate}T${appointmentTime}`
+    );
     const now = new Date();
     return appointmentDateTime < now;
   };
@@ -92,16 +94,17 @@ const PatientProfile = () => {
         <Sidebar isOpen={isSidebarOpen} role="patient" />
         <main className={`main-container ${isSidebarOpen ? "show" : ""}`}>
           <div className="prof-hdng">
-            <h3>
-              Welcome {userName}. You can view your appointments
-              here.
-            </h3>
+            <h3>Welcome {userName}. You can view your appointments here.</h3>
           </div>
           <div className="appnt-btn">
             <button
               className="btn btn-primary"
               onClick={() => {
-                router.push(`/appointmentBooking`);
+                toast.info("Navigating to Appointment booking page...");
+                // router.push(`/appointmentBooking`);
+                setTimeout(() => {
+                  router.push("/appointmentBooking");
+                }, 2000); // Adjust the delay as needed
               }}
             >
               Book an Appointment
@@ -149,13 +152,17 @@ const PatientProfile = () => {
                         </thead>
                         <tbody>
                           {appointments.map((appointment) => (
-                            <tr key={appointment._id}
-                            className={isPastAppointment(
-                              appointment.appointmentDate,
-                              appointment.appointmentTime
-                            )
-                              ? "blurred"
-                              : ""}>
+                            <tr
+                              key={appointment._id}
+                              className={
+                                isPastAppointment(
+                                  appointment.appointmentDate,
+                                  appointment.appointmentTime
+                                )
+                                  ? "blurred"
+                                  : ""
+                              }
+                            >
                               <td>{appointment.disease}</td>
                               <td>Dr. {appointment.doctor.toUpperCase()}</td>
                               <td>{appointment.department}</td>

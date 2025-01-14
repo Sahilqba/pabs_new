@@ -486,48 +486,6 @@ function page() {
                   ))}
                 </select>
               </div>
-              {/* Department Filter with Icon */}
-              {/* <div className="col-md-4">
-          <select
-            className="form-control"
-            value={selectedDepartment}
-            onChange={(e) => handleDepartmentChange(e.target.value)}
-          >
-            <option value="">Select Department</option>
-            {Array.from(
-          new Set(
-            doctors
-              .filter((doc) => doc.department) // Ensure only valid departments are listed
-              .map((doc) => doc.department)
-          )
-        ).map((department) => (
-          <option key={department} value={department}>
-            {department}
-          </option>
-        ))}
-          </select>
-        </div> */}
-
-              {/* <div className="col-md-4">
-              <select
-                // type="text"
-                className="form-control"
-                // placeholder="Choose doctor"
-                value={selectedDoctor}
-                onChange={(e) => {
-                  setSelectedDoctor(e.target.value);
-                }}
-                required
-              >
-                <option value="">Select Doctor</option>
-                {Array.isArray(filteredDoctors) && filteredDoctors.map((doc) => (
-                  <option key={doc._id} value={doc.name}>
-                   Dr. {doc.name.toUpperCase()} {doc.image} ({doc.department})
-                  </option>
-                ))}
-              </select>
-            </div> */}
-
               <div className="col-md-4">
                 <DoctorSelect
                   doctors={filteredDoctors}
@@ -565,35 +523,7 @@ function page() {
                 <button className="btn btn-primary app-sub">Submit</button>
               </div>
             </div>
-
-            {/* <input
-          type="text"
-          placeholder="Enter your allergies"
-          value={allergies}
-          onChange={(e) => {
-            setAllergies(e.target.value);
-          }}
-        /> */}
-
-            {/* <input
-          type="text"
-          placeholder="Enter your appointment date"
-          value={appointmentDate}
-          onChange={(e) => {
-            setAppointmentDate(e.target.value);
-          }}
-        /> */}
           </form>
-          {/* <ul>
-        {appointments.map((appointment) => (
-          <li key={appointment._id}>
-            Disease: {appointment.disease}
-            Allergies: {appointment.allergies}
-            Appointment Date: {appointment.appointmentDate}
-            <button>Delete</button>
-          </li>
-        ))}
-      </ul> */}
           {loading ? (
             <div className="spinner-border" role="status">
               <span className="sr-only"></span>
@@ -638,11 +568,6 @@ function page() {
                         <i className="fa-solid fa-calendar-days"></i>
                       </button>
                     </td>
-                    {/* <td>
-                <button onClick={() => handleModal(appointment._id)} className="appointment-button">
-                  Edit appointment date
-                </button>
-              </td> */}
                   </tr>
                 ))}
               </tbody>
