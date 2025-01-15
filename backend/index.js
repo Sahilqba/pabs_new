@@ -27,6 +27,9 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID; // Add your Twilio Account SI
 const authToken = process.env.TWILIO_AUTH_TOKEN; // Add your Twilio Auth Token here
 const verifyServiceSid = process.env.TWILIO_VERIFY_SERVICE_SID; // Add your Twilio Verify Service SID here
 const client = twilio(accountSid, authToken);
+const axios = require('axios');
+const fs = require('fs');
+const { v4: uuidv4 } = require('uuid'); 
 // Enable CORS
 // app.use(cors());
 
@@ -121,11 +124,22 @@ app.get(
         res.cookie("userIdinDb", userId, { httpOnly: false, secure: false });
       } else {
         // If the user does not exist, create a new user
+        const photoUrl = req.user.photos[0].value;
+        const filename = `${uuidv4()}.png`;
+        const filePath = path.join(__dirname, 'uploads', filename);
+                        // Download the image and save it to the uploads folder
+                        const response = await axios({
+                          url: photoUrl,
+                          responseType: 'stream',
+                        });
+                        response.data.pipe(fs.createWriteStream(filePath));
         const newUser = new User({
           email: req.user.emails[0].value,
           name: req.user.displayName,
           userIdinUse: req.user.id,
           role: req.cookies.userRoleGoogle,
+          filename: filename,
+          path: `uploads/${filename}`,
         });
         await newUser.save();
         userId = newUser._id.toString();

@@ -146,8 +146,11 @@ const DoctorProfile = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data)
         toast.success("Information set successfully");
+        console.log(data)
+        setTimeout(() => {
+        window.location.reload();
+        }, 2000);
         // setImageName(data.image);
         fetchDepartment(userIdfetched);
       } else if (response.status === 401) {
@@ -208,6 +211,9 @@ const DoctorProfile = () => {
         const data = await response.json();
         console.log(data);
         toast.success("Profile picture updated successfully.");
+        setTimeout(() => {
+          window.location.reload();
+          }, 2000);
         setImagePath(data.path);
         setImageName(data.filename);
         fetchProfilePicture(userIdfetched);
