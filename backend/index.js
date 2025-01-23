@@ -201,16 +201,13 @@ app.get("/logout", (req, res) => {
 
 // Endpoint to send OTP
 app.post("/sendOtp", (req, res) => {
-  // const authHeader = req.headers.authorization;
-  // if (!authHeader) {
-  //   return res.status(401).send("Unauthorized");
-  // }
   const { contactNumber, email, role } = req.body;
   if (!contactNumber || !email || !role) {
     return res.status(400).send({ error: "Contact number, email, and role are required" });
   }
   const phoneNumber = parsePhoneNumberFromString(contactNumber, 'US'); // Replace 'US' with the default country code if needed
-
+console.log(phoneNumber);
+console.log(contactNumber)
   if (!phoneNumber || !phoneNumber.isValid()) {
     return res.status(400).send({ error: "Invalid phone number" });
   }
@@ -229,11 +226,6 @@ app.post("/sendOtp", (req, res) => {
 
 // Endpoint to verify OTP
 app.post("/verifyOtp", (req, res) => {
-  // const authHeader = req.headers.authorization;
-  // console.log(`Auth header: ${authHeader}`);
-  // if (!authHeader) {
-  //   return res.status(401).send("Unauthorized");
-  // }
   const { sid, token } = req.body;
   client.verify.v2.services(verifyServiceSid)
     .verificationChecks
