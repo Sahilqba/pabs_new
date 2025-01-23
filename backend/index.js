@@ -27,6 +27,9 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID; // Add your Twilio Account SI
 const authToken = process.env.TWILIO_AUTH_TOKEN; // Add your Twilio Auth Token here
 const verifyServiceSid = process.env.TWILIO_VERIFY_SERVICE_SID; // Add your Twilio Verify Service SID here
 const client = twilio(accountSid, authToken);
+const axios = require('axios');
+const fs = require('fs');
+const { v4: uuidv4 } = require('uuid'); 
 // Enable CORS
 // app.use(cors());
 
@@ -121,11 +124,22 @@ app.get(
         res.cookie("userIdinDb", userId, { httpOnly: false, secure: false });
       } else {
         // If the user does not exist, create a new user
+        const photoUrl = req.user.photos[0].value;
+        const filename = `${uuidv4()}.png`;
+        const filePath = path.join(__dirname, 'uploads', filename);
+                        // Download the image and save it to the uploads folder
+                        const response = await axios({
+                          url: photoUrl,
+                          responseType: 'stream',
+                        });
+                        response.data.pipe(fs.createWriteStream(filePath));
         const newUser = new User({
           email: req.user.emails[0].value,
           name: req.user.displayName,
           userIdinUse: req.user.id,
           role: req.cookies.userRoleGoogle,
+          filename: filename,
+          path: `uploads/${filename}`,
         });
         await newUser.save();
         userId = newUser._id.toString();
@@ -187,16 +201,13 @@ app.get("/logout", (req, res) => {
 
 // Endpoint to send OTP
 app.post("/sendOtp", (req, res) => {
-  // const authHeader = req.headers.authorization;
-  // if (!authHeader) {
-  //   return res.status(401).send("Unauthorized");
-  // }
   const { contactNumber, email, role } = req.body;
   if (!contactNumber || !email || !role) {
     return res.status(400).send({ error: "Contact number, email, and role are required" });
   }
   const phoneNumber = parsePhoneNumberFromString(contactNumber, 'US'); // Replace 'US' with the default country code if needed
-
+console.log(phoneNumber);
+console.log(contactNumber)
   if (!phoneNumber || !phoneNumber.isValid()) {
     return res.status(400).send({ error: "Invalid phone number" });
   }
@@ -215,11 +226,6 @@ app.post("/sendOtp", (req, res) => {
 
 // Endpoint to verify OTP
 app.post("/verifyOtp", (req, res) => {
-  // const authHeader = req.headers.authorization;
-  // console.log(`Auth header: ${authHeader}`);
-  // if (!authHeader) {
-  //   return res.status(401).send("Unauthorized");
-  // }
   const { sid, token } = req.body;
   client.verify.v2.services(verifyServiceSid)
     .verificationChecks
