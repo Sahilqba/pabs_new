@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import "bootstrap/dist/css/bootstrap.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -19,6 +19,8 @@ function page() {
   const [verificationSid, setVerificationSid] = useState("");
   const [otp, setOtp] = useState("");
   const [contactNumberValid, setContactNumberValid] = useState(true);
+  const [isResendDisabled, setIsResendDisabled] = useState(false);
+  const [timer, setTimer] = useState(0);
   const jwtToken = localStorage.getItem("jwtToken");
   const sendOtp = async (e) => {
     // setLoading(true);
@@ -77,9 +79,11 @@ function page() {
             setVerificationSid(data.sid);
             toast.success("OTP sent to your contact number");
             setLoading(false);
+            setIsResendDisabled(true);
+            setTimer(60);
           } else if (response.status === 400) {
             setShowRoleModal(false);
-            toast.error("Incorrect Contact number, email, or role.");
+            toast.error("Incorrect email or role.");
             setLoading(false);
           } else {
             console.error("Failed to send OTP");
@@ -91,7 +95,7 @@ function page() {
         }
       } else if (additionalResponse.status === 401) {
         setShowRoleModal(false);
-        toast.error("Incorrect Contact number, email, or role.");
+        toast.error("Incorrect email or role.");
         setLoading(false);
       }
       else {
@@ -129,6 +133,27 @@ function page() {
       console.error("Error verifying OTP:", error);
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    if (isResendDisabled && timer > 0) {
+      const interval = setInterval(() => {
+        setTimer((prevTimer) => prevTimer - 1);
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+    if (timer === 0) {
+      setIsResendDisabled(false);
+    }
+  }, [timer, isResendDisabled]);
+
+  const formatTimer = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    return `${minutes.toString().padStart(2, "0")}:${seconds
+      .toString()
+      .padStart(2, "0")}`;
   };
   return (
     <>
@@ -230,22 +255,37 @@ function page() {
                     </button>
                   </div>
                   <div className="modal-body">
-                    <p>Please enter the otp:</p>
+                    <p>Please enter the 6-digit code:</p>
                     <input
                       type="text"
                       className="form-control"
                       id="otp"
-                      placeholder="OTP*"
+                      placeholder="6-digit OTP"
                       value={otp}
                       onChange={(e) => setOtp(e.target.value)}
                       required
                     />
+                    <div className="otp-btn">
                     <button
-                      className="btn btn-primary mdl-btn m-2"
+                      className="btn btn-primary mdl-btn m-2 sbmt-otp"
                       onClick={verifyOtp}
                     >
                       Submit OTP
                     </button>
+                    <button
+                      className="btn btn-secondary rsnd-otp mdl-btn m-2"
+                      onClick={sendOtp}
+                      disabled={isResendDisabled}
+                    >
+                      Resend OTP
+                    </button>
+                    {isResendDisabled && (
+                        <p className="text-muted mt-2">
+                          Resend available in:{" "}
+                          <strong>{formatTimer(timer)}</strong>
+                        </p>
+                      )}
+                     </div> 
                   </div>
                 </div>
               </div>

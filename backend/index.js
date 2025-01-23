@@ -213,7 +213,7 @@ console.log(contactNumber)
   }
 
   const formattedNumber = phoneNumber.number; // Get the number in E.164 format
-
+  console.log("Format num :", formattedNumber );
   client.verify.v2.services(verifyServiceSid)
     .verifications
     .create({to: formattedNumber, channel: 'sms'})

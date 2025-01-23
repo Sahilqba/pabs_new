@@ -16,6 +16,7 @@ function page() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [formValidated, setFormValidated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState("");
@@ -41,7 +42,13 @@ function page() {
     const error = validatePassword(value);
     setPasswordError(error);
   };
+  const handleMouseDown = () => {
+    setShowPassword(true);
+  };
 
+  const handleMouseUp = () => {
+    setShowPassword(false);
+  };
   const handleSubmit = async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
@@ -158,9 +165,9 @@ function page() {
                     <option value="Patient">Patient</option>
                   </select>
                 </div>
-                <div className="mb-3">
+                <div className="mb-3 position-relative">
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     className={`form-control ${
                       passwordError
                         ? "is-invalid"
@@ -179,6 +186,14 @@ function page() {
                   ) : password ? (
                     <div className="valid-feedback">Password looks good!</div>
                   ) : null}
+                  <span
+                    className="shw-pswrd" 
+                    onMouseDown={handleMouseDown}
+                    onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseUp}
+                    >
+                    <i className="bi bi-eye"></i>
+                  </span>
                 </div>
                 <div className="btn-grp">
                   <button
