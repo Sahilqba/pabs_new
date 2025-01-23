@@ -31,7 +31,6 @@ function page() {
   const jwtToken = localStorage.getItem("jwtToken");
   const jwtCookie = Cookies.get("jwtCookie");
   const router = useRouter();
-
   const [disease, setDisease] = useState("");
   const [department, setDepartment] = useState("");
   const [appointmentDate, setAppointmentDate] = useState("");
