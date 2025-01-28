@@ -442,3 +442,35 @@ exports.userIdfromEmail = async (req, res) => {
     res.status(400).send(error);
   }
 };
+
+// exports.checkEmailnContact = async (req, res) => {
+//   const { email, contactNumber} = req.body;
+//   try {
+//     const user = await User.find({ email, contactNumber});
+
+
+//   } catch (error) {
+//     res.status(400).send(error);
+//   }
+// };
+
+exports.checkEmailnContact = async (req, res) => {
+  const { email, contactNumber } = req.body;
+  try {
+    const emailExists = await User.findOne({ email });
+    const contactNumberExists = await User.findOne({ contactNumber });
+
+    if (emailExists && contactNumberExists) {
+      res.status(200).json({ message: "Email and contact number already exist" });
+    } else if (emailExists) {
+      res.status(200).json({ message: "Email already exists" });
+    } else if (contactNumberExists) {
+      res.status(200).json({ message: "Contact number already exists" });
+    } else {
+      res.status(200).json({ message: "Proceed for registration" });
+    }
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};
+

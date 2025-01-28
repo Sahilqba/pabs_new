@@ -392,4 +392,7 @@ router.patch('/updatePassword/:id', userController.updatePassword);
  */
 router.post('/getuserIdfromEmail', userController.userIdfromEmail);
 
+router.post('/checkEmailnContact', userController.checkEmailnContact);
+
+
 module.exports = router;
