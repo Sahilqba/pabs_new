@@ -22,7 +22,7 @@ function page() {
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState("");
   const [contactNumberValid, setContactNumberValid] = useState(true);
-   const [contactNumber, setContactNumber] = useState("");
+  const [contactNumber, setContactNumber] = useState("");
   const router = useRouter();
 
   const validatePassword = (value) => {
@@ -64,7 +64,7 @@ function page() {
 
     setFormValidated(true);
     setLoading(true);
-    const user = { name, email, password, role };
+    const user = { name, email, password, role, contactNumber: `+${contactNumber}` };
     console.log("User:", user);
     try {
       const response = await fetch(
@@ -85,8 +85,7 @@ function page() {
         setTimeout(() => {
           router.push(`/userlogin`);
         }, 3000);
-      } 
-      else {
+      } else {
         const errorResult = await response.json();
         console.log(errorResult.error);
         console.error("Failed to create user:", errorResult.error);
@@ -154,22 +153,22 @@ function page() {
                   </div>
                 </div>
                 <div className="mb-3">
-                <PhoneInput
-                  country={"in"}
-                  value={contactNumber}
-                  onChange={(phone) => setContactNumber(phone)}
-                  inputProps={{
-                    name: "phone",
-                    required: true,
-                    autoFocus: true,
-                    className: "form-control",
-                    id: "phone",
-                  }}
-                />
-                <div className="invalid-feedback">
-                  Please provide a valid phone number.
+                  <PhoneInput
+                    country={"in"}
+                    value={contactNumber}
+                    onChange={(phone) => setContactNumber(phone)}
+                    inputProps={{
+                      name: "phone",
+                      required: true,
+                      autoFocus: true,
+                      className: "form-control",
+                      id: "phone",
+                    }}
+                  />
+                  <div className="invalid-feedback">
+                    Please provide a valid phone number.
+                  </div>
                 </div>
-              </div>
                 <div className="mb-3">
                   <select
                     type="text"
@@ -207,11 +206,11 @@ function page() {
                     <div className="valid-feedback">Password looks good!</div>
                   ) : null}
                   <span
-                    className="shw-pswrd" 
+                    className="shw-pswrd"
                     onMouseDown={handleMouseDown}
                     onMouseUp={handleMouseUp}
                     onMouseLeave={handleMouseUp}
-                    >
+                  >
                     <i className="bi bi-eye"></i>
                   </span>
                 </div>
