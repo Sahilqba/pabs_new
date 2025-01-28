@@ -36,7 +36,7 @@ function page() {
     }
     setFormValidated(true);
     // setContactNumberValid(true);
-    setShowRoleModal(true);
+    // setShowRoleModal(true);
     console.log("email", email);
     Cookies.set("emailfromPhoneVerification", email, { expires: 1, path: "/" });
     Cookies.set("rolefromPhoneVerification", role, { expires: 1, path: "/" });
@@ -82,10 +82,12 @@ function page() {
           );
   
           if (response.ok) {
+
             const data = await response.json();
             setVerificationSid(data.sid);
             toast.success("OTP sent to your contact number");
             setLoading(false);
+            setShowRoleModal(true);
             setIsResendDisabled(true);
             setTimer(60);
           } else if (response.status === 400) {
@@ -162,6 +164,15 @@ function page() {
       .toString()
       .padStart(2, "0")}`;
   };
+
+  const maskNumber = (number) => {
+    if (number.length < 6) return number;
+    const firstFour = number.slice(0, 5);
+    const lastTwo = number.slice(-2);
+    const masked = `${firstFour}${"*".repeat(number.length - 6)}${lastTwo}`;
+    return masked;
+  };
+
   return (
     <>
       <div className="flex-container">
@@ -262,7 +273,7 @@ function page() {
                     </button>
                   </div>
                   <div className="modal-body">
-                    <p>Please enter the 6-digit code that has been sent to your registered number {formattedNumber}:</p>
+                    <p>Please enter the 6-digit code that has been sent to your registered number {maskNumber(formattedNumber)}:</p>
                     <input
                       type="text"
                       className="form-control"
