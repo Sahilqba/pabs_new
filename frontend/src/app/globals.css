@@ -765,3 +765,10 @@ button.menu-item.btn.btn-sm.btn-link.text-start {
 .otp-btn {
   margin: 15px 0px;
 }
+.btn.rsnd-otp:disabled {
+  opacity: 0.2;
+  cursor: not-allowed !important;
+}
+/* .disabled-cursor:disabled {
+  cursor: not-allowed;
+} */

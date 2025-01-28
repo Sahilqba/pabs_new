@@ -273,7 +273,7 @@ function page() {
                     </button>
                   </div>
                   <div className="modal-body">
-                    <p>Please enter the 6-digit code that has been sent to your registered number {maskNumber(formattedNumber)}:</p>
+                    <p>Please enter the 6-digit code that has been sent to your registered phone number {maskNumber(formattedNumber)} :</p>
                     <input
                       type="text"
                       className="form-control"

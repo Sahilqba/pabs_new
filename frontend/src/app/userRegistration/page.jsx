@@ -48,14 +48,18 @@ function page() {
   const handleMouseDown = () => {
     setShowPassword(true);
   };
-
+  const handlePhoneChange = (phone) => {
+    setContactNumber(phone);
+    const isValid = phone.length >= 10; 
+    setContactNumberValid(isValid);
+  };
   const handleMouseUp = () => {
     setShowPassword(false);
   };
   const handleSubmit = async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
-    if (!form.checkValidity() || passwordError || !contactNumber) {
+    if (!form.checkValidity() || passwordError || !contactNumberValid) {
       event.stopPropagation();
       setFormValidated(true);
       toast.error("Please fix the form before submitting.");
@@ -64,7 +68,7 @@ function page() {
 
     setFormValidated(true);
     setLoading(true);
-    const user = { name, email, password, role };
+    const user = { name, email, password, role, contactNumber };
     console.log("User:", user);
     try {
       const response = await fetch(
@@ -157,7 +161,7 @@ function page() {
                 <PhoneInput
                   country={"in"}
                   value={contactNumber}
-                  onChange={(phone) => setContactNumber(phone)}
+                  onChange={handlePhoneChange}
                   inputProps={{
                     name: "phone",
                     required: true,
@@ -166,9 +170,10 @@ function page() {
                     id: "phone",
                   }}
                 />
-                <div className="invalid-feedback">
+                { !contactNumberValid &&  ( <div className="invalid-feedback">
                   Please provide a valid phone number.
                 </div>
+                )}                
               </div>
                 <div className="mb-3">
                   <select
