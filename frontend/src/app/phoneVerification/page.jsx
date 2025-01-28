@@ -27,7 +27,7 @@ function page() {
     // setLoading(true);
     e.preventDefault();
     const form = e.currentTarget;
-    if (!form.checkValidity() ) {
+    if (!form.checkValidity()) {
       e.stopPropagation();
       setFormValidated(true);
       // setContactNumberValid(!!contactNumber);
@@ -41,8 +41,7 @@ function page() {
     Cookies.set("emailfromPhoneVerification", email, { expires: 1, path: "/" });
     Cookies.set("rolefromPhoneVerification", role, { expires: 1, path: "/" });
     // Cookies.set("contactfromPhoneVerification", contactNumber, { expires: 1, path: "/" });
-    
-  
+
     try {
       // First API call to get user ID from email
       const additionalResponse = await fetch(
@@ -55,17 +54,24 @@ function page() {
           body: JSON.stringify({ email: email, role: role }),
         }
       );
-  
+
       if (additionalResponse.ok) {
         setLoading(false);
         const additionalData = await additionalResponse.json();
         console.log("Additional API call successful:", additionalData);
-        Cookies.set("userIdfromPhoneVerification", additionalData.user[0]._id, { expires: 1, path: "/" });
-        Cookies.set("contactfromPhoneVerification", additionalData.user[0].contactNumber, { expires: 1, path: "/" });
+        Cookies.set("userIdfromPhoneVerification", additionalData.user[0]._id, {
+          expires: 1,
+          path: "/",
+        });
+        Cookies.set(
+          "contactfromPhoneVerification",
+          additionalData.user[0].contactNumber,
+          { expires: 1, path: "/" }
+        );
         // Check if role matches
         console.log("check", additionalData.user[0].contactNumber);
         // setContactNumber(additionalData.user[0].contactNumber)
-        let number= additionalData.user[0].contactNumber;
+        let number = additionalData.user[0].contactNumber;
         if (role === additionalData.user[0].role) {
           // Second API call to send OTP
           setFormattedNumber(number);
@@ -80,9 +86,8 @@ function page() {
               body: JSON.stringify({ contactNumber: number, email, role }),
             }
           );
-  
-          if (response.ok) {
 
+          if (response.ok) {
             const data = await response.json();
             setVerificationSid(data.sid);
             toast.success("OTP sent to your contact number");
@@ -110,8 +115,7 @@ function page() {
         console.log("errorMessage", errorMessage);
         toast.error(errorMessage || "Incorrect email or role.");
         setLoading(false);
-      }
-      else {
+      } else {
         console.error("Failed to make additional API call");
         setLoading(false);
       }
@@ -277,7 +281,10 @@ function page() {
                     </button>
                   </div>
                   <div className="modal-body">
-                    <p>Please enter the 6-digit code that has been sent to your registered number {maskNumber(formattedNumber)}:</p>
+                    <p>
+                      Please enter the 6-digit code that has been sent to your
+                      registered number {maskNumber(formattedNumber)}:
+                    </p>
                     <input
                       type="text"
                       className="form-control"
@@ -288,33 +295,34 @@ function page() {
                       required
                     />
                     <div className="otp-btn">
-                    <button
-                      className="btn btn-primary mdl-btn m-2 sbmt-otp"
-                      onClick={verifyOtp}
-                    >
-                      Submit OTP
-                    </button>
-                    <button
-                      className="btn btn-secondary rsnd-otp mdl-btn m-2"
-                      onClick={sendOtp}
-                      disabled={isResendDisabled}
-                    >
-                      Resend OTP
-                    </button>
-                    {isResendDisabled && (
+                      <button
+                        className="btn btn-primary mdl-btn m-2 sbmt-otp"
+                        onClick={verifyOtp}
+                        disabled={!isResendDisabled}
+                      >
+                        Submit OTP
+                      </button>
+                      <button
+                        className="btn btn-secondary rsnd-otp mdl-btn m-2"
+                        onClick={sendOtp}
+                        disabled={isResendDisabled}
+                      >
+                        Resend OTP
+                      </button>
+                      {isResendDisabled && (
                         <p className="text-muted mt-2">
                           Resend available in:{" "}
                           <strong>{formatTimer(timer)}</strong>
                         </p>
                       )}
-                     </div> 
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Modal Backdrop */}   
+          {/* Modal Backdrop */}
           {showRoleModal && <div className="modal-backdrop fade show"></div>}
         </div>
       </div>

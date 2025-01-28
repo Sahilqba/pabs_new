@@ -8,6 +8,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import Cookies from "js-cookie";
 function page() {
   useEffect(() => {
     require("bootstrap/dist/js/bootstrap.js");
@@ -23,6 +24,13 @@ function page() {
   const [role, setRole] = useState("");
   const [contactNumberValid, setContactNumberValid] = useState(true);
   const [contactNumber, setContactNumber] = useState("");
+  const [showRoleModal, setShowRoleModal] = useState(false);
+  const [verificationSid, setVerificationSid] = useState("");
+  const [otp, setOtp] = useState("");
+  const [isResendDisabled, setIsResendDisabled] = useState(false);
+  const [timer, setTimer] = useState(0);
+  const [formattedNumber, setFormattedNumber] = useState("");
+  const jwtToken = localStorage.getItem("jwtToken");
   const router = useRouter();
 
   const validatePassword = (value) => {
@@ -52,20 +60,85 @@ function page() {
   const handleMouseUp = () => {
     setShowPassword(false);
   };
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const form = event.currentTarget;
-    if (!form.checkValidity() || passwordError || !contactNumber) {
-      event.stopPropagation();
+
+  const sendOtp = async (e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    if (!form.checkValidity()) {
+      e.stopPropagation();
       setFormValidated(true);
-      toast.error("Please fix the form before submitting.");
+      toast.error("Please enter the values.");
       return;
     }
-
     setFormValidated(true);
+    Cookies.set("emailfromPhoneVerification", email, { expires: 1, path: "/" });
+    Cookies.set("rolefromPhoneVerification", role, { expires: 1, path: "/" });
+  
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/sendOtp`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ contactNumber: `+${contactNumber}`, email, role }),
+        }
+      );
+  
+      if (response.ok) {
+        const data = await response.json();
+        setVerificationSid(data.sid);
+        toast.success("OTP sent to your contact number");
+        setLoading(false);
+        setShowRoleModal(true);
+        setIsResendDisabled(true);
+        setTimer(60);
+      } else if (response.status === 400) {
+        setShowRoleModal(false);
+        toast.error("Incorrect email or role.");
+        setLoading(false);
+      } else {
+        console.error("Failed to send OTP");
+        toast.error("Failed to send OTP. Please refresh the page and try again.");
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+      setLoading(false);
+    }
+  };
+
+
+  const verifyOtp = async () => {
     setLoading(true);
+    try {
+      const response = await fetch("http://localhost:8080/verifyOtp", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ sid: verificationSid, token: otp }),
+      });
+
+      if (response.ok) {
+        setLoading(false);
+        toast.success("OTP verified successfully");
+        createUser();
+      } else {
+        console.error("Failed to verify OTP");
+        toast.error("Failed to verify OTP");
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+      setLoading(false);
+    }
+  };
+
+  const createUser = async () => {
     const user = { name, email, password, role, contactNumber: `+${contactNumber}` };
-    console.log("User:", user);
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/newUser`,
@@ -81,23 +154,48 @@ function page() {
       if (response.ok) {
         const result = await response.json();
         toast.success("User created successfully. Please login to continue.");
-        console.log("User created:", result);
         setTimeout(() => {
           router.push(`/userlogin`);
         }, 3000);
       } else {
         const errorResult = await response.json();
-        console.log(errorResult.error);
-        console.error("Failed to create user:", errorResult.error);
         toast.error(`Failed to create user: ${errorResult.message}`);
       }
     } catch (error) {
-      console.error("Error:", error);
       toast.error("An unexpected error occurred. Please try again.");
-    } finally {
-      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (isResendDisabled && timer > 0) {
+      const interval = setInterval(() => {
+        setTimer((prevTimer) => prevTimer - 1);
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+    if (timer === 0) {
+      setIsResendDisabled(false);
+    }
+  }, [timer, isResendDisabled]);
+
+  const formatTimer = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    return `${minutes.toString().padStart(2, "0")}:${seconds
+      .toString()
+      .padStart(2, "0")}`;
+  };
+
+  const maskNumber = (number) => {
+    if (number.length < 6) return number;
+    const firstFour = number.slice(0, 5);
+    const lastTwo = number.slice(-2);
+    const masked = `${firstFour}${"*".repeat(number.length - 6)}${lastTwo}`;
+    return masked;
+  };
+
+
   return (
     <>
       {/* <Header /> */}
@@ -115,7 +213,7 @@ function page() {
                   formValidated ? "was-validated" : ""
                 }`}
                 noValidate
-                onSubmit={handleSubmit}
+                onSubmit={sendOtp}
               >
                 <div className="mb-3">
                   {/* <label htmlFor="name" className="form-label">
@@ -228,6 +326,73 @@ function page() {
           </div>
         </div>
       </div>
+
+      {showRoleModal && (
+        <div
+          className="modal fade show d-block"
+          tabIndex="-1"
+          role="dialog"
+        >
+          <div
+            className="modal-dialog modal-dialog-centered"
+            role="document"
+          >
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">OTP verification</h5>
+                <button
+                  type="button"
+                  className="custom-close-btn"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                  onClick={() => {
+                    setShowRoleModal(false);
+                    setLoading(false);
+                  }}
+                >
+                  <span>&times;</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                <p>Please enter the 6-digit code that has been sent to your registered number +{maskNumber(contactNumber)} :</p>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="otp"
+                  placeholder="6-digit OTP"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  required
+                />
+                <div className="otp-btn">
+                  <button
+                    className="btn btn-primary mdl-btn m-2 sbmt-otp"
+                    onClick={verifyOtp}
+                    disabled={!isResendDisabled}
+                  >
+                    Submit OTP
+                  </button>
+                  <button
+                    className="btn btn-secondary rsnd-otp mdl-btn m-2"
+                    onClick={sendOtp}
+                    disabled={isResendDisabled}
+                  >
+                    Resend OTP
+                  </button>
+                  {isResendDisabled && (
+                    <p className="text-muted mt-2">
+                      Resend available in:{" "}
+                      <strong>{formatTimer(timer)}</strong>
+                    </p>
+                  )}
+                </div> 
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showRoleModal && <div className="modal-backdrop fade show"></div>}
       <ToastContainer />
       {/* <Footer /> */}
     </>
