@@ -61,6 +61,54 @@ function page() {
     setShowPassword(false);
   };
 
+  // const sendOtp = async (e) => {
+  //   e.preventDefault();
+  //   const form = e.currentTarget;
+  //   if (!form.checkValidity()) {
+  //     e.stopPropagation();
+  //     setFormValidated(true);
+  //     toast.error("Please enter the values.");
+  //     return;
+  //   }
+  //   setFormValidated(true);
+  //   Cookies.set("emailfromPhoneVerification", email, { expires: 1, path: "/" });
+  //   Cookies.set("rolefromPhoneVerification", role, { expires: 1, path: "/" });
+
+  //   try {
+  //     const response = await fetch(
+  //       `${process.env.NEXT_PUBLIC_API_URL}/sendOtp`,
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({ contactNumber: `+${contactNumber}`, email, role }),
+  //       }
+  //     );
+
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       setVerificationSid(data.sid);
+  //       toast.success("OTP sent to your contact number");
+  //       setLoading(false);
+  //       setShowRoleModal(true);
+  //       setIsResendDisabled(true);
+  //       setTimer(60);
+  //     } else if (response.status === 400) {
+  //       setShowRoleModal(false);
+  //       toast.error("Incorrect email or role.");
+  //       setLoading(false);
+  //     } else {
+  //       console.error("Failed to send OTP");
+  //       toast.error("Failed to send OTP. Please refresh the page and try again.");
+  //       setLoading(false);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error sending OTP:", error);
+  //     setLoading(false);
+  //   }
+  // };
+
   const sendOtp = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -71,10 +119,44 @@ function page() {
       return;
     }
     setFormValidated(true);
-    Cookies.set("emailfromPhoneVerification", email, { expires: 1, path: "/" });
-    Cookies.set("rolefromPhoneVerification", role, { expires: 1, path: "/" });
-  
+
     try {
+      const checkResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/checkEmailnContact`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, contactNumber: `+${contactNumber}` }),
+        }
+      );
+      console.log("checkResponse status:", checkResponse.status);
+      if (checkResponse.ok) {
+        const checkData = await checkResponse.json();
+        console.log("checkData:", checkData);
+        console.log("checkData.message:", checkData.message);
+        if (checkData.message === "Email and contact number already exist") {
+          console.error('hihihihihihi', checkData.message);
+          toast.error(checkData.message);
+          return;
+        }
+        else if (checkData.message === "Email already exists") {
+          toast.error(checkData.message);
+          return;
+        }
+        else if (checkData.message === "Contact number already exists") {
+          console.error('hihihihihihi', checkData.message);
+          toast.error(checkData.message);
+          return;
+        }
+      }
+      else {
+        const errorData = await checkResponse.json();
+        console.error("Error data:", errorData);
+        toast.error(`Error: ${errorData.message}`);
+        return;
+      }
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/sendOtp`,
         {
@@ -82,10 +164,14 @@ function page() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ contactNumber: `+${contactNumber}`, email, role }),
+          body: JSON.stringify({
+            contactNumber: `+${contactNumber}`,
+            email,
+            role,
+          }),
         }
       );
-  
+
       if (response.ok) {
         const data = await response.json();
         setVerificationSid(data.sid);
@@ -100,7 +186,9 @@ function page() {
         setLoading(false);
       } else {
         console.error("Failed to send OTP");
-        toast.error("Failed to send OTP. Please refresh the page and try again.");
+        toast.error(
+          "Failed to send OTP. Please refresh the page and try again."
+        );
         setLoading(false);
       }
     } catch (error) {
@@ -108,7 +196,6 @@ function page() {
       setLoading(false);
     }
   };
-
 
   const verifyOtp = async () => {
     setLoading(true);
@@ -138,7 +225,13 @@ function page() {
   };
 
   const createUser = async () => {
-    const user = { name, email, password, role, contactNumber: `+${contactNumber}` };
+    const user = {
+      name,
+      email,
+      password,
+      role,
+      contactNumber: `+${contactNumber}`,
+    };
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/newUser`,
@@ -194,7 +287,6 @@ function page() {
     const masked = `${firstFour}${"*".repeat(number.length - 6)}${lastTwo}`;
     return masked;
   };
-
 
   return (
     <>
@@ -328,15 +420,8 @@ function page() {
       </div>
 
       {showRoleModal && (
-        <div
-          className="modal fade show d-block"
-          tabIndex="-1"
-          role="dialog"
-        >
-          <div
-            className="modal-dialog modal-dialog-centered"
-            role="document"
-          >
+        <div className="modal fade show d-block" tabIndex="-1" role="dialog">
+          <div className="modal-dialog modal-dialog-centered" role="document">
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">OTP verification</h5>
@@ -354,7 +439,10 @@ function page() {
                 </button>
               </div>
               <div className="modal-body">
-                <p>Please enter the 6-digit code that has been sent to your registered number +{maskNumber(contactNumber)} :</p>
+                <p>
+                  Please enter the 6-digit code that has been sent to your
+                  registered number +{maskNumber(contactNumber)} :
+                </p>
                 <input
                   type="text"
                   className="form-control"
@@ -381,11 +469,10 @@ function page() {
                   </button>
                   {isResendDisabled && (
                     <p className="text-muted mt-2">
-                      Resend available in:{" "}
-                      <strong>{formatTimer(timer)}</strong>
+                      Resend available in: <strong>{formatTimer(timer)}</strong>
                     </p>
                   )}
-                </div> 
+                </div>
               </div>
             </div>
           </div>
