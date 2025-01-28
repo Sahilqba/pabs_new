@@ -393,12 +393,38 @@ exports.userIdfromEmail = async (req, res) => {
   const { email, role } = req.body;
   try {
     const user = await User.find({ email, role });
+
     if (user && user.length > 0) {
       res.status(200).json({ user });
-    } else {
+    }  else if(!user.email){
+      return res.status(401).send("Invalid email");
+    } 
+    else if(!user.role){
+      return res.status(401).send("Invalid role");
+    } 
+    else {
       res.status(401).send("Invalid user");
     }
   } catch (error) {
     res.status(400).send(error);
   }
 };
+
+// exports.userIdfromEmail = async (req, res) => {
+//   const { email, role } = req.body;
+//   try {
+//     const userByEmail = await User.findOne({ email });
+//     if (!userByEmail) {
+//       return res.status(401).send("Invalid email");
+//     }
+
+//     const userByRole = await User.findOne({ email, role });
+//     if (!userByRole) {
+//       return res.status(401).send("Invalid role");
+//     }
+
+//     res.status(200).json({ user: userByRole });
+//   } catch (error) {
+//     res.status(400).send(error);
+//   }
+// };

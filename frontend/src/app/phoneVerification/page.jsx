@@ -104,7 +104,11 @@ function page() {
         }
       } else if (additionalResponse.status === 401) {
         setShowRoleModal(false);
-        toast.error("Incorrect email or role.");
+        // toast.error("Incorrect email or role.");
+        // const errorMessage = await additionalResponse.json();
+        const errorMessage = await additionalResponse.text();
+        console.log("errorMessage", errorMessage);
+        toast.error(errorMessage || "Incorrect email or role.");
         setLoading(false);
       }
       else {

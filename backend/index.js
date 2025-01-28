@@ -3,9 +3,9 @@ const app = express();
 const mongoose = require("mongoose");
 const cors = require("cors");
 const userRoutes = require("./routes/userRoute");
-const swaggerUi = require('swagger-ui-express');
-const swaggerSpec = require('./swaggerConfig');
-require('dotenv').config(); // Load environment variables
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./swaggerConfig");
+require("dotenv").config(); // Load environment variables
 const port = process.env.PORT;
 const mongoPassword = process.env.MONGODB_PASSWORD;
 const appName = process.env.APP_NAME;
@@ -18,31 +18,31 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
-const path = require('path');
+const path = require("path");
 const secretKey = process.env.SECRET_KEY;
-const { User} = require("./models/user");
-const twilio = require('twilio');
-const { parsePhoneNumberFromString } = require('libphonenumber-js');
+const { User } = require("./models/user");
+const twilio = require("twilio");
+const { parsePhoneNumberFromString } = require("libphonenumber-js");
 const accountSid = process.env.TWILIO_ACCOUNT_SID; // Add your Twilio Account SID here
 const authToken = process.env.TWILIO_AUTH_TOKEN; // Add your Twilio Auth Token here
 const verifyServiceSid = process.env.TWILIO_VERIFY_SERVICE_SID; // Add your Twilio Verify Service SID here
 const client = twilio(accountSid, authToken);
-const axios = require('axios');
-const fs = require('fs');
-const { v4: uuidv4 } = require('uuid'); 
+const axios = require("axios");
+const fs = require("fs");
+const { v4: uuidv4 } = require("uuid");
 // Enable CORS
 // app.use(cors());
 
 const rateLimit = require("express-rate-limit");
 const limiter = rateLimit({
-    // 200 requests per hour
-    max: 2000,    
-    windowMs: 60* 60 * 1000,  //1 hour in milliseconds
-    message: "Too many requests from this IP"
+  // 200 requests per hour
+  max: 2000,
+  windowMs: 60 * 60 * 1000, //1 hour in milliseconds
+  message: "Too many requests from this IP",
 });
 
 app.use(limiter);
- 
+
 // CORS configuration
 const corsOptions = {
   origin: `${frontend_url}`, // Replace with your frontend URL
@@ -50,10 +50,10 @@ const corsOptions = {
 };
 
 // Serve static files from the "uploads" directory
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(cors(corsOptions));
- 
+
 // Body parser middleware
 app.use(express.json());
 app.use(cookieParser());
@@ -63,12 +63,11 @@ app.use(
 // Initialize Passport
 app.use(passport.initialize());
 app.use(passport.session());
- 
+
 passport.use(
   new GoogleStrategy(
     {
-      clientID:
-        `${client_ID}`,
+      clientID: `${client_ID}`,
       clientSecret: `${client_secret}`,
       callbackURL: `${backend_url}/auth/google/callback`,
     },
@@ -79,32 +78,31 @@ passport.use(
     }
   )
 );
- 
+
 passport.serializeUser((user, done) => {
   done(null, user);
 });
- 
+
 passport.deserializeUser((obj, done) => {
   done(null, obj);
 });
- 
- 
+
 main().catch((err) => console.log(err));
- 
+
 async function main() {
   await mongoose.connect(
     `mongodb+srv://${appName}:${mongoPassword}@cluster0.oullp.mongodb.net/demoAppdbName`
   );
 }
- 
+
 // Use routes
 app.use("/", userRoutes);
- 
+
 app.get(
   "/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
- 
+
 app.get(
   "/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/" }),
@@ -126,13 +124,13 @@ app.get(
         // If the user does not exist, create a new user
         const photoUrl = req.user.photos[0].value;
         const filename = `${uuidv4()}.png`;
-        const filePath = path.join(__dirname, 'uploads', filename);
-                        // Download the image and save it to the uploads folder
-                        const response = await axios({
-                          url: photoUrl,
-                          responseType: 'stream',
-                        });
-                        response.data.pipe(fs.createWriteStream(filePath));
+        const filePath = path.join(__dirname, "uploads", filename);
+        // Download the image and save it to the uploads folder
+        const response = await axios({
+          url: photoUrl,
+          responseType: "stream",
+        });
+        response.data.pipe(fs.createWriteStream(filePath));
         const newUser = new User({
           email: req.user.emails[0].value,
           name: req.user.displayName,
@@ -156,7 +154,7 @@ app.get(
         secretKey,
         { expiresIn: "15m" }
       );
- 
+
       // Set cookies
       res.cookie("jwtCookie", token, { httpOnly: false, secure: false });
       res.cookie("nameFromGoogle", req.user.displayName, {
@@ -176,7 +174,7 @@ app.get(
     }
   }
 );
- 
+
 app.get("/logout", (req, res) => {
   req.logout((err) => {
     if (err) {
@@ -226,22 +224,26 @@ app.get("/logout", (req, res) => {
 app.post("/sendOtp", (req, res) => {
   const { contactNumber, email, role } = req.body;
   if (!contactNumber || !email || !role) {
-    return res.status(400).send({ error: "Contact number, email, and role are required" });
+    return res
+      .status(400)
+      .send({ error: "Contact number, email, and role are required" });
   }
-  const phoneNumber = parsePhoneNumberFromString(contactNumber, 'US'); // Replace 'US' with the default country code if needed
-console.log(phoneNumber);
-console.log(contactNumber)
+  const phoneNumber = parsePhoneNumberFromString(contactNumber, "US"); // Replace 'US' with the default country code if needed
+  console.log(phoneNumber);
+  console.log(contactNumber);
   if (!phoneNumber || !phoneNumber.isValid()) {
     return res.status(400).send({ error: "Invalid phone number" });
   }
 
   const formattedNumber = phoneNumber.number; // Get the number in E.164 format
-  console.log("Format num :", formattedNumber );
-  client.verify.v2.services(verifyServiceSid)
-    .verifications
-    .create({to: formattedNumber, channel: 'sms'})
-    .then(verification => res.status(200).send({ sid: verification.sid, email, role }))
-    .catch(err => {
+  console.log("Format num :", formattedNumber);
+  client.verify.v2
+    .services(verifyServiceSid)
+    .verifications.create({ to: formattedNumber, channel: "sms" })
+    .then((verification) =>
+      res.status(200).send({ sid: verification.sid, email, role })
+    )
+    .catch((err) => {
       console.error("Error sending OTP:", err.message, err.stack);
       res.status(500).send({ error: "Failed to send OTP" });
     });
@@ -249,25 +251,25 @@ console.log(contactNumber)
 // Endpoint to verify OTP
 app.post("/verifyOtp", (req, res) => {
   const { sid, token } = req.body;
-  client.verify.v2.services(verifyServiceSid)
-    .verificationChecks
-    .create({verificationSid: sid, code: token})
-    .then(verification_check => {
-      if (verification_check.status === 'approved') {
+  client.verify.v2
+    .services(verifyServiceSid)
+    .verificationChecks.create({ verificationSid: sid, code: token })
+    .then((verification_check) => {
+      if (verification_check.status === "approved") {
         res.status(200).send({ message: "OTP verified successfully" });
       } else {
         res.status(400).send({ error: "Invalid OTP" });
       }
     })
-    .catch(err => {
+    .catch((err) => {
       console.error("Error verifying OTP:", err);
       res.status(500).send({ error: "Failed to verify OTP" });
     });
 });
 
 // Serve Swagger UI
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
- 
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
