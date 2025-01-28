@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import "bootstrap/dist/css/bootstrap.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -19,24 +19,29 @@ function page() {
   const [verificationSid, setVerificationSid] = useState("");
   const [otp, setOtp] = useState("");
   const [contactNumberValid, setContactNumberValid] = useState(true);
+  const [isResendDisabled, setIsResendDisabled] = useState(false);
+  const [timer, setTimer] = useState(0);
+  const [formattedNumber, setFormattedNumber] = useState("");
   const jwtToken = localStorage.getItem("jwtToken");
   const sendOtp = async (e) => {
     // setLoading(true);
     e.preventDefault();
     const form = e.currentTarget;
-    if (!form.checkValidity() || !contactNumber) {
+    if (!form.checkValidity() ) {
       e.stopPropagation();
       setFormValidated(true);
-      setContactNumberValid(!!contactNumber);
+      // setContactNumberValid(!!contactNumber);
       toast.error("Please enter the values.");
       return;
     }
     setFormValidated(true);
-    setContactNumberValid(true);
+    // setContactNumberValid(true);
     setShowRoleModal(true);
     console.log("email", email);
     Cookies.set("emailfromPhoneVerification", email, { expires: 1, path: "/" });
     Cookies.set("rolefromPhoneVerification", role, { expires: 1, path: "/" });
+    // Cookies.set("contactfromPhoneVerification", contactNumber, { expires: 1, path: "/" });
+    
   
     try {
       // First API call to get user ID from email
@@ -56,11 +61,15 @@ function page() {
         const additionalData = await additionalResponse.json();
         console.log("Additional API call successful:", additionalData);
         Cookies.set("userIdfromPhoneVerification", additionalData.user[0]._id, { expires: 1, path: "/" });
-  
+        Cookies.set("contactfromPhoneVerification", additionalData.user[0].contactNumber, { expires: 1, path: "/" });
         // Check if role matches
+        console.log("check", additionalData.user[0].contactNumber);
+        // setContactNumber(additionalData.user[0].contactNumber)
+        let number= additionalData.user[0].contactNumber;
         if (role === additionalData.user[0].role) {
           // Second API call to send OTP
-          const formattedNumber = `+${contactNumber}`;
+          setFormattedNumber(number);
+          console.log("number", number);
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/sendOtp`,
             {
@@ -68,7 +77,7 @@ function page() {
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({ contactNumber: formattedNumber, email, role }),
+              body: JSON.stringify({ contactNumber: number, email, role }),
             }
           );
   
@@ -77,9 +86,11 @@ function page() {
             setVerificationSid(data.sid);
             toast.success("OTP sent to your contact number");
             setLoading(false);
+            setIsResendDisabled(true);
+            setTimer(60);
           } else if (response.status === 400) {
             setShowRoleModal(false);
-            toast.error("Incorrect Contact number, email, or role.");
+            toast.error("Incorrect email or role.");
             setLoading(false);
           } else {
             console.error("Failed to send OTP");
@@ -91,7 +102,7 @@ function page() {
         }
       } else if (additionalResponse.status === 401) {
         setShowRoleModal(false);
-        toast.error("Incorrect Contact number, email, or role.");
+        toast.error("Incorrect email or role.");
         setLoading(false);
       }
       else {
@@ -103,7 +114,6 @@ function page() {
       setLoading(false);
     }
   };
-
 
   const verifyOtp = async () => {
     setLoading(true);
@@ -125,14 +135,32 @@ function page() {
         console.error("Failed to verify OTP");
         toast.error("Failed to verify OTP");
         setLoading(false);
-        // Cookies.remove("userIdfromPhoneVerification", { path: "/" });
-        // Cookies.remove("emailfromPhoneVerification", { path: "/" });
-        // Cookies.remove("rolefromPhoneVerification", { path: "/" });
       }
     } catch (error) {
       console.error("Error verifying OTP:", error);
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    if (isResendDisabled && timer > 0) {
+      const interval = setInterval(() => {
+        setTimer((prevTimer) => prevTimer - 1);
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+    if (timer === 0) {
+      setIsResendDisabled(false);
+    }
+  }, [timer, isResendDisabled]);
+
+  const formatTimer = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    return `${minutes.toString().padStart(2, "0")}:${seconds
+      .toString()
+      .padStart(2, "0")}`;
   };
   return (
     <>
@@ -182,7 +210,7 @@ function page() {
                   Please provide a valid role.
                 </div>
               </div>
-              <div className="mb-3">
+              {/* <div className="mb-3">
                 <PhoneInput
                   country={"in"}
                   value={contactNumber}
@@ -198,7 +226,7 @@ function page() {
                 <div className="invalid-feedback">
                   Please provide a valid phone number.
                 </div>
-              </div>
+              </div> */}
               <div className="btn-grp">
                 <button type="submit" className="btn btn-primary">
                   Send OTP
@@ -234,29 +262,44 @@ function page() {
                     </button>
                   </div>
                   <div className="modal-body">
-                    <p>Please enter the otp:</p>
+                    <p>Please enter the 6-digit code that has been sent to your registered number {formattedNumber}:</p>
                     <input
                       type="text"
                       className="form-control"
                       id="otp"
-                      placeholder="OTP*"
+                      placeholder="6-digit OTP"
                       value={otp}
                       onChange={(e) => setOtp(e.target.value)}
                       required
                     />
+                    <div className="otp-btn">
                     <button
-                      className="btn btn-primary mdl-btn m-2"
+                      className="btn btn-primary mdl-btn m-2 sbmt-otp"
                       onClick={verifyOtp}
                     >
                       Submit OTP
                     </button>
+                    <button
+                      className="btn btn-secondary rsnd-otp mdl-btn m-2"
+                      onClick={sendOtp}
+                      disabled={isResendDisabled}
+                    >
+                      Resend OTP
+                    </button>
+                    {isResendDisabled && (
+                        <p className="text-muted mt-2">
+                          Resend available in:{" "}
+                          <strong>{formatTimer(timer)}</strong>
+                        </p>
+                      )}
+                     </div> 
                   </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Modal Backdrop */}
+          {/* Modal Backdrop */}   
           {showRoleModal && <div className="modal-backdrop fade show"></div>}
         </div>
       </div>

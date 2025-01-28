@@ -22,6 +22,7 @@ const userSchema = new mongoose.Schema({
   qualification: String,
   experianceyear: String,
   previousCompany: String,
+  contactNumber: String,
 });
 
 const appointmentSchema = new mongoose.Schema({

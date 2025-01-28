@@ -6,7 +6,8 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 function page() {
   useEffect(() => {
     require("bootstrap/dist/js/bootstrap.js");
@@ -16,9 +17,12 @@ function page() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [formValidated, setFormValidated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState("");
+  const [contactNumberValid, setContactNumberValid] = useState(true);
+   const [contactNumber, setContactNumber] = useState("");
   const router = useRouter();
 
   const validatePassword = (value) => {
@@ -41,11 +45,17 @@ function page() {
     const error = validatePassword(value);
     setPasswordError(error);
   };
+  const handleMouseDown = () => {
+    setShowPassword(true);
+  };
 
+  const handleMouseUp = () => {
+    setShowPassword(false);
+  };
   const handleSubmit = async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
-    if (!form.checkValidity() || passwordError) {
+    if (!form.checkValidity() || passwordError || !contactNumber) {
       event.stopPropagation();
       setFormValidated(true);
       toast.error("Please fix the form before submitting.");
@@ -144,6 +154,23 @@ function page() {
                   </div>
                 </div>
                 <div className="mb-3">
+                <PhoneInput
+                  country={"in"}
+                  value={contactNumber}
+                  onChange={(phone) => setContactNumber(phone)}
+                  inputProps={{
+                    name: "phone",
+                    required: true,
+                    autoFocus: true,
+                    className: "form-control",
+                    id: "phone",
+                  }}
+                />
+                <div className="invalid-feedback">
+                  Please provide a valid phone number.
+                </div>
+              </div>
+                <div className="mb-3">
                   <select
                     type="text"
                     className="form-control"
@@ -158,9 +185,9 @@ function page() {
                     <option value="Patient">Patient</option>
                   </select>
                 </div>
-                <div className="mb-3">
+                <div className="mb-3 position-relative">
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     className={`form-control ${
                       passwordError
                         ? "is-invalid"
@@ -179,6 +206,14 @@ function page() {
                   ) : password ? (
                     <div className="valid-feedback">Password looks good!</div>
                   ) : null}
+                  <span
+                    className="shw-pswrd" 
+                    onMouseDown={handleMouseDown}
+                    onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseUp}
+                    >
+                    <i className="bi bi-eye"></i>
+                  </span>
                 </div>
                 <div className="btn-grp">
                   <button

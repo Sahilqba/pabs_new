@@ -351,14 +351,14 @@ const DoctorProfile = () => {
                         value={department}
                         onChange={(e) => setDepartment(e.target.value)}
                       >
-                        <option value="">Select your Department</option>
+                       <option value="">Select your Department</option>
                         <option value="GeneralPhysician">
                           General Physician
                         </option>
                         <option value="Orthopedic">Orthopedic</option>
                         <option value="Neurology">Neurology</option>
                         <option value="Cardiology">Cardiology</option>
-                        <option value="Others">Others</option>
+                        <option value="Others">Others</option> 
                       </select>
                       {errors.department && (
                         <div className="invalid-feedback">
