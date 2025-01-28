@@ -389,26 +389,24 @@ exports.updatePassword = async (req, res) => {
   }
 };
 
-exports.userIdfromEmail = async (req, res) => {
-  const { email, role } = req.body;
-  try {
-    const user = await User.find({ email, role });
+// exports.userIdfromEmail = async (req, res) => {
+//   const { email, role } = req.body;
+//   try {
+//     const user = await User.find({ email, role });
 
-    if (user && user.length > 0) {
-      res.status(200).json({ user });
-    }  else if(!user.email){
-      return res.status(401).send("Invalid email");
-    } 
-    else if(!user.role){
-      return res.status(401).send("Invalid role");
-    } 
-    else {
-      res.status(401).send("Invalid user");
-    }
-  } catch (error) {
-    res.status(400).send(error);
-  }
-};
+//     if (user && user.length > 0) {
+//       res.status(200).json({ user });
+//     } else if (!user.email) {
+//       return res.status(401).send("Invalid email");
+//     } else if (!user.role) {
+//       return res.status(401).send("Invalid role");
+//     } else {
+//       res.status(401).send("Invalid user");
+//     }
+//   } catch (error) {
+//     res.status(400).send(error);
+//   }
+// };
 
 // exports.userIdfromEmail = async (req, res) => {
 //   const { email, role } = req.body;
@@ -428,3 +426,19 @@ exports.userIdfromEmail = async (req, res) => {
 //     res.status(400).send(error);
 //   }
 // };
+
+
+exports.userIdfromEmail = async (req, res) => {
+  const { email, role } = req.body;
+  try {
+    const user = await User.find({ email, role });
+
+    if (user && user.length > 0) {
+      res.status(200).json({ user });
+    } else {
+      res.status(401).send("Invalid email or role");
+    }
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};
