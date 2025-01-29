@@ -14,6 +14,24 @@ function page() {
   const [showRoleModal, setShowRoleModal] = useState(false);
   const [passwordError, setPasswordError] = React.useState("");
   const [verificationSid, setVerificationSid] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const validatePassword = (value) => {
+    const pattern = /^(?=.*[a-zA-Z])(?=.*\d)[A-Za-z\d]{5,10}$/;
+    if (!value) {
+      return "Password is required.";
+    }
+    if (value.length < 5 || value.length > 10) {
+      return "Password must be 5-10 characters long.";
+    }
+    if (!pattern.test(value)) {
+      return "Password must include at least one letter and one number.";
+    }
+    return ""; // No error
+  };
   const handlePasswordChange = (e) => {
     const value = e.target.value;
     setPassword(value);
@@ -21,6 +39,27 @@ function page() {
     const error = validatePassword(value);
     setPasswordError(error);
   };
+  const handleConfirmPasswordChange = (e) => {
+    const value = e.target.value;
+    setConfirmPassword(value);
+    setConfirmPasswordError(value !== password ? "Passwords do not match" : "");
+  };
+  const handleMouseDown = () => {
+    setShowPassword(true);
+    setShowConfirmPassword(true);
+  };
+  const handleMouseUp = () => {
+    setShowPassword(false);
+    setShowConfirmPassword(true);
+  };
+
+  // const handlePasswordChange = (e) => {
+  //   const value = e.target.value;
+  //   setPassword(value);
+
+  //   const error = validatePassword(value);
+  //   setPasswordError(error);
+  // };
 
   const passwordUpdate = async (e) => {
     e.preventDefault();
@@ -38,7 +77,7 @@ function page() {
             // Authorization: `Bearer ${jwtToken}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ password: password }),
+          body: JSON.stringify({ password: password, confirmPassword: confirmPassword }),
         }
       );
 
@@ -52,10 +91,9 @@ function page() {
         Cookies.remove("emailfromPhoneVerification", { path: "/" });
         Cookies.remove("rolefromPhoneVerification", { path: "/" });
       } else if (response.status === 400) {
-        toast.error("Password is required");
+        toast.error("Password do not match");
         setLoading(false);
-      } 
-      else {
+      } else {
         console.error("Failed to send OTP");
         setLoading(false);
       }
@@ -83,7 +121,7 @@ function page() {
               noValidate
               onSubmit={passwordUpdate}
             >
-              <div className="mb-3">
+              {/* <div className="mb-3">
                 <input
                   type="password"
                   className={`form-control ${
@@ -99,6 +137,66 @@ function page() {
                   onChange={handlePasswordChange}
                   required
                 />
+              </div> */}
+              <div className="mb-3 position-relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className={`form-control ${
+                    passwordError
+                      ? "is-invalid"
+                      : password && !passwordError
+                      ? "is-valid"
+                      : ""
+                  }`}
+                  id="password"
+                  placeholder="Password*"
+                  value={password}
+                  onChange={handlePasswordChange}
+                  required
+                />
+                {passwordError ? (
+                  <div className="invalid-feedback">{passwordError}</div>
+                ) : password ? (
+                  <div className="valid-feedback">Password looks good!</div>
+                ) : null}
+                <span
+                  className="shw-pswrd"
+                  onMouseDown={handleMouseDown}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseUp}
+                >
+                  <i className="bi bi-eye"></i>
+                </span>
+              </div>
+              <div className="mb-3 position-relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className={`form-control ${
+                    confirmPasswordError
+                      ? "is-invalid"
+                      : confirmPassword && !confirmPasswordError
+                      ? "is-valid"
+                      : ""
+                  }`}
+                  id="confirmPassword"
+                  placeholder="Confirm Password*"
+                  value={confirmPassword}
+                  onChange={handleConfirmPasswordChange}
+                  required
+                />
+                {confirmPasswordError ? (
+                  <div className="invalid-feedback">{confirmPasswordError}</div>
+                ) : confirmPassword ? (
+                  <div className="valid-feedback">Passwords match!</div>
+                ) : null}
+                <span
+                  className="shw-pswrd"
+                  onMouseDown={handleMouseDown}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseUp}
+                >
+                  <i className="bi bi-eye"></i>
+                </span>
               </div>
               <div className="btn-grp">
                 <button type="submit" className="btn btn-primary">

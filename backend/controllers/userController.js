@@ -16,8 +16,9 @@ require("dotenv").config();
 const secretKey = process.env.SECRET_KEY;
 
 exports.createUser = async (req, res) => {
+  console.log(`Request body: ${req.body.password}`);
+  console.log(`Request body: ${req.body.confirmPassword}`);
   try {
-    // console.log("request body", req.body)
     const existingUser = await User.findOne({
       email: req.body.email,
       role: req.body.role,
@@ -30,10 +31,14 @@ exports.createUser = async (req, res) => {
     }
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
-    // console.log(`Hashed password: ${hashedPassword}`);
+    const hashedConfirmPassword = await bcrypt.hash(req.body.confirmPassword, saltRounds)
+    if (req.body.password !== req.body.confirmPassword) {
+      return res.status(400).json({ message: "Passwords do not match" });
+    }
     const user = new User({
       ...req.body,
       password: hashedPassword,
+      confirmPassword: hashedConfirmPassword
     });
     // console.log(`User: ${user}`);
     await user.save();
@@ -358,19 +363,53 @@ exports.deleteDoctorImage = async (req, res) => {
   }
 };
 
-exports.updatePassword = async (req, res) => {
-  const { password } = req.body;
-  if (!password) {
-    return res.status(400).json({ error: "Password is required" });
-  }
+// exports.updatePassword = async (req, res) => {
+//   const { password } = req.body;
+//   if (!password) {
+//     return res.status(400).json({ error: "Password is required" });
+//   }
 
+//   try {
+//     const { id } = req.params;
+//     const saltRounds = 10;
+//     const hashedPassword = await bcrypt.hash(password, saltRounds);
+//     const result = await User.findByIdAndUpdate(
+//       id,
+//       { password: hashedPassword },
+//       { new: true }
+//     );
+//     if (result) {
+//       res.status(200).json({
+//         message: "Password updated successfully",
+//         User: result,
+//       });
+//     } else {
+//       res.status(404).json({ message: "User not found" });
+//     }
+//   } catch (err) {
+//     if (err.name === "TokenExpiredError") {
+//       return res.status(401).send("Token has expired");
+//     }
+//     res.status(400).send(err);
+//   }
+// };
+
+exports.updatePassword = async (req, res) => {
+  const { password, confirmPassword } = req.body;
+  if (!password || !confirmPassword) {
+    return res.status(400).json({ error: "Password fields are required" });
+  }
   try {
     const { id } = req.params;
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const hashedConfirmPassword = await bcrypt.hash(confirmPassword, saltRounds);
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: "Passwords do not match" });}
     const result = await User.findByIdAndUpdate(
       id,
       { password: hashedPassword },
+      { confirmPassword: hashedConfirmPassword },
       { new: true }
     );
     if (result) {
@@ -389,45 +428,6 @@ exports.updatePassword = async (req, res) => {
   }
 };
 
-// exports.userIdfromEmail = async (req, res) => {
-//   const { email, role } = req.body;
-//   try {
-//     const user = await User.find({ email, role });
-
-//     if (user && user.length > 0) {
-//       res.status(200).json({ user });
-//     } else if (!user.email) {
-//       return res.status(401).send("Invalid email");
-//     } else if (!user.role) {
-//       return res.status(401).send("Invalid role");
-//     } else {
-//       res.status(401).send("Invalid user");
-//     }
-//   } catch (error) {
-//     res.status(400).send(error);
-//   }
-// };
-
-// exports.userIdfromEmail = async (req, res) => {
-//   const { email, role } = req.body;
-//   try {
-//     const userByEmail = await User.findOne({ email });
-//     if (!userByEmail) {
-//       return res.status(401).send("Invalid email");
-//     }
-
-//     const userByRole = await User.findOne({ email, role });
-//     if (!userByRole) {
-//       return res.status(401).send("Invalid role");
-//     }
-
-//     res.status(200).json({ user: userByRole });
-//   } catch (error) {
-//     res.status(400).send(error);
-//   }
-// };
-
-
 exports.userIdfromEmail = async (req, res) => {
   const { email, role } = req.body;
   try {
@@ -443,17 +443,6 @@ exports.userIdfromEmail = async (req, res) => {
   }
 };
 
-// exports.checkEmailnContact = async (req, res) => {
-//   const { email, contactNumber} = req.body;
-//   try {
-//     const user = await User.find({ email, contactNumber});
-
-
-//   } catch (error) {
-//     res.status(400).send(error);
-//   }
-// };
-
 exports.checkEmailnContact = async (req, res) => {
   const { email, contactNumber } = req.body;
   try {
@@ -461,7 +450,9 @@ exports.checkEmailnContact = async (req, res) => {
     const contactNumberExists = await User.findOne({ contactNumber });
 
     if (emailExists && contactNumberExists) {
-      res.status(200).json({ message: "Email and contact number already exist" });
+      res
+        .status(200)
+        .json({ message: "Email and contact number already exist" });
     } else if (emailExists) {
       res.status(200).json({ message: "Email already exists" });
     } else if (contactNumberExists) {
@@ -473,4 +464,3 @@ exports.checkEmailnContact = async (req, res) => {
     res.status(400).send(error);
   }
 };
-
