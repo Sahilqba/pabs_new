@@ -537,7 +537,6 @@ function page() {
                   <button
                     className="btn btn-primary mdl-btn m-2 sbmt-otp"
                     onClick={verifyOtp}
-                    disabled={!isResendDisabled}
                   >
                     Submit OTP
                   </button>
