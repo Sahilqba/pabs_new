@@ -65,6 +65,10 @@ function page() {
     setShowPassword(true);
     setShowConfirmPassword(true);
   };
+  const handleMouseUp = () => {
+    setShowPassword(false);
+    setShowConfirmPassword(true);
+  };
   const validatePhoneNumber = (number) => {
     const phoneRegex = /^[6-9]\d{9}$/;
     return phoneRegex.test(number);
@@ -74,58 +78,7 @@ function page() {
     // const isValid = phone.length >= 10;
     setContactNumberValid(validatePhoneNumber(number));
   };
-  const handleMouseUp = () => {
-    setShowPassword(false);
-    setShowConfirmPassword(true);
-  };
 
-  // const sendOtp = async (e) => {
-  //   e.preventDefault();
-  //   const form = e.currentTarget;
-  //   if (!form.checkValidity()) {
-  //     e.stopPropagation();
-  //     setFormValidated(true);
-  //     toast.error("Please enter the values.");
-  //     return;
-  //   }
-  //   setFormValidated(true);
-  //   Cookies.set("emailfromPhoneVerification", email, { expires: 1, path: "/" });
-  //   Cookies.set("rolefromPhoneVerification", role, { expires: 1, path: "/" });
-
-  //   try {
-  //     const response = await fetch(
-  //       `${process.env.NEXT_PUBLIC_API_URL}/sendOtp`,
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({ contactNumber: `+${contactNumber}`, email, role }),
-  //       }
-  //     );
-
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       setVerificationSid(data.sid);
-  //       toast.success("OTP sent to your contact number");
-  //       setLoading(false);
-  //       setShowRoleModal(true);
-  //       setIsResendDisabled(true);
-  //       setTimer(60);
-  //     } else if (response.status === 400) {
-  //       setShowRoleModal(false);
-  //       toast.error("Incorrect email or role.");
-  //       setLoading(false);
-  //     } else {
-  //       console.error("Failed to send OTP");
-  //       toast.error("Failed to send OTP. Please refresh the page and try again.");
-  //       setLoading(false);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error sending OTP:", error);
-  //     setLoading(false);
-  //   }
-  // };
 
   const sendOtp = async (e) => {
     e.preventDefault();
@@ -254,6 +207,7 @@ function page() {
       password,
       role,
       contactNumber: `+${contactNumber}`,
+      confirmPassword
     };
     try {
       const response = await fetch(

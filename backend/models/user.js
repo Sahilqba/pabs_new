@@ -23,6 +23,7 @@ const userSchema = new mongoose.Schema({
   experianceyear: String,
   previousCompany: String,
   contactNumber: String,
+  confirmPassword: String
 });
 
 const appointmentSchema = new mongoose.Schema({
