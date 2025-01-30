@@ -17,7 +17,7 @@ function page() {
   const [password, setPassword] = React.useState("");
   const [passwordError, setPasswordError] = useState("");
   const [formValidated, setFormValidated] = useState(false);
-  const [showRoleModal, setShowRoleModal] = useState(false);
+  // const [showRoleModal, setShowRoleModal] = useState(false);
   const [userRole, setUserRole] = useState("");
   const [isGoogleLogin, setIsGoogleLogin] = useState(false);
   const [loading, setLoading] = React.useState(false);
@@ -70,20 +70,73 @@ function page() {
     Cookies.set("emailFromLoginPage", email, { expires: 1, path: "/" });
     Cookies.set("passwordFromLoginPage", password, { expires: 1, path: "/" });
     // router.push("/userRoleVanilla");
-    setShowRoleModal(true);
+    // setShowRoleModal(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/userLogin`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email,
+            password: password,
+          }),
+        }
+      );
+      let errorMessage;
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Login successful");
+        // console.log("Data:", data);
+        toast.success("Login successful !");
+        localStorage.setItem("jwtToken", data.token);
+        // localStorage.setItem("userId", data.user._id);
+        localStorage.setItem("userName", data.user.name);
+        // localStorage.setItem("role", data.user.role);
+        localStorage.setItem("isDoctor", data.user.isDoctor);
+        // localStorage.setItem("department", data.user.department);
+        Cookies.set("jwtCookie", data.token, { expires: 1, path: "/" });
+        Cookies.set("userIdinDb", data.user._id, { expires: 1, path: "/" });
+        Cookies.set("userId", data.user._id, { expires: 1, path: "/" });
+        setTimeout(() => {
+          router.push(`/userProfile`);
+        }, 2000);
+      }
+      else {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const data = await response.json();
+          errorMessage = data.message || "Failed to login";
+        } else {
+          errorMessage = await response.text();
+        }
+        console.error("Login failed:", errorMessage);
+        toast.error(errorMessage);
+        Cookies.remove("emailFromLoginPage", { path: "/" });
+        Cookies.remove("role", { path: "/" });
+        Cookies.remove("passwordFromLoginPage", { path: "/" });
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+      toast.error(error.message);
+    } finally {
+      setLoading(false); // Reset loading state
+    }
   };
 
   const handleGoogleLogin = () => {
     console.log("Google login clicked");
     // router.push("/userRoleGoogle");
     setIsGoogleLogin(true);
-    setShowRoleModal(true);
+    // setShowRoleModal(true);
     // window.location.href = "http://localhost:8080/auth/google";
   };
 
   const handleRoleSelection = async (role) => {
     setUserRole(role);
-    setShowRoleModal(false);
+    // setShowRoleModal(false);
     // You can now use the selectedRole state to capture the input
     // console.log("Selected Role:", role);
 
@@ -286,7 +339,7 @@ function page() {
             </form>
           )}
           {/* Bootstrap Modal */}
-          {showRoleModal && (
+          {/* {showRoleModal && (
             <div
               className="modal fade show d-block"
               tabIndex="-1"
@@ -330,10 +383,10 @@ function page() {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Modal Backdrop */}
-          {showRoleModal && <div className="modal-backdrop fade show"></div>}
+          {/* {showRoleModal && <div className="modal-backdrop fade show"></div>} */}
         </div>
       </div>
 

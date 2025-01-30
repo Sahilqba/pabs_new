@@ -17,24 +17,29 @@ function page() {
     require("bootstrap/dist/js/bootstrap.js");
   });
   const [role, setRole] = useState(null);
+  const [isDoctor, setIsDoctor] = useState(null);
   const [userName, setUserName] = useState(null);
   // const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => {
     const storedRole = localStorage.getItem("role");
+    const storedisDoctor = localStorage.getItem("isDoctor");
     const storedUserName = localStorage.getItem("userName");
     const nameFromGoogle = Cookies.get("nameFromGoogle");
     const userRoleGoogle = Cookies.get("userRoleGoogle");
     setRole(storedRole || userRoleGoogle);
+    setIsDoctor(storedisDoctor);
     setUserName(storedUserName || nameFromGoogle);
   }, []);
 
-  if (!role || !userName) {
+  if (!userName || !isDoctor) {
     return <div>Loading...</div>;
   }
-  const normalizedRole = role?.toLowerCase(); 
+  const normalizedRole = role?.toLowerCase();
   return (
     <>
-    {normalizedRole === 'doctor' ? <DoctorProfile /> : <PatientProfile /> }
+      {/* {normalizedRole === 'doctor' ? <DoctorProfile /> : <PatientProfile /> } */}
+      {/* {isDoctor === "true" ? <DoctorProfile /> : <PatientProfile />} */}
+      {<PatientProfile />}
     </>
   );
 }

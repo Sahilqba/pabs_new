@@ -34,6 +34,7 @@ function Header({toggleSidebar}) {
         localStorage.removeItem("role");
         localStorage.removeItem("userName");
         localStorage.removeItem("userId");
+        localStorage.removeItem("isDoctor");
         sessionStorage.clear();
         Cookies.remove("jwtCookie", { path: "/" });
         Cookies.remove("emailFromGoogle", { path: "/" });

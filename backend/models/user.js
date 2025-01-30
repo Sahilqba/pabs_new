@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
-  // email: { type: String, unique: true },
   email: { type: String }, // Removed unique constraint
   name: String,
   password: String,
@@ -9,11 +8,9 @@ const userSchema = new mongoose.Schema({
   department: String,
   filename: {
     type: String,
-    // required: true,
   },
   path: {
     type: String,
-    // required: true,
   },
   createdAt: {
     type: Date,
@@ -23,7 +20,8 @@ const userSchema = new mongoose.Schema({
   experianceyear: String,
   previousCompany: String,
   contactNumber: String,
-  confirmPassword: String
+  confirmPassword: String,
+  isDoctor: Boolean
 });
 
 const appointmentSchema = new mongoose.Schema({

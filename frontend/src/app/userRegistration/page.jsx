@@ -36,6 +36,7 @@ function page() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isDoctor, setIsDoctor] = useState(false);
   const validatePassword = (value) => {
     const pattern = /^(?=.*[a-zA-Z])(?=.*\d)[A-Za-z\d]{5,10}$/;
     if (!value) {
@@ -79,7 +80,6 @@ function page() {
     setContactNumberValid(validatePhoneNumber(number));
   };
 
-
   const sendOtp = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -90,7 +90,7 @@ function page() {
       return;
     }
     if (password !== confirmPassword) {
-      setConfirmPasswordError('Passwords do not match');
+      setConfirmPasswordError("Passwords do not match");
       toast.error("Passwords do not match.");
       return;
     }
@@ -113,21 +113,18 @@ function page() {
         console.log("checkData:", checkData);
         console.log("checkData.message:", checkData.message);
         if (checkData.message === "Email and contact number already exist") {
-          console.error('hihihihihihi', checkData.message);
+          console.error("hihihihihihi", checkData.message);
+          toast.error(checkData.message);
+          return;
+        } else if (checkData.message === "Email already exists") {
+          toast.error(checkData.message);
+          return;
+        } else if (checkData.message === "Contact number already exists") {
+          console.error("hihihihihihi", checkData.message);
           toast.error(checkData.message);
           return;
         }
-        else if (checkData.message === "Email already exists") {
-          toast.error(checkData.message);
-          return;
-        }
-        else if (checkData.message === "Contact number already exists") {
-          console.error('hihihihihihi', checkData.message);
-          toast.error(checkData.message);
-          return;
-        }
-      }
-      else {
+      } else {
         const errorData = await checkResponse.json();
         console.error("Error data:", errorData);
         toast.error(`Error: ${errorData.message}`);
@@ -205,9 +202,10 @@ function page() {
       name,
       email,
       password,
-      role,
+      role: "Patient",
       contactNumber: `+${contactNumber}`,
-      confirmPassword
+      confirmPassword,
+      isDoctor,
     };
     try {
       const response = await fetch(
@@ -345,7 +343,7 @@ function page() {
                     </div>
                   )}
                 </div>
-                <div className="mb-3">
+                {/* <div className="mb-3">
                   <select
                     type="text"
                     className="form-control"
@@ -355,14 +353,13 @@ function page() {
                     required
                   >
                     <option value="">Select Role*</option>
-                    {/* <option value="Admin">Admin</option> */}
                     <option value="Doctor">Doctor</option>
                     <option value="Patient">Patient</option>
                   </select>
                   <div className="invalid-feedback">
                     Please provide a valid role.
                   </div>
-                </div>
+                </div> */}
                 <div className="mb-3 position-relative">
                   <input
                     type={showPassword ? "text" : "password"}
@@ -425,6 +422,19 @@ function page() {
                     <i className="bi bi-eye"></i>
                   </span>
                 </div>
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    value={isDoctor}
+                    id="flexCheckDefault"
+                    onChange={(e) => setIsDoctor(e.target.checked)}
+                  />
+                  <label class="form-check-label" for="flexCheckDefault">
+                    Are you a Doctor?
+                  </label>
+                </div>
+
                 <div className="btn-grp">
                   <button
                     type="submit"
@@ -434,19 +444,19 @@ function page() {
                     Submit
                   </button>
                   <div className="register-link">
-                  Already have an account?{" "}
-                  {loading ? (
-                    <span className="loader">Loading...</span> 
-                  ) : (
-                    <Link
-                      href="/userlogin"
-                      className="sign-up-link"
-                      onClick={handleLoginClick}
-                    >
-                      Log In
-                    </Link>
-                  )}
-                </div>
+                    Already have an account?{" "}
+                    {loading ? (
+                      <span className="loader">Loading...</span>
+                    ) : (
+                      <Link
+                        href="/userlogin"
+                        className="sign-up-link"
+                        onClick={handleLoginClick}
+                      >
+                        Log In
+                      </Link>
+                    )}
+                  </div>
                 </div>
               </form>
             )}
