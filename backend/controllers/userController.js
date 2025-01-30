@@ -111,9 +111,9 @@ exports.createAppointment = async (req, res) => {
 };
 
 exports.userLogin = async (req, res) => {
-  const { email, password, role } = req.body;
+  const { email, password } = req.body;
   try {
-    const user = await LoginUser.findOne({ email, role });
+    const user = await LoginUser.findOne({ email });
     if (user && (await bcrypt.compare(password, user.password))) {
       const token = jwt.sign(
         { id: user._id, email: user.email, role: user.role },
@@ -363,37 +363,6 @@ exports.deleteDoctorImage = async (req, res) => {
   }
 };
 
-// exports.updatePassword = async (req, res) => {
-//   const { password } = req.body;
-//   if (!password) {
-//     return res.status(400).json({ error: "Password is required" });
-//   }
-
-//   try {
-//     const { id } = req.params;
-//     const saltRounds = 10;
-//     const hashedPassword = await bcrypt.hash(password, saltRounds);
-//     const result = await User.findByIdAndUpdate(
-//       id,
-//       { password: hashedPassword },
-//       { new: true }
-//     );
-//     if (result) {
-//       res.status(200).json({
-//         message: "Password updated successfully",
-//         User: result,
-//       });
-//     } else {
-//       res.status(404).json({ message: "User not found" });
-//     }
-//   } catch (err) {
-//     if (err.name === "TokenExpiredError") {
-//       return res.status(401).send("Token has expired");
-//     }
-//     res.status(400).send(err);
-//   }
-// };
-
 exports.updatePassword = async (req, res) => {
   const { password, confirmPassword } = req.body;
   if (!password || !confirmPassword) {
@@ -429,9 +398,9 @@ exports.updatePassword = async (req, res) => {
 };
 
 exports.userIdfromEmail = async (req, res) => {
-  const { email, role } = req.body;
+  const { email } = req.body;
   try {
-    const user = await User.find({ email, role });
+    const user = await User.find({ email });
 
     if (user && user.length > 0) {
       res.status(200).json({ user });

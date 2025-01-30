@@ -8,11 +8,13 @@ import "react-toastify/dist/ReactToastify.css";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import Cookies from "js-cookie";
+// import { cookies } from "next/headers";
 function page() {
   const router = useRouter();
   const [loading, setLoading] = React.useState(false);
   const [email, setEmail] = React.useState("");
   const [role, setRole] = React.useState("");
+  const [isDoctor, setIsDoctor] = React.useState(null);
   const [formValidated, setFormValidated] = useState(false);
   const [contactNumber, setContactNumber] = useState("");
   const [showRoleModal, setShowRoleModal] = useState(false);
@@ -39,7 +41,7 @@ function page() {
     // setShowRoleModal(true);
     console.log("email", email);
     Cookies.set("emailfromPhoneVerification", email, { expires: 1, path: "/" });
-    Cookies.set("rolefromPhoneVerification", role, { expires: 1, path: "/" });
+    // Cookies.set("rolefromPhoneVerification", role, { expires: 1, path: "/" });
     // Cookies.set("contactfromPhoneVerification", contactNumber, { expires: 1, path: "/" });
     
   
@@ -52,7 +54,7 @@ function page() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ email: email, role: role }),
+          body: JSON.stringify({ email: email}),
         }
       );
   
@@ -66,7 +68,7 @@ function page() {
         console.log("check", additionalData.user[0].contactNumber);
         // setContactNumber(additionalData.user[0].contactNumber)
         let number= additionalData.user[0].contactNumber;
-        if (role === additionalData.user[0].role) {
+        // if (role === additionalData.user[0].role) {
           // Second API call to send OTP
           setFormattedNumber(number);
           console.log("number", number);
@@ -82,7 +84,6 @@ function page() {
           );
   
           if (response.ok) {
-
             const data = await response.json();
             setVerificationSid(data.sid);
             toast.success("OTP sent to your contact number");
@@ -98,10 +99,7 @@ function page() {
             console.error("Failed to send OTP");
             setLoading(false);
           }
-        } else {
-          toast.error("Invalid credentials: role does not match");
-          setLoading(false);
-        }
+        // } 
       } else if (additionalResponse.status === 401) {
         setShowRoleModal(false);
         // toast.error("Incorrect email or role.");
@@ -134,9 +132,12 @@ function page() {
       });
 
       if (response.ok) {
+        const data = await response.json();
+        console.log("OTP verified successfully:", data);
         setLoading(false);
         toast.success("OTP verified successfully");
         router.push("/updatePassword");
+        Cookies.set("verificationMessage", data.message, { expires: 1, path: "/" });
       } else {
         console.error("Failed to verify OTP");
         toast.error("Failed to verify OTP");
@@ -208,7 +209,7 @@ function page() {
                   Please provide a valid email address.
                 </div>
               </div>
-              <div className="mb-3">
+              {/* <div className="mb-3">
                 <select
                   type="text"
                   className="form-control"
@@ -224,7 +225,7 @@ function page() {
                 <div className="invalid-feedback">
                   Please provide a valid role.
                 </div>
-              </div>
+              </div> */}
               {/* <div className="mb-3">
                 <PhoneInput
                   country={"in"}

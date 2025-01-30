@@ -222,8 +222,8 @@ app.get("/logout", (req, res) => {
 //     });
 // });
 app.post("/sendOtp", (req, res) => {
-  const { contactNumber, email, role } = req.body;
-  if (!contactNumber || !email || !role) {
+  const { contactNumber, email} = req.body;
+  if (!contactNumber || !email ) {
     return res
       .status(400)
       .send({ error: "Contact number, email, and role are required" });
@@ -241,7 +241,7 @@ app.post("/sendOtp", (req, res) => {
     .services(verifyServiceSid)
     .verifications.create({ to: formattedNumber, channel: "sms" })
     .then((verification) =>
-      res.status(200).send({ sid: verification.sid, email, role })
+      res.status(200).send({ sid: verification.sid, email})
     )
     .catch((err) => {
       console.error("Error sending OTP:", err.message, err.stack);

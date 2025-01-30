@@ -7,7 +7,10 @@ export function middleware(request) {
   console.log("RoleObject:", roleObject);
   const role = roleObject ? roleObject.value : null;
   console.log("Role:", role);
-  const userIdfromPhoneVerification = request.cookies.get("userIdfromPhoneVerification")
+  const userIdfromPhoneVerification = request.cookies.get(
+    "userIdfromPhoneVerification"
+  );
+  const otpVerificationMessage = request.cookies.get("otpVerificationMessage");
   if (
     (request.nextUrl.pathname === "/userlogin" ||
       request.nextUrl.pathname === "/userRegistration") &&
@@ -34,8 +37,13 @@ export function middleware(request) {
   if (request.nextUrl.pathname === "/docAppointment" && role === "Patient") {
     return NextResponse.redirect(new URL("/userlogin", request.nextUrl));
   }
-  if (request.nextUrl.pathname === "/updatePassword" && !userIdfromPhoneVerification) {
-    return NextResponse.redirect(new URL("/phoneVerification", request.nextUrl));
+  if (
+    request.nextUrl.pathname === "/updatePassword" &&
+    !userIdfromPhoneVerification && !otpVerificationMessage
+  ) {
+    return NextResponse.redirect(
+      new URL("/phoneVerification", request.nextUrl)
+    );
   }
   return NextResponse.next();
 }
