@@ -26,8 +26,9 @@ function page() {
     const storedUserName = localStorage.getItem("userName");
     const nameFromGoogle = Cookies.get("nameFromGoogle");
     const userRoleGoogle = Cookies.get("userRoleGoogle");
+    const isDoctorGoogle = Cookies.get("isDoctor");
     setRole(storedRole || userRoleGoogle);
-    setIsDoctor(storedisDoctor);
+    setIsDoctor(storedisDoctor || isDoctorGoogle);
     setUserName(storedUserName || nameFromGoogle);
   }, []);
 

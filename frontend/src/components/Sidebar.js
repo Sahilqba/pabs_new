@@ -1,6 +1,9 @@
 import Link from "next/link";
+import Cookies from "js-cookie";
 const Sidebar = ({ isOpen, role }) => {
   let isDoctor = localStorage.getItem("isDoctor");
+  let isDoctorGoogle = Cookies.get("isDoctor");
+  console.log("isDoctor:", isDoctor);
   return (
     <aside className={`sidebar bg-light p-3 ${isOpen ? "show" : "hide"}`}>
       <ul className="nav flex-column">
@@ -34,16 +37,31 @@ const Sidebar = ({ isOpen, role }) => {
             </Link>
           </li>
         )}
-        {isDoctor === "true" && (
-          <li className="nav-item">
-            <Link 
-            href="/appointmentBooking"
-             className="nav-link sd-link">
-              <i className="bi bi-capsule-pill"></i>
-              Go to doctor's profile
-            </Link>
-          </li>
-        )}
+        {/* {isDoctor === "true" ||
+          (isDoctorGoogle === "true" && (
+            <li className="nav-item">
+              <Link
+                // href="/appointmentBooking"
+                href="/doctorProfilePage"
+                className="nav-link sd-link"
+              >
+                <i className="bi bi-capsule-pill"></i>
+                Go to doctor's profile
+              </Link>
+            </li>
+          ))} */}
+          {(isDoctor === "true" || isDoctorGoogle === "true") && (
+  <li className="nav-item">
+    <Link
+      // href="/appointmentBooking"
+      href="/doctorProfilePage"
+      className="nav-link sd-link"
+    >
+      <i className="bi bi-capsule-pill"></i>
+      Go to doctor's profile
+    </Link>
+  </li>
+)}
       </ul>
     </aside>
   );

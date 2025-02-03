@@ -17,10 +17,11 @@ function page() {
   const [password, setPassword] = React.useState("");
   const [passwordError, setPasswordError] = useState("");
   const [formValidated, setFormValidated] = useState(false);
-  // const [showRoleModal, setShowRoleModal] = useState(false);
+  const [showRoleModal, setShowRoleModal] = useState(false);
   const [userRole, setUserRole] = useState("");
   const [isGoogleLogin, setIsGoogleLogin] = useState(false);
   const [loading, setLoading] = React.useState(false);
+  const [isDoctor, setIsDoctor] = useState(false);
   const handleSignUpClick = (e) => {
     e.preventDefault();
     setLoading(true); // Show loader
@@ -31,7 +32,7 @@ function page() {
     e.preventDefault();
     setLoading(true); // Show loader
     router.push("/phoneVerification").finally(() => setIsLoading(false)); // Hide loader after navigation
-  }
+  };
 
   const validatePassword = (value) => {
     const pattern = /^(?=.*[a-zA-Z])(?=.*\d)[A-Za-z\d]{5,10}$/;
@@ -103,8 +104,7 @@ function page() {
         setTimeout(() => {
           router.push(`/userProfile`);
         }, 2000);
-      }
-      else {
+      } else {
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.includes("application/json")) {
           const data = await response.json();
@@ -130,7 +130,7 @@ function page() {
     console.log("Google login clicked");
     // router.push("/userRoleGoogle");
     setIsGoogleLogin(true);
-    // setShowRoleModal(true);
+    setShowRoleModal(true);
     // window.location.href = "http://localhost:8080/auth/google";
   };
 
@@ -142,67 +142,68 @@ function page() {
 
     if (isGoogleLogin) {
       Cookies.set("role", role, { expires: 1, path: "/" });
+      Cookies.set("isDoctor", isDoctor, { expires: 1, path: "/" });
       Cookies.set("userRoleGoogle", role, { expires: 1, path: "/" });
       window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
       return;
     }
 
-    Cookies.set("emailFromLoginPage", email, { expires: 1, path: "/" });
-    Cookies.set("passwordFromLoginPage", password, { expires: 1, path: "/" });
-    Cookies.set("role", role, { expires: 1, path: "/" });
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/userLogin`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: email,
-            password: password,
-            role: role,
-          }),
-        }
-      );
-      let errorMessage;
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Login successful");
-        // console.log("Data:", data);
-        toast.success("Login successful !");
-        localStorage.setItem("jwtToken", data.token);
-        // localStorage.setItem("userId", data.user._id);
-        localStorage.setItem("userName", data.user.name);
-        localStorage.setItem("role", data.user.role);
-        // localStorage.setItem("department", data.user.department);
-        Cookies.set("jwtCookie", data.token, { expires: 1, path: "/" });
-        Cookies.set("userIdinDb", data.user._id, { expires: 1, path: "/" });
-        Cookies.set("userId", data.user._id, { expires: 1, path: "/" });
-        setTimeout(() => {
-          router.push(`/userProfile`);
-        }, 2000);
-      }
-      else {
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-          const data = await response.json();
-          errorMessage = data.message || "Failed to login";
-        } else {
-          errorMessage = await response.text();
-        }
-        console.error("Login failed:", errorMessage);
-        toast.error(errorMessage);
-        Cookies.remove("emailFromLoginPage", { path: "/" });
-        Cookies.remove("role", { path: "/" });
-        Cookies.remove("passwordFromLoginPage", { path: "/" });
-      }
-    } catch (error) {
-      console.error("Error during login:", error);
-      toast.error(error.message);
-    } finally {
-      setLoading(false); // Reset loading state
-    }
+    // Cookies.set("emailFromLoginPage", email, { expires: 1, path: "/" });
+    // Cookies.set("passwordFromLoginPage", password, { expires: 1, path: "/" });
+    // Cookies.set("role", role, { expires: 1, path: "/" });
+    // try {
+    //   const response = await fetch(
+    //     `${process.env.NEXT_PUBLIC_API_URL}/userLogin`,
+    //     {
+    //       method: "POST",
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //       body: JSON.stringify({
+    //         email: email,
+    //         password: password,
+    //         // role: role,
+    //         isDoctor: isDoctor,
+    //       }),
+    //     }
+    //   );
+    //   let errorMessage;
+    //   if (response.ok) {
+    //     const data = await response.json();
+    //     console.log("Login successful");
+    //     // console.log("Data:", data);
+    //     toast.success("Login successful !");
+    //     localStorage.setItem("jwtToken", data.token);
+    //     // localStorage.setItem("userId", data.user._id);
+    //     localStorage.setItem("userName", data.user.name);
+    //     localStorage.setItem("role", data.user.role);
+    //     // localStorage.setItem("department", data.user.department);
+    //     Cookies.set("jwtCookie", data.token, { expires: 1, path: "/" });
+    //     Cookies.set("userIdinDb", data.user._id, { expires: 1, path: "/" });
+    //     Cookies.set("userId", data.user._id, { expires: 1, path: "/" });
+    //     setTimeout(() => {
+    //       router.push(`/userProfile`);
+    //     }, 2000);
+    //   } else {
+    //     const contentType = response.headers.get("content-type");
+    //     if (contentType && contentType.includes("application/json")) {
+    //       const data = await response.json();
+    //       errorMessage = data.message || "Failed to login";
+    //     } else {
+    //       errorMessage = await response.text();
+    //     }
+    //     console.error("Login failed:", errorMessage);
+    //     toast.error(errorMessage);
+    //     Cookies.remove("emailFromLoginPage", { path: "/" });
+    //     Cookies.remove("role", { path: "/" });
+    //     Cookies.remove("passwordFromLoginPage", { path: "/" });
+    //   }
+    // } catch (error) {
+    //   console.error("Error during login:", error);
+    //   toast.error(error.message);
+    // } finally {
+    //   setLoading(false); // Reset loading state
+    // }
   };
 
   return (
@@ -223,9 +224,6 @@ function page() {
               onSubmit={handleSubmit}
             >
               <div className="mb-3">
-                {/* <label htmlFor="email" className="form-label">
-                    Email
-                  </label> */}
                 <input
                   type="email"
                   className="form-control"
@@ -273,7 +271,7 @@ function page() {
                 <div className="register-link">
                   Don't have an account?{" "}
                   {loading ? (
-                    <span className="loader">Loading...</span> 
+                    <span className="loader">Loading...</span>
                   ) : (
                     <Link
                       href="/userRegistration"
@@ -287,7 +285,7 @@ function page() {
                 <div className="register-link">
                   Forgot password?{" "}
                   {loading ? (
-                    <span className="loader">Loading...</span> 
+                    <span className="loader">Loading...</span>
                   ) : (
                     <Link
                       href="/phoneVerification"
@@ -299,15 +297,12 @@ function page() {
                   )}
                 </div>
               </div>
-              
+
               <div className="separator">
                 <span>OR</span>
               </div>
               <div className="alternate-signin">
-                <button
-                  onClick={handleGoogleLogin}
-                  className="btn"
-                >
+                <button onClick={handleGoogleLogin} className="btn">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     x="0px"
@@ -339,7 +334,7 @@ function page() {
             </form>
           )}
           {/* Bootstrap Modal */}
-          {/* {showRoleModal && (
+          {showRoleModal && (
             <div
               className="modal fade show d-block"
               tabIndex="-1"
@@ -351,7 +346,7 @@ function page() {
               >
                 <div className="modal-content">
                   <div className="modal-header">
-                    <h5 className="modal-title">Select Your Role</h5>
+                    <h5 className="modal-title">Info</h5>
                     <button
                       type="button"
                       className="custom-close-btn"
@@ -365,28 +360,34 @@ function page() {
                       <span>&times;</span>
                     </button>
                   </div>
+                  <div className="form-check">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      value={isDoctor}
+                      id="flexCheckDefault"
+                      onChange={(e) => setIsDoctor(e.target.checked)}
+                    />
+                    <label className="form-check-label">
+                      Are you a Doctor?
+                    </label>
+                  </div>
                   <div className="modal-body">
-                    <p>Please select your role to continue:</p>
+                    {/* <p>Are you a doctor:</p> */}
                     <button
                       className="btn btn-primary mdl-btn m-2"
-                      onClick={() => handleRoleSelection("Doctor")}
-                    >
-                      Doctor
-                    </button>
-                    <button
-                      className="btn btn-secondary mdl-btn m-2"
                       onClick={() => handleRoleSelection("Patient")}
                     >
-                      Patient
+                      Doctor
                     </button>
                   </div>
                 </div>
               </div>
             </div>
-          )} */}
+          )}
 
           {/* Modal Backdrop */}
-          {/* {showRoleModal && <div className="modal-backdrop fade show"></div>} */}
+          {showRoleModal && <div className="modal-backdrop fade show"></div>}
         </div>
       </div>
 

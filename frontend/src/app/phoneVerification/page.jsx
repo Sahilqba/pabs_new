@@ -137,7 +137,7 @@ function page() {
         setLoading(false);
         toast.success("OTP verified successfully");
         router.push("/updatePassword");
-        Cookies.set("verificationMessage", data.message, { expires: 1, path: "/" });
+        Cookies.set("sidOTP", data.sid, { expires: 1, path: "/" });
       } else {
         console.error("Failed to verify OTP");
         toast.error("Failed to verify OTP");

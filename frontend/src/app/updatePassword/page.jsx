@@ -90,6 +90,9 @@ function page() {
         Cookies.remove("userIdfromPhoneVerification", { path: "/" });
         Cookies.remove("emailfromPhoneVerification", { path: "/" });
         Cookies.remove("rolefromPhoneVerification", { path: "/" });
+        Cookies.remove("verificationMessage", { path: "/" });
+        Cookies.remove("contactfromPhoneVerification", { path: "/" });
+        Cookies.remove("sidOTP", { path: "/" });
       } else if (response.status === 400) {
         toast.error("Password do not match");
         setLoading(false);
