@@ -38,7 +38,7 @@ function page() {
   return (
     <>
       {/* {normalizedRole === 'doctor' ? <DoctorProfile /> : <PatientProfile /> } */}
-      {/* {isDoctor === "true" ? <DoctorProfile /> : <PatientProfile />} */}
+      {isDoctor === "true" ? <DoctorProfile /> : <PatientProfile />}
       {<PatientProfile />}
     </>
   );

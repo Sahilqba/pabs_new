@@ -37,7 +37,7 @@ const Sidebar = ({ isOpen, role }) => {
         {isDoctor === "true" && (
           <li className="nav-item">
             <Link 
-            href="/appointmentBooking"
+            href="/userProfile"
              className="nav-link sd-link">
               <i className="bi bi-capsule-pill"></i>
               Go to doctor's profile
