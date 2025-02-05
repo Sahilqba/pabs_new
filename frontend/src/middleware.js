@@ -10,7 +10,11 @@ export function middleware(request) {
   const userIdfromPhoneVerification = request.cookies.get(
     "userIdfromPhoneVerification"
   );
-  const otpVerificationMessage = request.cookies.get("otpVerificationMessage");
+  const sidOTP = request.cookies.get("sidOTP");
+  const sidOTPValue = sidOTP ? sidOTP.value : null;
+  // const sidOTPValue = sidOTP.value
+  console.log("sidOTP:", sidOTP);
+  console.log("sidOTP value:", sidOTPValue);
   if (
     (request.nextUrl.pathname === "/userlogin" ||
       request.nextUrl.pathname === "/userRegistration") &&
@@ -39,7 +43,8 @@ export function middleware(request) {
   }
   if (
     request.nextUrl.pathname === "/updatePassword" &&
-    !userIdfromPhoneVerification && !otpVerificationMessage
+    !userIdfromPhoneVerification &&
+    !sidOTPValue
   ) {
     return NextResponse.redirect(
       new URL("/phoneVerification", request.nextUrl)

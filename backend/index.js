@@ -113,11 +113,14 @@ app.get(
       }
       const existingUser = await User.findOne({
         email: req.user.emails[0].value,
-        role: req.cookies.userRoleGoogle, // Check for the specific role
+        role: req.cookies.userRoleGoogle,
+        // isDoctor: req.cookies.isDoctor,
       });
       console.log("Existing user:", existingUser);
       let userId;
       if (existingUser) {
+        existingUser.isDoctor = req.cookies.isDoctor;
+        await existingUser.save();
         userId = existingUser._id.toString();
         res.cookie("userIdinDb", userId, { httpOnly: false, secure: false });
       } else {
@@ -138,6 +141,7 @@ app.get(
           role: req.cookies.userRoleGoogle,
           filename: filename,
           path: `uploads/${filename}`,
+          isDoctor: req.cookies.isDoctor,
         });
         await newUser.save();
         userId = newUser._id.toString();
@@ -192,6 +196,7 @@ app.get("/logout", (req, res) => {
       res.clearCookie("userRoleGoogle", { path: "/" });
       res.clearCookie("role", { path: "/" });
       res.clearCookie("userIdinDb", { path: "/" });
+      res.clearCookie("isDoctor", { path: "/" });
       res.status(200).json({ message: "Logged out successfully" });
     });
   });
@@ -222,8 +227,8 @@ app.get("/logout", (req, res) => {
 //     });
 // });
 app.post("/sendOtp", (req, res) => {
-  const { contactNumber, email} = req.body;
-  if (!contactNumber || !email ) {
+  const { contactNumber, email } = req.body;
+  if (!contactNumber || !email) {
     return res
       .status(400)
       .send({ error: "Contact number, email, and role are required" });
@@ -241,7 +246,7 @@ app.post("/sendOtp", (req, res) => {
     .services(verifyServiceSid)
     .verifications.create({ to: formattedNumber, channel: "sms" })
     .then((verification) =>
-      res.status(200).send({ sid: verification.sid, email})
+      res.status(200).send({ sid: verification.sid, email })
     )
     .catch((err) => {
       console.error("Error sending OTP:", err.message, err.stack);
@@ -256,9 +261,19 @@ app.post("/verifyOtp", (req, res) => {
     .verificationChecks.create({ verificationSid: sid, code: token })
     .then((verification_check) => {
       if (verification_check.status === "approved") {
-        res.status(200).send({ message: "OTP verified successfully" });
+        res.status(200).send({
+          message: "OTP verified successfully",
+          sid: verification_check.sid,
+          status: verification_check.status,
+        });
       } else {
-        res.status(400).send({ error: "Invalid OTP" });
+        res
+          .status(400)
+          .send({
+            error: "Invalid OTP",
+            sid: verification_check.sid,
+            status: verification_check.status,
+          });
       }
     })
     .catch((err) => {

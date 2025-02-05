@@ -301,9 +301,9 @@ exports.getDoctorDepartmentByUserId = async (req, res) => {
     if (!user) {
       return res.status(404).send("No user found");
     }
-    if (user.role !== "Doctor") {
-      return res.status(400).json({ message: "User is not a doctor" });
-    }
+    // if (user.role !== "Doctor") {
+    //   return res.status(400).json({ message: "User is not a doctor" });
+    // }
     //   if (!user.department) {
     //     return res.status(400).json({ message: 'No department selected' });
     // }
@@ -363,6 +363,44 @@ exports.deleteDoctorImage = async (req, res) => {
   }
 };
 
+
+// exports.updatePassword = async (req, res) => {
+//   const { password, confirmPassword } = req.body;
+//   const { id } = req.params;
+
+//   if (!password || !confirmPassword) {
+//     return res.status(400).json({ error: "Password fields are required" });
+//   }
+
+//   if (password !== confirmPassword) {
+//     return res.status(400).json({ message: "Passwords do not match" });
+//   }
+
+//   try {
+//     const user = await User.findById(id);
+//     if (!user) return res.status(404).json({ message: "User not found" });
+
+//     // Compare with last password
+//     const isSameAsLastPassword = await bcrypt.compare(password, user.password);
+//     if (isSameAsLastPassword) {
+//       return res.status(400).json({ message: "New password cannot be the same as the last password" });
+//     }
+
+//     // Hash the new password
+//     const hashedPassword = await bcrypt.hash(password, 10);
+
+//     // Update password in the database
+//     user.password = hashedPassword;
+//     await user.save();
+
+//     res.status(200).json({ message: "Password updated successfully" });
+
+//   } catch (err) {
+//     console.error("Error updating password:", err);
+//     return res.status(500).json({ message: "Server error" });
+//   }
+// };
+
 exports.updatePassword = async (req, res) => {
   const { password, confirmPassword } = req.body;
   if (!password || !confirmPassword) {
@@ -370,6 +408,15 @@ exports.updatePassword = async (req, res) => {
   }
   try {
     const { id } = req.params;
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+ 
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (isMatch) {
+      return res.status(400).json({ message: "New password cannot be the same as the old password" });
+    }
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     const hashedConfirmPassword = await bcrypt.hash(confirmPassword, saltRounds);
@@ -396,7 +443,7 @@ exports.updatePassword = async (req, res) => {
     res.status(400).send(err);
   }
 };
-
+ 
 exports.userIdfromEmail = async (req, res) => {
   const { email } = req.body;
   try {
@@ -429,6 +476,19 @@ exports.checkEmailnContact = async (req, res) => {
     } else {
       res.status(200).json({ message: "Proceed for registration" });
     }
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};
+
+exports.getLastPassword = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({ lastPassword: user.password });
   } catch (error) {
     res.status(400).send(error);
   }

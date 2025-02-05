@@ -394,5 +394,6 @@ router.post('/getuserIdfromEmail', userController.userIdfromEmail);
 
 router.post('/checkEmailnContact', userController.checkEmailnContact);
 
+router.get("/getLastPassword/:userId", userController.getLastPassword);
 
 module.exports = router;

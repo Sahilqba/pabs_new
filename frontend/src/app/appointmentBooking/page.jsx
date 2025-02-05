@@ -38,6 +38,7 @@ function page() {
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState("");
   const [filteredDoctors, setFilteredDoctors] = useState([]);
+  const [isDoctor, setIsDoctor] = useState(null);
   // const [selectedDepartment, setSelectedDepartment] = useState("");
   const fetchAppointments = async (userIdfetched) => {
     setLoading(true);
@@ -399,7 +400,7 @@ function page() {
       const data = await response.json();
       const doctors = data.filter(
         (user) =>
-          user.role === "Doctor" &&
+          user.isDoctor === true &&
           user.email !== userEmailFromGoogle &&
           user.email !== userEmailFromLoginPage &&
           user.department

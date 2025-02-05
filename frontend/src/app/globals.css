@@ -772,3 +772,23 @@ button.menu-item.btn.btn-sm.btn-link.text-start {
 /* .disabled-cursor:disabled {
   cursor: not-allowed;
 } */
+.doc-chk {
+  display: flex !important;
+  /* padding-left: 1.5em;
+  margin-bottom: 0.125rem; */
+  gap: 10px !important;
+  line-height: 23px !important;
+  font-size: 17px !important;
+  font-weight: 400 !important;
+}
+.doc-chk-mdl{
+  display: flex !important;
+  justify-content: center;
+  /* padding-left: 1.5em;
+  margin-bottom: 0.125rem; */
+  gap: 10px !important;
+  line-height: 23px !important;
+  font-size: 17px !important;
+  font-weight: 400 !important;
+  padding-top: 24px;
+}

@@ -62,13 +62,20 @@ function page() {
     setConfirmPassword(value);
     setConfirmPasswordError(value !== password ? "Passwords do not match" : "");
   };
-  const handleMouseDown = () => {
-    setShowPassword(true);
-    setShowConfirmPassword(true);
+  const handleMouseDown = (field) => {
+    if (field === "password") {
+      setShowPassword(true);
+    } else if (field === "confirmPassword") {
+      setShowConfirmPassword(true);
+    }
   };
-  const handleMouseUp = () => {
-    setShowPassword(false);
-    setShowConfirmPassword(true);
+
+  const handleMouseUp = (field) => {
+    if (field === "password") {
+      setShowPassword(false);
+    } else if (field === "confirmPassword") {
+      setShowConfirmPassword(false);
+    }
   };
   const validatePhoneNumber = (number) => {
     const phoneRegex = /^[6-9]\d{9}$/;
@@ -113,7 +120,6 @@ function page() {
         console.log("checkData:", checkData);
         console.log("checkData.message:", checkData.message);
         if (checkData.message === "Email and contact number already exist") {
-          console.error("hihihihihihi", checkData.message);
           toast.error(checkData.message);
           return;
         } else if (checkData.message === "Email already exists") {
@@ -383,16 +389,16 @@ function page() {
                   ) : null}
                   <span
                     className="shw-pswrd"
-                    onMouseDown={handleMouseDown}
-                    onMouseUp={handleMouseUp}
-                    onMouseLeave={handleMouseUp}
+                    onMouseDown={() => handleMouseDown("password")}
+                    onMouseUp={() => handleMouseUp("password")}
+                    onMouseLeave={() => handleMouseUp("password")}
                   >
                     <i className="bi bi-eye"></i>
                   </span>
                 </div>
                 <div className="mb-3 position-relative">
                   <input
-                    type={showPassword ? "text" : "password"}
+                    type={showConfirmPassword ? "text" : "password"}
                     className={`form-control ${
                       confirmPasswordError
                         ? "is-invalid"
@@ -415,14 +421,14 @@ function page() {
                   ) : null}
                   <span
                     className="shw-pswrd"
-                    onMouseDown={handleMouseDown}
-                    onMouseUp={handleMouseUp}
-                    onMouseLeave={handleMouseUp}
+                    onMouseDown={() => handleMouseDown("confirmPassword")}
+                    onMouseUp={() => handleMouseUp("confirmPassword")}
+                    onMouseLeave={() => handleMouseUp("confirmPassword")}
                   >
                     <i className="bi bi-eye"></i>
                   </span>
                 </div>
-                <div class="form-check">
+                <div class="form-check doc-chk">
                   <input
                     class="form-check-input"
                     type="checkbox"
