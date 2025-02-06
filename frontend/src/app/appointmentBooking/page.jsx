@@ -64,18 +64,19 @@ function page() {
       const data = await response.json();
       const now = new Date(); // Current date and time
 
-    // Filter and sort appointments
-    const filteredAppointments = data
-      .filter((appointment) => {
-        const appointmentDateTime = new Date(
-          `${appointment.appointmentDate}T${appointment.appointmentTime}`
-        );
-        return appointmentDateTime >= now; // Include only future or current appointments
-      }).sort((a, b) => {
-        const dateA = new Date(`${a.appointmentDate}T${a.appointmentTime}`);
-        const dateB = new Date(`${b.appointmentDate}T${b.appointmentTime}`);
-        return dateA - dateB;
-      });
+      // Filter and sort appointments
+      const filteredAppointments = data
+        .filter((appointment) => {
+          const appointmentDateTime = new Date(
+            `${appointment.appointmentDate}T${appointment.appointmentTime}`
+          );
+          return appointmentDateTime >= now; // Include only future or current appointments
+        })
+        .sort((a, b) => {
+          const dateA = new Date(`${a.appointmentDate}T${a.appointmentTime}`);
+          const dateB = new Date(`${b.appointmentDate}T${b.appointmentTime}`);
+          return dateA - dateB;
+        });
       setAppointments(filteredAppointments);
     } catch (error) {
       console.error("Failed to fetch appointments:", error);
@@ -146,6 +147,9 @@ function page() {
         );
         console.log("Appointment deleted successfully");
         toast.success("Appointment deleted successfully");
+        setTimeout(() => {
+          window.location.reload();
+          }, 3000);
       } else if (response.status === 404) {
         toast.error("Appointment not found");
       } else if (response.status === 401) {
@@ -263,6 +267,9 @@ function page() {
         setIsModalOpen(false);
         fetchAppointments(userIdfetched);
         // handle success (e.g., update state, close modal, show notification)
+        setTimeout(() => {
+          window.location.reload();
+          }, 3000);
       } else if (response.status === 401) {
         toast.warning(
           "Token has expired. Please log in again and try rescheduling."
@@ -311,9 +318,9 @@ function page() {
       return;
     }
 
-  // Fetch the doctor's name based on the selected doctor's ID
-  const selectedDoctorObj = doctors.find((doc) => doc._id === selectedDoctor);
-  const doctorName = selectedDoctorObj ? selectedDoctorObj.name : "";
+    // Fetch the doctor's name based on the selected doctor's ID
+    const selectedDoctorObj = doctors.find((doc) => doc._id === selectedDoctor);
+    const doctorName = selectedDoctorObj ? selectedDoctorObj.name : "";
 
     try {
       const response = await fetch(
@@ -349,6 +356,9 @@ function page() {
         setAppointmentTime("");
         console.log("Appointment booked:", appointment);
         toast.success("Appointment booked successfully");
+        setTimeout(() => {
+          window.location.reload();
+          }, 3000);
         // router.push(`/userProfile`);
       } else if (response.status === 401) {
         toast.warning("Token has expired. Please log in again.");
@@ -418,9 +428,28 @@ function page() {
     }
   };
 
+  // const handleDepartmentChange = (department) => {
+  //   setDepartment(department);
+  //   if (department === "") {
+  //     setFilteredDoctors(doctors.filter((doc) => doc.department));
+  //   } else {
+  //     const filtered = doctors.filter(
+  //       (doc) => doc.department.toLowerCase() === department.toLowerCase()
+  //     );
+  //     setFilteredDoctors(filtered);
+  //   }
+  // };
+
   const handleDepartmentChange = (department) => {
     setDepartment(department);
-    if (department === "") {
+    if (selectedDoctor) {
+      const selectedDoctorObj = doctors.find(
+        (doc) => doc._id === selectedDoctor
+      );
+      if (selectedDoctorObj) {
+        setFilteredDoctors([selectedDoctorObj]);
+      }
+    } else if (department === "") {
       setFilteredDoctors(doctors.filter((doc) => doc.department));
     } else {
       const filtered = doctors.filter(
@@ -429,6 +458,7 @@ function page() {
       setFilteredDoctors(filtered);
     }
   };
+
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -461,7 +491,7 @@ function page() {
                   required
                 />
               </div>
-              <div className="col-md-4">
+              {/* <div className="col-md-4">
                 <select
                   type="text"
                   className="form-control"
@@ -484,6 +514,40 @@ function page() {
                       {department}
                     </option>
                   ))}
+                </select>
+              </div> */}
+              <div className="col-md-4">
+                <select
+                  type="text"
+                  className="form-control"
+                  placeholder="Enter your department"
+                  value={department}
+                  onChange={(e) => {
+                    handleDepartmentChange(e.target.value);
+                  }}
+                  required
+                  // disabled={!!selectedDoctor} // Disable if a doctor is selected
+                >
+                  <option value="">Select Department</option>
+                  {selectedDoctor
+                    ? doctors
+                        .filter((doc) => doc._id === selectedDoctor)
+                        .map((doc) => (
+                          <option key={doc.department} value={doc.department}>
+                            {doc.department}
+                          </option>
+                        ))
+                    : Array.from(
+                        new Set(
+                          doctors
+                            .filter((doc) => doc.department) // Ensure only valid departments are listed
+                            .map((doc) => doc.department)
+                        )
+                      ).map((department) => (
+                        <option key={department} value={department}>
+                          {department}
+                        </option>
+                      ))}
                 </select>
               </div>
               <div className="col-md-4">
