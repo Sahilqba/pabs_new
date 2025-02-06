@@ -124,7 +124,7 @@ exports.userLogin = async (req, res) => {
       );
       res.status(200).json({ user, token });
     } else {
-      res.status(401).send("Invalid email or password or role");
+      res.status(401).send("Invalid email or password");
     }
   } catch (error) {
     res.status(400).send(error);

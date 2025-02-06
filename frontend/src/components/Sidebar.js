@@ -72,13 +72,13 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Cookies from "js-cookie";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 const Sidebar = ({ isOpen }) => {
   const [isDoctor, setIsDoctor] = useState(false);
   const [viewAsPatient, setViewAsPatient] = useState(false); 
   const router = useRouter();
-
+  const pathname = usePathname(); 
   // useEffect(() => {
   //   const doctorStatus =
   //     localStorage.getItem("isDoctor") === "true" ||
@@ -100,11 +100,19 @@ const Sidebar = ({ isOpen }) => {
   useEffect(() => {
     const doctorStatus = localStorage.getItem("isDoctor") === "true" || Cookies.get("isDoctor") === "true";
     setIsDoctor(doctorStatus);
-  }, []);
-
-  const handleProfileClick = () => {
-    setViewAsPatient(!viewAsPatient);
-  };
+    
+    if (pathname === "/patientProfilePage") {
+      setViewAsPatient(true);
+    } else if (pathname === "/userProfile") {
+      setViewAsPatient(false);
+    }
+  }, [pathname]);
+ 
+  
+  // const handleProfileClick = () => {
+  //   setViewAsPatient(!viewAsPatient);
+  //   router.push(viewAsPatient ? "/userProfile" : "/patientProfilePage");
+  // };
   
   const profileHref = viewAsPatient ? "/userProfile" : "/patientProfilePage";
 
@@ -149,7 +157,7 @@ const Sidebar = ({ isOpen }) => {
             <Link
               href={profileHref}
               className="nav-link sd-link"
-              onClick={handleProfileClick} // Toggle state on click
+              onClick={() => setViewAsPatient(!viewAsPatient)} 
             >
               <i className="bi bi-person-badge"></i>{" "}
               {viewAsPatient ? "Switch to Doctor Profile" : "Switch to Patient Profile"}
