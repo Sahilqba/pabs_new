@@ -182,7 +182,7 @@ function page() {
     <>
       <div className="flex-container">
         <div className="flex-item-login login-form">
-          <h2>Phone verification</h2>
+          <h2>Forgot Password</h2>
           {loading ? (
             <div className="spinner-border" role="status">
               <span className="sr-only"></span>

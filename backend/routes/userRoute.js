@@ -396,4 +396,8 @@ router.post('/checkEmailnContact', userController.checkEmailnContact);
 
 router.get("/getLastPassword/:userId", userController.getLastPassword);
 
+router.post('/isGoogleEmailThere', userController.isGoogleEmailThere);
+
+router.post("/addRolenIsdoctorinGmailAccount", userController.addRolenIsdoctorinGmailAccount);
+
 module.exports = router;
