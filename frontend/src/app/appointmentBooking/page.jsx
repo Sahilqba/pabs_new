@@ -25,6 +25,7 @@ function page() {
   const [appointmentToDelete, setAppointmentToDelete] = useState(null);
   const [imagePath, setImagePath] = useState("");
   const [imageName, setImageName] = useState("");
+  const [toggle, setToggle] = useState(false);
   // const userIdfetched = localStorage.getItem("userId");
   const userIdfetched = Cookies.get("userId");
   const [loading, setLoading] = useState(false);
@@ -147,9 +148,9 @@ function page() {
         );
         console.log("Appointment deleted successfully");
         toast.success("Appointment deleted successfully");
-        setTimeout(() => {
-          window.location.reload();
-          }, 3000);
+        // setTimeout(() => {
+        //   window.location.reload();
+        //   }, 3000);
       } else if (response.status === 404) {
         toast.error("Appointment not found");
       } else if (response.status === 401) {
@@ -267,9 +268,9 @@ function page() {
         setIsModalOpen(false);
         fetchAppointments(userIdfetched);
         // handle success (e.g., update state, close modal, show notification)
-        setTimeout(() => {
-          window.location.reload();
-          }, 3000);
+        // setTimeout(() => {
+        //   window.location.reload();
+        //   }, 3000);
       } else if (response.status === 401) {
         toast.warning(
           "Token has expired. Please log in again and try rescheduling."
@@ -357,7 +358,7 @@ function page() {
         console.log("Appointment booked:", appointment);
         toast.success("Appointment booked successfully");
         setTimeout(() => {
-          window.location.reload();
+          router.push(`/appointmentBooking`);
           }, 3000);
         // router.push(`/userProfile`);
       } else if (response.status === 401) {

@@ -39,9 +39,9 @@ export function middleware(request) {
     return NextResponse.redirect(new URL("/userlogin", request.nextUrl));
   }
 
-  if (request.nextUrl.pathname === "/docAppointment" && role === "Patient") {
-    return NextResponse.redirect(new URL("/userlogin", request.nextUrl));
-  }
+  // if (request.nextUrl.pathname === "/docAppointment" && role === "Patient") {
+  //   return NextResponse.redirect(new URL("/userlogin", request.nextUrl));
+  // }
   if (
     request.nextUrl.pathname === "/updatePassword" &&
     !userIdfromPhoneVerification &&

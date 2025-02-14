@@ -26,13 +26,13 @@ function page() {
   const handleSignUpClick = (e) => {
     e.preventDefault();
     setLoading(true); // Show loader
-    router.push("/userRegistration").finally(() => setIsLoading(false)); // Hide loader after navigation
+    router.push("/userRegistration").finally(() => setLoading(false)); // Hide loader after navigation
   };
 
   const handlePhoneVerificationClick = (e) => {
     e.preventDefault();
     setLoading(true); // Show loader
-    router.push("/phoneVerification").finally(() => setIsLoading(false)); // Hide loader after navigation
+    router.push("/phoneVerification").finally(() => setLoading(false)); // Hide loader after navigation
   };
 
   const validatePassword = (value) => {
@@ -160,12 +160,13 @@ function page() {
     <>
       <div className="flex-container">
         <div className="flex-item-login login-form">
-          <h2>Login with Email</h2>
           {loading ? (
             <div className="spinner-border" role="status">
               <span className="sr-only"></span>
             </div>
           ) : (
+            <>
+            <h2>Login with Email</h2>
             <form
               className={`needs-validation ${
                 formValidated ? "was-validated" : ""
@@ -290,6 +291,7 @@ function page() {
                 </button>
               </div>
             </form>
+            </>
           )}
           {/* Bootstrap Modal */}
           {showRoleModal && (
@@ -304,7 +306,7 @@ function page() {
               >
                 <div className="modal-content">
                   <div className="modal-header">
-                    <h5 className="modal-title">Info</h5>
+                    <h5 className="modal-title">Please Choose your Role.</h5>
                     <button
                       type="button"
                       className="custom-close-btn"

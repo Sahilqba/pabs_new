@@ -1,13 +1,12 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.css";
 import Cookies from "js-cookie";
 import Sidebar from "./Sidebar";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+
 const DoctorProfile = () => {
   useEffect(() => {
     require("bootstrap/dist/js/bootstrap.js");
@@ -21,15 +20,16 @@ const DoctorProfile = () => {
   const [qualification, setQualification] = useState("");
   const [experianceyear, setExperianceyear] = useState("");
   const [previousCompany, setpreviousCompany] = useState("");
-  const [userName, setUserName] = useState(null);
+  const [userName, setUserName] = useState("");
   const userIdfetched = Cookies.get("userId");
   const jwtToken = localStorage.getItem("jwtToken");
   const userIdinDb = Cookies.get("userIdinDb");
   const jwtCookie = Cookies.get("jwtCookie");
   const [menuOpen, setMenuOpen] = useState(false);
-  const [role, setRole] = useState(null);
+  const [role, setRole] = useState("");
   const [modal, setModal] = useState(false);
   const [errors, setErrors] = useState({});
+  const [successMessage, setSuccessMessage] = useState("");
 
   const toggleMenu = () => {
     console.log("Menu toggled!");
@@ -44,8 +44,8 @@ const DoctorProfile = () => {
     const storedUserName = localStorage.getItem("userName");
     const nameFromGoogle = Cookies.get("nameFromGoogle");
     const userRoleGoogle = Cookies.get("userRoleGoogle");
-    setRole(storedRole || userRoleGoogle);
-    setUserName(storedUserName || nameFromGoogle);
+    setRole(storedRole || userRoleGoogle || "");
+    setUserName(storedUserName || nameFromGoogle || "");
   }, []);
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen);
@@ -58,7 +58,6 @@ const DoctorProfile = () => {
         {
           method: "GET",
           headers: {
-            // Authorization: `Bearer ${jwtToken}`,
             Authorization: `Bearer ${jwtToken ? jwtToken : jwtCookie}`,
             "Content-Type": "application/json",
           },
@@ -70,13 +69,12 @@ const DoctorProfile = () => {
       }
 
       const data = await response.json();
-      // console.log("Department data:", data);
-      setDepartment(data.department);
-      setImageName(data.filename);
-      setImagePath(data.path);
-      setQualification(data.qualification);
-      setExperianceyear(data.experianceyear);
-      setpreviousCompany(data.previousCompany);
+      setDepartment(data.department || "");
+      setImageName(data.filename || "");
+      setImagePath(data.path || "");
+      setQualification(data.qualification || "");
+      setExperianceyear(data.experianceyear || "");
+      setpreviousCompany(data.previousCompany || "");
     } catch (error) {
       console.error("Failed to fetch department:", error);
     } finally {
@@ -103,23 +101,23 @@ const DoctorProfile = () => {
     return Object.keys(newErrors).length === 0; // Return true if no errors
   };
 
+  const showSuccessMessage = (message) => {
+    setSuccessMessage(message);
+    setTimeout(() => {
+      setSuccessMessage("");
+    }, 300000); // Hide after 3 seconds
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // if (!department || !qualification || !experianceyear) {
-    //   toast.error("Please fill the required fields.");
-    //   return;
-    // }
 
     if (!validateForm()) {
-      toast.error("Please fill out all required fields.");
+      showSuccessMessage("Please fill out all required fields.");
       return;
     }
 
     const formData = new FormData();
     formData.append("department", department);
-    // formData.append("qualification", qualification);
-    // formData.append("experianceyear", experianceyear);
-    // formData.append("previousCompany", previousCompany);
 
     if (qualification) {
       formData.append("qualification", qualification);
@@ -138,7 +136,6 @@ const DoctorProfile = () => {
         {
           method: "PATCH",
           headers: {
-            // "Content-Type": "application/json", // Remove this line
             Authorization: `Bearer ${jwtToken ? jwtToken : jwtCookie}`,
           },
           body: formData,
@@ -147,19 +144,19 @@ const DoctorProfile = () => {
 
       if (response.ok) {
         const data = await response.json();
-        toast.success("Information set successfully");
-        console.log(data)
         setTimeout(() => {
-        window.location.reload();
-        }, 2000);
-        // setImageName(data.image);
+          console.log("Before success message is shown");
+          showSuccessMessage("Information set successfully");
+          console.log("After success message is shown");
+        }, 0);
+        console.log(data);
         fetchDepartment(userIdfetched);
       } else if (response.status === 401) {
-        toast.warning(
+        showSuccessMessage(
           "Token has expired. Please log in again and try rescheduling."
         );
       } else if (response.status === 400) {
-        toast.warning("Appointment date is required.");
+        showSuccessMessage("Appointment date is required.");
       } else {
         const errorData = await response.json();
         console.error("Error updating appointment date", errorData);
@@ -182,8 +179,8 @@ const DoctorProfile = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setImagePath(data.path);
-        setImageName(data.filename);
+        setImagePath(data.path || "");
+        setImageName(data.filename || "");
       } else {
         throw new Error("Failed to fetch profile picture.");
       }
@@ -211,20 +208,20 @@ const DoctorProfile = () => {
       if (response.ok) {
         const data = await response.json();
         console.log(data);
-        toast.success("Profile picture updated successfully.");
+        showSuccessMessage("Profile picture updated successfully.");
         setTimeout(() => {
           window.location.reload();
-          }, 2000);
-        setImagePath(data.path);
-        setImageName(data.filename);
+        }, 2000);
+        setImagePath(data.path || "");
+        setImageName(data.filename || "");
         fetchProfilePicture(userIdfetched);
         setMenuOpen(false);
       } else if (response.status === 401) {
-        toast.warning(
+        showSuccessMessage(
           "Token has expired. Please log in again and try rescheduling."
         );
       } else {
-        toast.error("Failed to update profile picture");
+        showSuccessMessage("Failed to update profile picture");
         const errorData = await response.json();
         console.error("Error updating image", errorData);
       }
@@ -246,12 +243,12 @@ const DoctorProfile = () => {
       );
 
       if (response.ok) {
-        toast.success("Profile picture deleted.");
+        showSuccessMessage("Profile picture deleted.");
         setImagePath("");
         setImageName("");
         setMenuOpen(false);
       } else {
-        toast.error("Failed to delete picture.");
+        showSuccessMessage("Failed to delete picture.");
       }
     } catch (error) {
       console.error("Error deleting image:", error);
@@ -261,15 +258,18 @@ const DoctorProfile = () => {
   useEffect(() => {
     fetchProfilePicture();
   }, []);
+
   return (
     <>
+      {successMessage && (
+        <div className="alert alert-success position-fixed top-0 end-0 m-3" role="alert">
+          {successMessage}
+        </div>
+      )}
       <Header toggleSidebar={toggleSidebar} />
       <div className="doc-panel">
         <Sidebar isOpen={isSidebarOpen} role="doctor" />
         <main className={`main-container ${isSidebarOpen ? "show" : ""}`}>
-          {/* <div className="prof-hdng">
-        <h3>Hi Dr. {userName}, Welcome.</h3>
-        </div> */}
           <div className="row justify-content-center">
             <div className="col-md-5">
               <div className="doc-details-card">
@@ -303,14 +303,6 @@ const DoctorProfile = () => {
                       </svg>
                     </div>
                   )}
-                  {/* <div
-                className="menu-trigger"
-                onClick={toggleMenu}
-                aria-haspopup="true"
-                aria-expanded={menuOpen}
-              >
-                ...
-              </div> */}
                   {menuOpen && (
                     <div className="menu position-absolute bg-light border shadow-sm">
                       <button
@@ -345,21 +337,20 @@ const DoctorProfile = () => {
                   <div className="row">
                     <div className="col-md-12">
                       <select
-                        // type="text"
                         className={`form-select dept-sel doc-inp w-100 ${
                           errors.department ? "is-invalid" : ""
                         }`}
                         value={department}
                         onChange={(e) => setDepartment(e.target.value)}
                       >
-                       <option value="">Select your Department</option>
+                        <option value="SelectDept">Select your Department</option>
                         <option value="GeneralPhysician">
                           General Physician
                         </option>
                         <option value="Orthopedic">Orthopedic</option>
                         <option value="Neurology">Neurology</option>
                         <option value="Cardiology">Cardiology</option>
-                        <option value="Others">Others</option> 
+                        <option value="Others">Others</option>
                       </select>
                       {errors.department && (
                         <div className="invalid-feedback">
@@ -394,7 +385,7 @@ const DoctorProfile = () => {
                           console.log(
                             "Selected Experience Year:",
                             e.target.value
-                          ); // Debugging
+                          );
                         }}
                       >
                         <option value="">Select your Experience Year</option>
@@ -435,8 +426,8 @@ const DoctorProfile = () => {
         </main>
       </div>
       <Footer />
-      <ToastContainer />
     </>
   );
 };
+
 export default DoctorProfile;

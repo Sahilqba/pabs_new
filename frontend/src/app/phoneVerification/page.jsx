@@ -24,6 +24,7 @@ function page() {
   const [isResendDisabled, setIsResendDisabled] = useState(false);
   const [timer, setTimer] = useState(0);
   const [formattedNumber, setFormattedNumber] = useState("");
+  const [resendCount, setResendCount] = useState(0);
   const jwtToken = localStorage.getItem("jwtToken");
   const sendOtp = async (e) => {
     // setLoading(true);
@@ -34,6 +35,10 @@ function page() {
       setFormValidated(true);
       // setContactNumberValid(!!contactNumber);
       toast.error("Please enter the values.");
+      return;
+    }
+    if (resendCount >= 3) {
+      toast.error("OTP limit exceeded, try after some time");
       return;
     }
     setFormValidated(true);
@@ -90,7 +95,8 @@ function page() {
             setLoading(false);
             setShowRoleModal(true);
             setIsResendDisabled(true);
-            setTimer(60);
+            setTimer(5);
+            setResendCount(resendCount + 1);
           } else if (response.status === 400) {
             setShowRoleModal(false);
             toast.error("Incorrect email or role.");
@@ -182,7 +188,7 @@ function page() {
     <>
       <div className="flex-container">
         <div className="flex-item-login login-form">
-          <h2>Phone verification</h2>
+          <h2>Forgot Password</h2>
           {loading ? (
             <div className="spinner-border" role="status">
               <span className="sr-only"></span>
@@ -209,40 +215,6 @@ function page() {
                   Please provide a valid email address.
                 </div>
               </div>
-              {/* <div className="mb-3">
-                <select
-                  type="text"
-                  className="form-control"
-                  placeholder="Select Role"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  required
-                >
-                  <option value="">Select Role*</option>
-                  <option value="Doctor">Doctor</option>
-                  <option value="Patient">Patient</option>
-                </select>
-                <div className="invalid-feedback">
-                  Please provide a valid role.
-                </div>
-              </div> */}
-              {/* <div className="mb-3">
-                <PhoneInput
-                  country={"in"}
-                  value={contactNumber}
-                  onChange={(phone) => setContactNumber(phone)}
-                  inputProps={{
-                    name: "phone",
-                    required: true,
-                    autoFocus: true,
-                    className: "form-control",
-                    id: "phone",
-                  }}
-                />
-                <div className="invalid-feedback">
-                  Please provide a valid phone number.
-                </div>
-              </div> */}
               <div className="btn-grp">
                 <button type="submit" className="btn btn-primary">
                   Send OTP
@@ -250,7 +222,6 @@ function page() {
               </div>
             </form>
           )}
-          {/* Bootstrap Modal */}
           {showRoleModal && (
             <div
               className="modal fade show d-block"
@@ -298,7 +269,7 @@ function page() {
                     <button
                       className="btn btn-secondary rsnd-otp mdl-btn m-2"
                       onClick={sendOtp}
-                      disabled={isResendDisabled}
+                      disabled={isResendDisabled || resendCount >= 3}
                     >
                       Resend OTP
                     </button>
@@ -306,6 +277,11 @@ function page() {
                         <p className="text-muted mt-2">
                           Resend available in:{" "}
                           <strong>{formatTimer(timer)}</strong>
+                        </p>
+                      )}
+                      {resendCount >= 3 && (
+                        <p className="text-danger mt-2">
+                          OTP limit exceeded, try after some time
                         </p>
                       )}
                      </div> 

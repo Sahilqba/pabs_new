@@ -797,3 +797,72 @@ button.menu-item.btn.btn-sm.btn-link.text-start {
   font-weight: 400 !important;
   padding-top: 24px;
 }
+
+
+.alert.alert-success.position-fixed.top-0.end-0.m-3 {
+  position: fixed !important;
+  top: 60px !important;
+  background: lightgreen;
+  font-weight: 600;
+}
+/* .toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  min-width: 250px;
+  max-width: 350px;
+  padding: 15px;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.5s, fadeOut 0.5s 3s forwards;
+}
+
+.toast.success {
+  background-color: #28a745;
+}
+.toast.error {
+  background-color: #dc3545;
+}
+.toast.warning {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.toast .close-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.toast.warning .close-btn {
+  color: #000;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+} */

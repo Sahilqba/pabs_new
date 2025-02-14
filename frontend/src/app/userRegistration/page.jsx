@@ -279,13 +279,14 @@ function page() {
       {/* <Header /> */}
       <div className="flex-container">
         <div className="flex-item reg-form">
-          <h2>Sign Up</h2>
           <div>
             {loading ? (
               <div className="spinner-border" role="status">
                 <span className="sr-only"></span>
               </div>
             ) : (
+              <>
+              <h2>Sign Up</h2>
               <form
                 className={`needs-validation ${
                   formValidated ? "was-validated" : ""
@@ -349,23 +350,6 @@ function page() {
                     </div>
                   )}
                 </div>
-                {/* <div className="mb-3">
-                  <select
-                    type="text"
-                    className="form-control"
-                    placeholder="Select Role"
-                    value={role}
-                    onChange={(e) => setRole(e.target.value)}
-                    required
-                  >
-                    <option value="">Select Role*</option>
-                    <option value="Doctor">Doctor</option>
-                    <option value="Patient">Patient</option>
-                  </select>
-                  <div className="invalid-feedback">
-                    Please provide a valid role.
-                  </div>
-                </div> */}
                 <div className="mb-3 position-relative">
                   <input
                     type={showPassword ? "text" : "password"}
@@ -465,6 +449,7 @@ function page() {
                   </div>
                 </div>
               </form>
+              </>
             )}
           </div>
         </div>
