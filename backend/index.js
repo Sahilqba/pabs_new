@@ -103,6 +103,272 @@ app.get(
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
+// app.get(
+//   "/auth/google/callback",
+//   passport.authenticate("google", { failureRedirect: "/" }),
+//   async function (req, res) {
+//     try {
+//       if (mongoose.connection.readyState !== 1) {
+//         throw new Error("Mongoose is not connected");
+//       }
+//       const existingUser = await User.findOne({
+//         email: req.user.emails[0].value,
+//         role: req.cookies.userRoleGoogle,
+//         // isDoctor: req.cookies.isDoctor,
+//       });
+//       // console.log("Existing user:", existingUser);
+//       let userId;
+//       if (existingUser) {
+//         existingUser.isDoctor = req.cookies.isDoctor;
+//         await existingUser.save();
+//         userId = existingUser._id.toString();
+//         res.cookie("userIdinDb", userId, { httpOnly: false, secure: false });
+//         res.cookie("googleEmail", existingUser.email, { httpOnly: false, secure: false });
+//         console.log("Existing user is ", existingUser);
+//       } else {
+//         // If the user does not exist, create a new user
+//         const photoUrl = req.user.photos[0].value;
+//         const filename = `${uuidv4()}.png`;
+//         const filePath = path.join(__dirname, "uploads", filename);
+//         // Download the image and save it to the uploads folder
+//         const response = await axios({
+//           url: photoUrl,
+//           responseType: "stream",
+//         });
+//         response.data.pipe(fs.createWriteStream(filePath));
+//         const newUser = new User({
+//           email: req.user.emails[0].value,
+//           name: req.user.displayName,
+//           userIdinUse: req.user.id,
+//           role: req.cookies.userRoleGoogle,
+//           filename: filename,
+//           path: `uploads/${filename}`,
+//           isDoctor: req.cookies.isDoctor,
+//         });
+//         await newUser.save();
+//         userId = newUser._id.toString();
+//         res.cookie("userIdinDb", userId, { httpOnly: false, secure: false });
+//         res.cookie("googleEmail", newUser.email, { httpOnly: false, secure: false });
+//       }
+//       // Generate JWT token with MongoDB ObjectId
+//       const token = jwt.sign(
+//         {
+//           id: userId,
+//           email: req.user.emails[0].value,
+//           role: req.cookies.userRoleGoogle,
+//         },
+//         secretKey,
+//         { expiresIn: "15m" }
+//       );
+
+//       // Set cookies
+//       res.cookie("jwtCookie", token, { httpOnly: false, secure: false });
+//       res.cookie("nameFromGoogle", req.user.displayName, {
+//         httpOnly: false,
+//         secure: false,
+//       });
+//       res.cookie("emailFromGoogle", req.user.emails[0].value, {
+//         httpOnly: false,
+//         secure: false,
+//       });
+//       res.cookie("userId", userId, { httpOnly: false, secure: false });
+//       // Redirect to user profile
+//       res.redirect(`${frontend_url}/userProfile`);
+//     } catch (error) {
+//       console.error("Error during Google OAuth callback:", error);
+//       res.status(500).json({ message: "Internal server error" });
+//     }
+//   }
+// );
+
+// app.get(
+//   "/auth/google/callback",
+//   passport.authenticate("google", { failureRedirect: "/" }),
+//   async function (req, res) {
+//     try {
+//       if (mongoose.connection.readyState !== 1) {
+//         throw new Error("Mongoose is not connected");
+//       }
+//       const existingUser = await User.findOne({
+//         email: req.user.emails[0].value,
+//         role: req.cookies.userRoleGoogle,
+//         // isDoctor: req.cookies.isDoctor,
+//       });
+//       // console.log("Existing user:", existingUser);
+//       let userId;
+//       if (existingUser) {
+//         existingUser.isDoctor = req.cookies.isDoctor;
+//         await existingUser.save();
+//         userId = existingUser._id.toString();
+//         res.cookie("userIdinDb", userId, { httpOnly: false, secure: false });
+//         res.cookie("googleEmail", existingUser.email, {
+//           httpOnly: false,
+//           secure: false,
+//         });
+//         console.log("Existing user is ", existingUser);
+
+//         // Generate JWT token with MongoDB ObjectId
+//         const token = jwt.sign(
+//           {
+//             id: userId,
+//             email: req.user.emails[0].value,
+//             role: req.cookies.userRoleGoogle,
+//           },
+//           secretKey,
+//           { expiresIn: "15m" }
+//         );
+
+//         // Set cookies
+//         res.cookie("jwtCookie", token, { httpOnly: false, secure: false });
+//         res.cookie("nameFromGoogle", req.user.displayName, {
+//           httpOnly: false,
+//           secure: false,
+//         });
+//         res.cookie("emailFromGoogle", req.user.emails[0].value, {
+//           httpOnly: false,
+//           secure: false,
+//         });
+//         res.cookie("userId", userId, { httpOnly: false, secure: false });
+
+//         // Redirect to user profile
+//         res.redirect(`${frontend_url}/userProfile`);
+//       } else {
+//         // If the user does not exist, create a new user
+//         const photoUrl = req.user.photos[0].value;
+//         const filename = `${uuidv4()}.png`;
+//         const filePath = path.join(__dirname, "uploads", filename);
+//         // Download the image and save it to the uploads folder
+//         const response = await axios({
+//           url: photoUrl,
+//           responseType: "stream",
+//         });
+//         response.data.pipe(fs.createWriteStream(filePath));
+//         const newUser = new User({
+//           email: req.user.emails[0].value,
+//           name: req.user.displayName,
+//           userIdinUse: req.user.id,
+//           role: req.cookies.userRoleGoogle,
+//           filename: filename,
+//           path: `uploads/${filename}`,
+//           isDoctor: req.cookies.isDoctor,
+//         });
+//         await newUser.save();
+//         userId = newUser._id.toString();
+//         res.cookie("userIdinDb", userId, { httpOnly: false, secure: false });
+//         res.cookie("googleEmail", newUser.email, {
+//           httpOnly: false,
+//           secure: false,
+//         });
+
+//         // Redirect to role selection page
+//         res.redirect(`${frontend_url}/googleRoleSelect`);
+//       }
+//     } catch (error) {
+//       console.error("Error during Google OAuth callback:", error);
+//       res.status(500).json({ message: "Internal server error" });
+//     }
+//   }
+// );
+
+//-------working----------//
+// app.get(
+//   "/auth/google/callback",
+//   passport.authenticate("google", { failureRedirect: "/" }),
+//   async function (req, res) {
+//     try {
+//       if (mongoose.connection.readyState !== 1) {
+//         throw new Error("Mongoose is not connected");
+//       }
+//       const existingUser = await User.findOne({
+//         email: req.user.emails[0].value,
+//         // role: req.cookies.userRoleGoogle,
+//         // isDoctor: req.cookies.isDoctor,
+//       });
+//       console.log("Existing user:", existingUser);
+//       let userId;
+//       if (existingUser) {
+//         // existingUser.isDoctor = req.cookies.isDoctor;
+//         await existingUser.save();
+//         userId = existingUser._id.toString();
+//         res.cookie("userIdinDb", userId, { httpOnly: false, secure: false });
+//         res.cookie("googleEmail", existingUser.email, {
+//           httpOnly: false,
+//           secure: false,
+//         });
+//         res.cookie("isDoctor", existingUser.isDoctor, {
+//           httpOnly: false,
+//           secure: false,
+//         });
+//         console.log("Existing user is ", existingUser);
+//       } else {
+//         // If the user does not exist, create a new user
+//         const photoUrl = req.user.photos[0].value;
+//         const filename = `${uuidv4()}.png`;
+//         const filePath = path.join(__dirname, "uploads", filename);
+//         // Download the image and save it to the uploads folder
+//         const response = await axios({
+//           url: photoUrl,
+//           responseType: "stream",
+//         });
+//         response.data.pipe(fs.createWriteStream(filePath));
+//         const newUser = new User({
+//           email: req.user.emails[0].value,
+//           name: req.user.displayName,
+//           userIdinUse: req.user.id,
+//           role: req.cookies.userRoleGoogle,
+//           filename: filename,
+//           path: `uploads/${filename}`,
+//           isDoctor: req.cookies.isDoctor,
+//         });
+//         await newUser.save();
+//         userId = newUser._id.toString();
+//         res.cookie("userIdinDb", userId, { httpOnly: false, secure: false });
+//         res.cookie("googleEmail", newUser.email, {
+//           httpOnly: false,
+//           secure: false,
+//         });
+//       }
+
+//       // Generate JWT token with MongoDB ObjectId
+//       const token = jwt.sign(
+//         {
+//           id: userId,
+//           email: req.user.emails[0].value,
+//           role: req.cookies.userRoleGoogle,
+//         },
+//         secretKey,
+//         { expiresIn: "15m" }
+//       );
+
+//       // Set cookies
+//       res.cookie("jwtCookie", token, { httpOnly: false, secure: false });
+//       res.cookie("nameFromGoogle", req.user.displayName, {
+//         httpOnly: false,
+//         secure: false,
+//       });
+//       res.cookie("emailFromGoogle", req.user.emails[0].value, {
+//         httpOnly: false,
+//         secure: false,
+//       });
+//       res.cookie("userId", userId, { httpOnly: false, secure: false });
+
+//       if (existingUser) {
+//         // Redirect to user profile
+//         console.log("existingUser.isDoctor", existingUser.isDoctor);
+//         console.log("existingUser.role", existingUser.role);
+//         res.redirect(`${frontend_url}/userProfile`);
+//       } else {
+//         // Redirect to role selection page
+//         res.redirect(`${frontend_url}/googleRoleSelect`);
+//       }
+//     } catch (error) {
+//       console.error("Error during Google OAuth callback:", error);
+//       res.status(500).json({ message: "Internal server error" });
+//     }
+//   }
+// );
+//-------working----------//
+
 app.get(
   "/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/" }),
@@ -113,16 +379,25 @@ app.get(
       }
       const existingUser = await User.findOne({
         email: req.user.emails[0].value,
-        role: req.cookies.userRoleGoogle,
+        // role: req.cookies.userRoleGoogle,
         // isDoctor: req.cookies.isDoctor,
       });
-      console.log("Existing user:", existingUser);
+      // console.log("Existing user:", existingUser);
       let userId;
       if (existingUser) {
-        existingUser.isDoctor = req.cookies.isDoctor;
+        // existingUser.isDoctor = req.cookies.isDoctor;
         await existingUser.save();
         userId = existingUser._id.toString();
         res.cookie("userIdinDb", userId, { httpOnly: false, secure: false });
+        res.cookie("googleEmail", existingUser.email, {
+          httpOnly: false,
+          secure: false,
+        });
+        res.cookie("isDoctor", existingUser.isDoctor, {
+          httpOnly: false,
+          secure: false,
+        });
+        // console.log("Existing user is ", existingUser);
       } else {
         // If the user does not exist, create a new user
         const photoUrl = req.user.photos[0].value;
@@ -146,6 +421,10 @@ app.get(
         await newUser.save();
         userId = newUser._id.toString();
         res.cookie("userIdinDb", userId, { httpOnly: false, secure: false });
+        res.cookie("googleEmail", newUser.email, {
+          httpOnly: false,
+          secure: false,
+        });
       }
 
       // Generate JWT token with MongoDB ObjectId
@@ -170,14 +449,34 @@ app.get(
         secure: false,
       });
       res.cookie("userId", userId, { httpOnly: false, secure: false });
-      // Redirect to user profile
-      res.redirect(`${frontend_url}/userProfile`);
+
+      if (existingUser) {
+        // Redirect to user profile
+        console.log("existingUser.isDoctor", existingUser.isDoctor);
+        console.log("existingUser.role", existingUser.role);
+        // if (existingUser.isDoctor && existingUser.role) {
+        //   res.redirect(`${frontend_url}/userProfile`);
+        // }
+        if (existingUser.isDoctor !== undefined && existingUser.role !== undefined) {
+          res.redirect(`${frontend_url}/userProfile`);
+        }
+         else {
+          console.log("hihihihihihi")
+          res.redirect(`${frontend_url}/googleRoleSelect`);
+        }
+      } else {
+        // Redirect to role selection page
+        console.log("hihihihihihi")
+        res.redirect(`${frontend_url}/googleRoleSelect`);
+      }
     } catch (error) {
       console.error("Error during Google OAuth callback:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   }
 );
+
+
 
 app.get("/logout", (req, res) => {
   req.logout((err) => {
@@ -197,6 +496,7 @@ app.get("/logout", (req, res) => {
       res.clearCookie("role", { path: "/" });
       res.clearCookie("userIdinDb", { path: "/" });
       res.clearCookie("isDoctor", { path: "/" });
+      res.clearCookie("googleEmail", { path: "/" });
       res.status(200).json({ message: "Logged out successfully" });
     });
   });
@@ -267,13 +567,11 @@ app.post("/verifyOtp", (req, res) => {
           status: verification_check.status,
         });
       } else {
-        res
-          .status(400)
-          .send({
-            error: "Invalid OTP",
-            sid: verification_check.sid,
-            status: verification_check.status,
-          });
+        res.status(400).send({
+          error: "Invalid OTP",
+          sid: verification_check.sid,
+          status: verification_check.status,
+        });
       }
     })
     .catch((err) => {

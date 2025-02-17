@@ -2,19 +2,20 @@ import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 export function middleware(request) {
   const token = request.cookies.get("jwtCookie");
-  // console.log("Token:", token);
   const roleObject = request.cookies.get("role");
-  console.log("RoleObject:", roleObject);
   const role = roleObject ? roleObject.value : null;
-  console.log("Role:", role);
   const userIdfromPhoneVerification = request.cookies.get(
     "userIdfromPhoneVerification"
   );
   const sidOTP = request.cookies.get("sidOTP");
   const sidOTPValue = sidOTP ? sidOTP.value : null;
-  // const sidOTPValue = sidOTP.value
-  console.log("sidOTP:", sidOTP);
-  console.log("sidOTP value:", sidOTPValue);
+  const jwtCookie = request.cookies.get("jwtCookie");
+
+  if (request.nextUrl.pathname === "/googleRoleSelect" && !jwtCookie) {
+    console.log("User already logged in, redirecting to /userProfile");
+    return NextResponse.redirect(new URL("/userlogin", request.nextUrl));
+  }
+
   if (
     (request.nextUrl.pathname === "/userlogin" ||
       request.nextUrl.pathname === "/userRegistration") &&
@@ -39,9 +40,6 @@ export function middleware(request) {
     return NextResponse.redirect(new URL("/userlogin", request.nextUrl));
   }
 
-  // if (request.nextUrl.pathname === "/docAppointment" && role === "Patient") {
-  //   return NextResponse.redirect(new URL("/userlogin", request.nextUrl));
-  // }
   if (
     request.nextUrl.pathname === "/updatePassword" &&
     !userIdfromPhoneVerification &&
@@ -65,6 +63,7 @@ export const config = {
     "/docPastApp",
     "/updatePassword",
     "/phoneVerification",
-    "/patientProfilePage"
+    "/patientProfilePage",
+    "/googleRoleSelect",
   ],
 };

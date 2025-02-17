@@ -12,6 +12,7 @@ function page() {
   useEffect(() => {
     require("bootstrap/dist/js/bootstrap.js");
   });
+
   const router = useRouter();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -23,6 +24,17 @@ function page() {
   const [loading, setLoading] = React.useState(false);
   const [isDoctor, setIsDoctor] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isGoogleEmail, setIsGoogleEmail] = useState(false);
+  useEffect(() => {
+    const googleEmail = Cookies.get("googleEmail");
+    console.log("Checking for googleEmail in cookies:", googleEmail);
+    if (googleEmail) {
+      console.log("Email from cookie after google login:", googleEmail);
+      setIsGoogleEmail(true);
+      checkGoogleEmail(googleEmail);
+    }
+  }, []);
+
   const handleSignUpClick = (e) => {
     e.preventDefault();
     setLoading(true); // Show loader
@@ -55,7 +67,7 @@ function page() {
     const error = validatePassword(value);
     setPasswordError(error);
   };
-  
+
   const handleMouseDown = () => {
     setShowPassword(true);
   };
@@ -137,8 +149,28 @@ function page() {
     console.log("Google login clicked");
     // router.push("/userRoleGoogle");
     setIsGoogleLogin(true);
-    setShowRoleModal(true);
-    // window.location.href = "http://localhost:8080/auth/google";
+    // setShowRoleModal(true);
+    window.location.href = "http://localhost:8080/auth/google";
+  };
+
+  const checkGoogleEmail = async (email) => {
+    console.log("Calling checkGoogleEmail with email:", email);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/isGoogleEmailThere`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        }
+      );
+      const data = await response.json();
+      console.log("API response:", data);
+    } catch (error) {
+      console.error("Error during API call:", error);
+    }
   };
 
   const handleRoleSelection = async (role) => {
@@ -146,7 +178,6 @@ function page() {
     // setShowRoleModal(false);
     // You can now use the selectedRole state to capture the input
     // console.log("Selected Role:", role);
-
     if (isGoogleLogin) {
       Cookies.set("role", role, { expires: 1, path: "/" });
       Cookies.set("isDoctor", isDoctor, { expires: 1, path: "/" });
@@ -210,14 +241,14 @@ function page() {
                 ) : password ? (
                   <div className="valid-feedback">Password looks good!</div>
                 ) : null}
-                 <span
-                    className="shw-pswrd"
-                    onMouseDown={handleMouseDown}
-                    onMouseUp={handleMouseUp}
-                    onMouseLeave={handleMouseUp}
-                  >
-                    <i className="bi bi-eye"></i>
-                  </span>
+                <span
+                  className="shw-pswrd"
+                  onMouseDown={handleMouseDown}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseUp}
+                >
+                  <i className="bi bi-eye"></i>
+                </span>
               </div>
               <div className="btn-grp">
                 <button

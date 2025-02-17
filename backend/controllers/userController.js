@@ -31,14 +31,17 @@ exports.createUser = async (req, res) => {
     }
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
-    const hashedConfirmPassword = await bcrypt.hash(req.body.confirmPassword, saltRounds)
+    const hashedConfirmPassword = await bcrypt.hash(
+      req.body.confirmPassword,
+      saltRounds
+    );
     if (req.body.password !== req.body.confirmPassword) {
       return res.status(400).json({ message: "Passwords do not match" });
     }
     const user = new User({
       ...req.body,
       password: hashedPassword,
-      confirmPassword: hashedConfirmPassword
+      confirmPassword: hashedConfirmPassword,
     });
     // console.log(`User: ${user}`);
     await user.save();
@@ -363,7 +366,6 @@ exports.deleteDoctorImage = async (req, res) => {
   }
 };
 
-
 // exports.updatePassword = async (req, res) => {
 //   const { password, confirmPassword } = req.body;
 //   const { id } = req.params;
@@ -412,16 +414,24 @@ exports.updatePassword = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
- 
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) {
-      return res.status(400).json({ message: "New password cannot be the same as the old password" });
+      return res
+        .status(400)
+        .json({
+          message: "New password cannot be the same as the old password",
+        });
     }
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    const hashedConfirmPassword = await bcrypt.hash(confirmPassword, saltRounds);
+    const hashedConfirmPassword = await bcrypt.hash(
+      confirmPassword,
+      saltRounds
+    );
     if (password !== confirmPassword) {
-      return res.status(400).json({ message: "Passwords do not match" });}
+      return res.status(400).json({ message: "Passwords do not match" });
+    }
     const result = await User.findByIdAndUpdate(
       id,
       { password: hashedPassword },
@@ -443,7 +453,7 @@ exports.updatePassword = async (req, res) => {
     res.status(400).send(err);
   }
 };
- 
+
 exports.userIdfromEmail = async (req, res) => {
   const { email } = req.body;
   try {
@@ -452,7 +462,7 @@ exports.userIdfromEmail = async (req, res) => {
     if (user && user.length > 0) {
       res.status(200).json({ user });
     } else {
-      res.status(401).send("Invalid email or role");
+      res.status(401).send("Email does not exist");
     }
   } catch (error) {
     res.status(400).send(error);
@@ -489,6 +499,76 @@ exports.getLastPassword = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
     res.status(200).json({ lastPassword: user.password });
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};
+
+exports.isGoogleEmailThere = async (req, res) => {
+  const { email } = req.body;
+  try {
+    const user = await User.find({ email });
+
+    if (user && user.length > 0) {
+      res.status(200).json({ user });
+    } else {
+      res.status(401).send("Email does not exist");
+    }
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};
+
+// exports.addRolenIsdoctorinGmailAccount = async (req, res) => {
+//   try {
+//     const existingUser = await User.findOne({
+//       email: req.body.email
+//     });
+//     if (existingUser) {
+//       const user = new User({
+//         ...req.body
+//       });
+//       await user.save();
+//       res.status(201).json(user);
+//     } else {
+//       return res
+//         .status(400)
+//         .json({ message: "User with this email does not exist" });
+//     }
+//   } catch (error) {
+//     res.status(400).send(error);
+//   }
+// };
+
+exports.addRolenIsdoctorinGmailAccount = async (req, res) => {
+  try {
+    const { email, role, isDoctor } = req.body;
+
+    // Search for the user by email
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      // Check if the user already has the isDoctor and role fields set
+      if (existingUser.role && existingUser.isDoctor !== undefined) {
+        return res
+          .status(400)
+          .json({ message: "User already has role and isDoctor fields set" });
+      }
+      // Update the user document with the provided fields
+      existingUser.role = role;
+      existingUser.isDoctor = isDoctor;
+
+      // Save the updated user document
+      await existingUser.save();
+
+      res
+        .status(200)
+        .json({ message: "User updated successfully", user: existingUser });
+    } else {
+      return res
+        .status(400)
+        .json({ message: "User with this email does not exist" });
+    }
   } catch (error) {
     res.status(400).send(error);
   }

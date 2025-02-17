@@ -253,6 +253,9 @@ const docApp = () => {
           )
         );
         setIsModalOpen(false);
+        setTimeout(() => {
+          window.location.reload();
+          }, 3000);
         // fetchAppointments(userIdfetched);
         // handle success (e.g., update state, close modal, show notification)
       } else if (response.status === 401) {
@@ -308,6 +311,9 @@ const docApp = () => {
         );
         console.log("Appointment deleted successfully");
         toast.success("Appointment deleted successfully");
+        setTimeout(() => {
+          window.location.reload();
+          }, 3000);
       } else if (response.status === 404) {
         toast.error("Appointment not found");
       } else if (response.status === 401) {

@@ -148,7 +148,9 @@ function page() {
           toast.error("Passwords do not match");
         } else if (errorData.message === "New password cannot be the same as the old password") {
           toast.error("New password cannot be the same as the last password.");
-        } else {
+        } else if (errorData.error === "Password fields are required") {
+          toast.error("Password fields are required");
+        }else {
           toast.error("Failed to update password. Please try again.");
         }
         setLoading(false);
