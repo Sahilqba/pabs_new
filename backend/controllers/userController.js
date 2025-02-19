@@ -417,11 +417,9 @@ exports.updatePassword = async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) {
-      return res
-        .status(400)
-        .json({
-          message: "New password cannot be the same as the old password",
-        });
+      return res.status(400).json({
+        message: "New password cannot be the same as the old password",
+      });
     }
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -564,6 +562,94 @@ exports.addRolenIsdoctorinGmailAccount = async (req, res) => {
       res
         .status(200)
         .json({ message: "User updated successfully", user: existingUser });
+    } else {
+      return res
+        .status(400)
+        .json({ message: "User with this email does not exist" });
+    }
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};
+
+exports.checkWhetherContactExistsGoogle = async (req, res) => {
+  const { contactNumber } = req.body;
+  try {
+    const contactNumberExists = await User.findOne({ contactNumber });
+
+    if (contactNumberExists) {
+      res.status(200).json({ message: "Phone number already exist" });
+    } else {
+      res.status(200).json({ message: "Proceed for registration" });
+    }
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};
+
+exports.addContactNumbertoGoogleDb = async (req, res) => {
+  const { googleEmail, contactNumber } = req.body;
+  try {
+    const user = await User.findOne({ email: googleEmail });
+    if (user) {
+      user.contactNumber = contactNumber;
+      await user.save();
+      res
+        .status(200)
+        .json({ message: "Contact number added successfully", user });
+    } else {
+      res.status(400).json({ message: "User with this email does not exist" });
+    }
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};
+
+// exports.addRolenIsdoctornContactinGmailAccount = async (req, res) => {
+//   try {
+//     const { email } = req.body;
+
+//     // Search for the user by email
+//     const existingUser = await User.findOne({ email });
+
+//     if (existingUser) {
+//       console.log(`Userrrrrr: ${existingUser}`);
+//       // Check if the user already has the isDoctor and role fields set
+//       if (existingUser.role) {
+//         return res
+//           .status(400)
+//           .json({ message: "User already has contact number set" });
+//       }
+//     } else {
+//       return res
+//         .status(400)
+//         .json({ message: "User with this email does not exist" });
+//     }
+//   } catch (error) {
+//     res.status(400).send(error);
+//   }
+// };
+
+
+exports.addRolenIsdoctornContactinGmailAccount = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Search for the user by email
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      console.log(`Userrrrrr: ${existingUser}`);
+      // Check if the user already has the contactNumber field set
+      if (existingUser.contactNumber) {
+        return res
+          .status(400)
+          .json({ message: "User already has contact number set" });
+      } else {
+        return res
+          .status(200)
+          .json({ message: "Email found with no contact and role" });
+      }
     } else {
       return res
         .status(400)

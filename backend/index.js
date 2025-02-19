@@ -476,8 +476,6 @@ app.get(
   }
 );
 
-
-
 app.get("/logout", (req, res) => {
   req.logout((err) => {
     if (err) {
@@ -497,6 +495,7 @@ app.get("/logout", (req, res) => {
       res.clearCookie("userIdinDb", { path: "/" });
       res.clearCookie("isDoctor", { path: "/" });
       res.clearCookie("googleEmail", { path: "/" });
+      res.clearCookie("contactNumber", { path: "/" });
       res.status(200).json({ message: "Logged out successfully" });
     });
   });
@@ -553,6 +552,64 @@ app.post("/sendOtp", (req, res) => {
       res.status(500).send({ error: "Failed to send OTP" });
     });
 });
+
+// app.post("/sendOtpGoogle", (req, res) => {
+//   const { contactNumber } = req.body;
+//   if (!contactNumber ) {
+//     return res
+//       .status(400)
+//       .send({ error: "Contact number is required" });
+//   }
+//   const phoneNumber = parsePhoneNumberFromString(contactNumber, "US"); // Replace 'US' with the default country code if needed
+//   console.log(phoneNumber);
+//   console.log(contactNumber);
+//   if (!phoneNumber || !phoneNumber.isValid()) {
+//     return res.status(400).send({ error: "Invalid phone number" });
+//   }
+
+//   const formattedNumber = phoneNumber.number; // Get the number in E.164 format
+//   console.log("Format num :", formattedNumber);
+//   client.verify.v2
+//     .services(verifyServiceSid)
+//     .verifications.create({ to: formattedNumber, channel: "sms" })
+//     .then((verification) =>{
+//       res.status(200).send({ sid: verification.sid, formattedNumber })
+//     }
+//     )
+//     .catch((err) => {
+//       console.error("Error sending OTP:", err.message, err.stack);
+//       res.status(500).send({ error: "Failed to send OTP" });
+//     });
+// });
+
+
+app.post("/sendOtpGoogle", (req, res) => {
+  const { contactNumber } = req.body;
+  if (!contactNumber) {
+    return res.status(400).send({ error: "Contact number is required" });
+  }
+  const phoneNumber = parsePhoneNumberFromString(contactNumber, "US"); // Replace 'US' with the default country code if needed
+  console.log(phoneNumber);
+  console.log(contactNumber);
+  if (!phoneNumber || !phoneNumber.isValid()) {
+    return res.status(400).send({ error: "Invalid phone number" });
+  }
+
+  const formattedNumber = phoneNumber.number; // Get the number in E.164 format
+  console.log("Format num :", formattedNumber);
+  client.verify.v2
+    .services(verifyServiceSid)
+    .verifications.create({ to: formattedNumber, channel: "sms" })
+    .then((verification) => {
+      // Store sid and formattedNumber in cookies
+      res.status(200).send({ sid: verification.sid, formattedNumber });
+    })
+    .catch((err) => {
+      console.error("Error sending OTP:", err.message, err.stack);
+      res.status(500).send({ error: "Failed to send OTP" });
+    });
+});
+
 // Endpoint to verify OTP
 app.post("/verifyOtp", (req, res) => {
   const { sid, token } = req.body;

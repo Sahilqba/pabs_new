@@ -37,6 +37,8 @@ function page() {
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isDoctor, setIsDoctor] = useState(false);
+  const [resendCount, setResendCount] = useState(0);
+
   const validatePassword = (value) => {
     const pattern = /^(?=.*[a-zA-Z])(?=.*\d)[A-Za-z\d]{5,10}$/;
     if (!value) {
@@ -101,6 +103,10 @@ function page() {
       toast.error("Passwords do not match.");
       return;
     }
+    if (resendCount >= 3) {
+      toast.error("OTP limit exceeded, try after some time");
+      return;
+    }
     setFormValidated(true);
 
     try {
@@ -158,7 +164,8 @@ function page() {
         setLoading(false);
         setShowRoleModal(true);
         setIsResendDisabled(true);
-        setTimer(60);
+        setTimer(5);
+        setResendCount(resendCount + 1);
       } else if (response.status === 400) {
         setShowRoleModal(false);
         toast.error("Please provide valid Phone Number");
@@ -286,169 +293,169 @@ function page() {
               </div>
             ) : (
               <>
-              <h2>Sign Up</h2>
-              <form
-                className={`needs-validation ${
-                  formValidated ? "was-validated" : ""
-                }`}
-                noValidate
-                onSubmit={sendOtp}
-              >
-                <div className="mb-3">
-                  {/* <label htmlFor="name" className="form-label">
+                <h2>Sign Up</h2>
+                <form
+                  className={`needs-validation ${
+                    formValidated ? "was-validated" : ""
+                  }`}
+                  noValidate
+                  onSubmit={sendOtp}
+                >
+                  <div className="mb-3">
+                    {/* <label htmlFor="name" className="form-label">
                     Name
                   </label> */}
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="name"
-                    placeholder="Name*"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Please provide a valid name.
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="name"
+                      placeholder="Name*"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                    />
+                    <div className="invalid-feedback">
+                      Please provide a valid name.
+                    </div>
                   </div>
-                </div>
 
-                <div className="mb-3">
-                  {/* <label htmlFor="email" className="form-label">
+                  <div className="mb-3">
+                    {/* <label htmlFor="email" className="form-label">
                     Email
                   </label> */}
-                  <input
-                    type="email"
-                    className="form-control"
-                    id="email"
-                    placeholder="Email*"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Please provide a valid email address.
+                    <input
+                      type="email"
+                      className="form-control"
+                      id="email"
+                      placeholder="Email*"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                    <div className="invalid-feedback">
+                      Please provide a valid email address.
+                    </div>
                   </div>
-                </div>
-                <div className="mb-3">
-                  <PhoneInput
-                    country={"in"}
-                    value={contactNumber}
-                    onChange={handlePhoneChange}
-                    inputProps={{
-                      name: "phone",
-                      required: true,
-                      autoFocus: true,
-                      className: `form-control ${
-                        !contactNumberValid ? "is-invalid" : ""
-                      }`,
-                      id: "phone",
-                    }}
-                  />
-                  {!contactNumberValid && (
-                    <div className="invalid-feedback">
-                      Please provide a valid phone number.
-                    </div>
-                  )}
-                </div>
-                <div className="mb-3 position-relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    className={`form-control ${
-                      passwordError
-                        ? "is-invalid"
-                        : password && !passwordError
-                        ? "is-valid"
-                        : ""
-                    }`}
-                    id="password"
-                    placeholder="Password*"
-                    value={password}
-                    onChange={handlePasswordChange}
-                    required
-                  />
-                  {passwordError ? (
-                    <div className="invalid-feedback">{passwordError}</div>
-                  ) : password ? (
-                    <div className="valid-feedback">Password looks good!</div>
-                  ) : null}
-                  <span
-                    className="shw-pswrd"
-                    onMouseDown={() => handleMouseDown("password")}
-                    onMouseUp={() => handleMouseUp("password")}
-                    onMouseLeave={() => handleMouseUp("password")}
-                  >
-                    <i className="bi bi-eye"></i>
-                  </span>
-                </div>
-                <div className="mb-3 position-relative">
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    className={`form-control ${
-                      confirmPasswordError
-                        ? "is-invalid"
-                        : confirmPassword && !confirmPasswordError
-                        ? "is-valid"
-                        : ""
-                    }`}
-                    id="confirmPassword"
-                    placeholder="Confirm Password*"
-                    value={confirmPassword}
-                    onChange={handleConfirmPasswordChange}
-                    required
-                  />
-                  {confirmPasswordError ? (
-                    <div className="invalid-feedback">
-                      {confirmPasswordError}
-                    </div>
-                  ) : confirmPassword ? (
-                    <div className="valid-feedback">Passwords match!</div>
-                  ) : null}
-                  <span
-                    className="shw-pswrd"
-                    onMouseDown={() => handleMouseDown("confirmPassword")}
-                    onMouseUp={() => handleMouseUp("confirmPassword")}
-                    onMouseLeave={() => handleMouseUp("confirmPassword")}
-                  >
-                    <i className="bi bi-eye"></i>
-                  </span>
-                </div>
-                <div class="form-check doc-chk">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    value={isDoctor}
-                    id="flexCheckDefault"
-                    onChange={(e) => setIsDoctor(e.target.checked)}
-                  />
-                  <label class="form-check-label" for="flexCheckDefault">
-                    Are you a Doctor?
-                  </label>
-                </div>
-
-                <div className="btn-grp">
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    // onClick={handleSubmit}
-                  >
-                    Submit
-                  </button>
-                  <div className="register-link">
-                    Already have an account?{" "}
-                    {loading ? (
-                      <span className="loader">Loading...</span>
-                    ) : (
-                      <Link
-                        href="/userlogin"
-                        className="sign-up-link"
-                        onClick={handleLoginClick}
-                      >
-                        Log In
-                      </Link>
+                  <div className="mb-3">
+                    <PhoneInput
+                      country={"in"}
+                      value={contactNumber}
+                      onChange={handlePhoneChange}
+                      inputProps={{
+                        name: "phone",
+                        required: true,
+                        autoFocus: true,
+                        className: `form-control ${
+                          !contactNumberValid ? "is-invalid" : ""
+                        }`,
+                        id: "phone",
+                      }}
+                    />
+                    {!contactNumberValid && (
+                      <div className="invalid-feedback">
+                        Please provide a valid phone number.
+                      </div>
                     )}
                   </div>
-                </div>
-              </form>
+                  <div className="mb-3 position-relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      className={`form-control ${
+                        passwordError
+                          ? "is-invalid"
+                          : password && !passwordError
+                          ? "is-valid"
+                          : ""
+                      }`}
+                      id="password"
+                      placeholder="Password*"
+                      value={password}
+                      onChange={handlePasswordChange}
+                      required
+                    />
+                    {passwordError ? (
+                      <div className="invalid-feedback">{passwordError}</div>
+                    ) : password ? (
+                      <div className="valid-feedback">Password looks good!</div>
+                    ) : null}
+                    <span
+                      className="shw-pswrd"
+                      onMouseDown={() => handleMouseDown("password")}
+                      onMouseUp={() => handleMouseUp("password")}
+                      onMouseLeave={() => handleMouseUp("password")}
+                    >
+                      <i className="bi bi-eye"></i>
+                    </span>
+                  </div>
+                  <div className="mb-3 position-relative">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      className={`form-control ${
+                        confirmPasswordError
+                          ? "is-invalid"
+                          : confirmPassword && !confirmPasswordError
+                          ? "is-valid"
+                          : ""
+                      }`}
+                      id="confirmPassword"
+                      placeholder="Confirm Password*"
+                      value={confirmPassword}
+                      onChange={handleConfirmPasswordChange}
+                      required
+                    />
+                    {confirmPasswordError ? (
+                      <div className="invalid-feedback">
+                        {confirmPasswordError}
+                      </div>
+                    ) : confirmPassword ? (
+                      <div className="valid-feedback">Passwords match!</div>
+                    ) : null}
+                    <span
+                      className="shw-pswrd"
+                      onMouseDown={() => handleMouseDown("confirmPassword")}
+                      onMouseUp={() => handleMouseUp("confirmPassword")}
+                      onMouseLeave={() => handleMouseUp("confirmPassword")}
+                    >
+                      <i className="bi bi-eye"></i>
+                    </span>
+                  </div>
+                  <div class="form-check doc-chk">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      value={isDoctor}
+                      id="flexCheckDefault"
+                      onChange={(e) => setIsDoctor(e.target.checked)}
+                    />
+                    <label class="form-check-label" for="flexCheckDefault">
+                      Are you a Doctor?
+                    </label>
+                  </div>
+
+                  <div className="btn-grp">
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      // onClick={handleSubmit}
+                    >
+                      Submit
+                    </button>
+                    <div className="register-link">
+                      Already have an account?{" "}
+                      {loading ? (
+                        <span className="loader">Loading...</span>
+                      ) : (
+                        <Link
+                          href="/userlogin"
+                          className="sign-up-link"
+                          onClick={handleLoginClick}
+                        >
+                          Log In
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                </form>
               </>
             )}
           </div>
@@ -498,13 +505,18 @@ function page() {
                   <button
                     className="btn btn-secondary rsnd-otp mdl-btn m-2"
                     onClick={sendOtp}
-                    disabled={isResendDisabled}
+                    disabled={isResendDisabled || resendCount >= 3}
                   >
                     Resend OTP
                   </button>
                   {isResendDisabled && (
                     <p className="text-muted mt-2">
                       Resend available in: <strong>{formatTimer(timer)}</strong>
+                    </p>
+                  )}
+                  {resendCount >= 3 && (
+                    <p className="text-danger mt-2">
+                      OTP limit exceeded, try after some time
                     </p>
                   )}
                 </div>

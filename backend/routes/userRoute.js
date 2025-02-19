@@ -400,4 +400,10 @@ router.post('/isGoogleEmailThere', userController.isGoogleEmailThere);
 
 router.post("/addRolenIsdoctorinGmailAccount", userController.addRolenIsdoctorinGmailAccount);
 
+router.post('/checkWhetherContactExistsGoogle', userController.checkWhetherContactExistsGoogle);
+
+router.post('/addContactNumbertoGoogleDb', userController.addContactNumbertoGoogleDb);
+
+router.post("/addRolenIsdoctornContactinGmailAccount", userController.addRolenIsdoctornContactinGmailAccount);
+
 module.exports = router;

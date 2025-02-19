@@ -80,9 +80,49 @@ function page() {
     setIsDoctor(storedisDoctor || isDoctorGoogle);
     setUserName(storedUserName || nameFromGoogle);
   }, []);
+
+  // const handleLogout = async () => {
+  //   try {
+  //     const response = await fetch("http://localhost:8080/logout", {
+  //       method: "GET",
+  //       credentials: "include",
+  //     });
+  //     if (response.ok) {
+  //       setLoading(false);
+  //       toast.success("Logging you out...");
+  //       localStorage.removeItem("jwtToken");
+  //       localStorage.removeItem("role");
+  //       localStorage.removeItem("userName");
+  //       localStorage.removeItem("userId");
+  //       localStorage.removeItem("isDoctor");
+  //       sessionStorage.clear();
+  //       Cookies.remove("jwtCookie", { path: "/" });
+  //       Cookies.remove("emailFromGoogle", { path: "/" });
+  //       Cookies.remove("nameFromGoogle", { path: "/" });
+  //       Cookies.remove("userId", { path: "/" });
+  //       Cookies.remove("userRoleGoogle", { path: "/" });
+  //       Cookies.remove("passwordFromLoginPage", { path: "/" });
+  //       Cookies.remove("emailFromLoginPage", { path: "/" });
+  //       Cookies.remove("userIdinDb", { path: "/" });
+  //       await router.push("/userlogin");
+  //     } else {
+  //       console.error("Logout failed");
+  //       setLoading(false);
+  //     }
+  //   } catch (error) {
+  //     console.error("Logout failed:", error);
+  //     setLoading(false);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   if (!userName || !isDoctor) {
+  //     handleLogout();
+  //   }
+  // }, [userName, isDoctor]);
  
   if (!userName || !isDoctor) {
-    return <div>Loading...</div>;
+    return <div>Please refresh the page...</div>;
   }
   const normalizedRole = role?.toLowerCase();
   return (
