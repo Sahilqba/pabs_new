@@ -5,12 +5,13 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Footer from "@/components/Footer";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// import { ToastContainer, toast } from "react-toastify";
+// import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
 import { Tooltip } from "bootstrap";
 import Sidebar from "@/components/Sidebar";
 import DoctorSelect from "@/components/DoctorSelect";
+import { Toast, ToastContainer } from "react-bootstrap";
 // import React from "react";
 function page() {
   const userEmailFromLoginPage = Cookies.get("emailFromLoginPage");
@@ -40,7 +41,17 @@ function page() {
   const [selectedDoctor, setSelectedDoctor] = useState("");
   const [filteredDoctors, setFilteredDoctors] = useState([]);
   const [isDoctor, setIsDoctor] = useState(null);
+  const [toastMessage, setToastMessage] = useState("");
+  const [showToast, setShowToast] = useState(false);
+  const [toastType, setToastType] = useState("");
   // const [selectedDepartment, setSelectedDepartment] = useState("");
+  const showToastMessage = (message, type) => {
+    setToastMessage(message);
+    setToastType(type);
+    console.log("Toast type: ", type);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  };
   const fetchAppointments = async (userIdfetched) => {
     setLoading(true);
     try {
@@ -147,15 +158,15 @@ function page() {
           )
         );
         console.log("Appointment deleted successfully");
-        toast.success("Appointment deleted successfully");
+        showToastMessage("Appointment deleted successfully", "success");
         // setTimeout(() => {
         //   window.location.reload();
         //   }, 3000);
       } else if (response.status === 404) {
-        toast.error("Appointment not found");
+        showToastMessage("Appointment not found", "error");
       } else if (response.status === 401) {
-        toast.warning(
-          "Token has expired. Please log in again and try deleting."
+        showToastMessage(
+          "Token has expired. Please log in again and try deleting.", "warning"
         );
         Cookies.remove("jwtCookie", { path: "/" });
         sessionStorage.clear();
@@ -166,11 +177,11 @@ function page() {
       } else {
         const errorMessage = await response.text();
         console.error("Failed to delete appointment:", errorMessage);
-        toast.error(errorMessage);
+        showToastMessage(errorMessage , "error");
       }
     } catch (error) {
       console.error("Failed to delete appointment:", error);
-      toast.error("An error occurred while deleting the appointment");
+      showToastMessage("An error occurred while deleting the appointment", "error");
     }
   };
 
@@ -202,7 +213,7 @@ function page() {
     // }
     // const appointmentDate = // get the new date value from your form or state
     if (!modalAppointmentDate || !modalAppointmentTime) {
-      toast.error("Please select a valid appointment date & time.");
+      showToastMessage("Please select a valid appointment date & time.", "error");
       return;
     }
     const currentDateTime = new Date(); // Current date and time
@@ -212,7 +223,7 @@ function page() {
 
     // Check if the selected appointment is in the past
     if (selectedDateTime <= currentDateTime) {
-      toast.error("You cannot schedule an appointment in the past.");
+      showToastMessage("You cannot schedule an appointment in the past.", "error");
       return;
     }
 
@@ -229,7 +240,7 @@ function page() {
     });
 
     if (hasConflict) {
-      toast.error("There must be at least a 2-hour gap between appointments.");
+      showToastMessage("There must be at least a 2-hour gap between appointments.","error");
       return;
     }
     //  console.log("New date:", appointmentDate);
@@ -253,7 +264,7 @@ function page() {
       if (response.ok) {
         const data = await response.json();
         console.log("Appointment date updated successfully", data);
-        toast.success("Appointment date & time updated successfully");
+        showToastMessage("Appointment date & time updated successfully", "success");
         setAppointments((prevAppointments) =>
           prevAppointments.map((appointment) =>
             appointment._id === modalAppointmentId
@@ -272,8 +283,8 @@ function page() {
         //   window.location.reload();
         //   }, 3000);
       } else if (response.status === 401) {
-        toast.warning(
-          "Token has expired. Please log in again and try rescheduling."
+        showToastMessage(
+          "Token has expired. Please log in again and try rescheduling." ,"warning"
         );
         Cookies.remove("jwtCookie", { path: "/" });
         sessionStorage.clear();
@@ -283,7 +294,7 @@ function page() {
           router.push(`/userlogin`);
         }, 4000);
       } else if (response.status === 400) {
-        toast.warning("Appointment date is required.");
+        showToastMessage("Appointment date is required.", "error");
       } else {
         const errorData = await response.json();
         console.error("Error updating appointment date", errorData);
@@ -301,7 +312,7 @@ function page() {
     const selectedDateTime = new Date(`${appointmentDate}T${appointmentTime}`);
     // Check if the selected appointment is in the past
     if (selectedDateTime <= currentDate) {
-      toast.error("You cannot book an appointment in the past.");
+      showToastMessage("You cannot book an appointment in the past.", "error");
       return;
     }
 
@@ -315,7 +326,7 @@ function page() {
     });
 
     if (hasConflict) {
-      toast.error("There must be at least a 2-hour gap between appointments.");
+      showToastMessage("There must be at least a 2-hour gap between appointments.", "error");
       return;
     }
 
@@ -356,13 +367,13 @@ function page() {
         setAppointmentDate("");
         setAppointmentTime("");
         console.log("Appointment booked:", appointment);
-        toast.success("Appointment booked successfully");
+        showToastMessage("Appointment booked successfully", "success");
         setTimeout(() => {
           router.push(`/appointmentBooking`);
           }, 3000);
         // router.push(`/userProfile`);
       } else if (response.status === 401) {
-        toast.warning("Token has expired. Please log in again.");
+        showToastMessage("Token has expired. Please log in again.", "warning");
         Cookies.remove("jwtCookie", { path: "/" });
         sessionStorage.clear();
         localStorage.clear();
@@ -372,12 +383,12 @@ function page() {
       } else {
         const errorMessage = await response.text();
         console.error("Failed to book appointment:", errorMessage);
-        toast.error(errorMessage);
+        showToastMessage(errorMessage, "error");
       }
     } catch (error) {
       console.error("Error booking appointment:", error);
-      toast.warning(
-        "An error occurred while booking the appointment. Please login and try again."
+      showToastMessage(
+        "An error occurred while booking the appointment. Please login and try again.", "error"
       );
       setTimeout(() => {
         router.push(`/userlogin`);
@@ -730,7 +741,11 @@ function page() {
         </main>
       </div>
       <Footer />
-      <ToastContainer />
+      <ToastContainer position="top-end" className="p-3">
+        <Toast show={showToast} onClose={() => setShowToast(false)} delay={30000} autohide className={`toast-${toastType}`}>
+          <Toast.Body>{toastMessage}</Toast.Body>
+        </Toast>
+      </ToastContainer>
     </>
   );
 }

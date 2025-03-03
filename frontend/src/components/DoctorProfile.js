@@ -6,7 +6,8 @@ import Cookies from "js-cookie";
 import Sidebar from "./Sidebar";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-
+// import Select from "react-select";
+import Multiselect from 'multiselect-react-dropdown';
 const DoctorProfile = () => {
   useEffect(() => {
     require("bootstrap/dist/js/bootstrap.js");
@@ -258,11 +259,40 @@ const DoctorProfile = () => {
   useEffect(() => {
     fetchProfilePicture();
   }, []);
-
+  const optionsDay = [
+    {
+      options: [
+        { value: "Monday", label: "Monday" },
+        { value: "Tuesday", label: "Tuesday" },
+        { value: "Wednesday", label: "Wednesday" },
+        { value: "Thursday", label: "Thursday" },
+        { value: "Friday", label: "Friday" },
+        { value: "Saturday", label: "Saturday" },
+        { value: "Sunday", label: "Sunday" },
+      ],
+    },
+  ];
+  const optionsTimeSlot = [
+    {
+      options: [
+        {value: "9:00 AM - 9:30 AM", label: "9:00 AM - 9:30 AM"}, 
+        {value: "9:30 AM - 10:00 AM", label: "9:30 AM - 10:00 AM"}, 
+        {value: "10:00 AM - 10:30 AM", label: "10:00 AM - 10:30 AM"}, 
+        {value: "10:30 AM - 11:00 AM", label: "10:30 AM - 11:00 AM"},
+        {value: "11:00 AM - 11:30 AM", label: "11:00 AM - 11:30 AM"},
+        {value: "11:30 AM - 12:00 PM", label: "11:30 AM - 12:00 PM"},
+        {value: "12:00 PM - 12:30 PM", label: "12:00 PM - 12:30 PM"}, 
+        {value: "12:30 PM - 1:00 PM", label: "12:30 PM - 1:00 PM"}, 
+      ]
+    }
+  ]; 
   return (
     <>
       {successMessage && (
-        <div className="alert alert-success position-fixed top-0 end-0 m-3" role="alert">
+        <div
+          className="alert alert-success position-fixed top-0 end-0 m-3"
+          role="alert"
+        >
           {successMessage}
         </div>
       )}
@@ -343,7 +373,9 @@ const DoctorProfile = () => {
                         value={department}
                         onChange={(e) => setDepartment(e.target.value)}
                       >
-                        <option value="SelectDept">Select your Department</option>
+                        <option value="SelectDept">
+                          Select your Department
+                        </option>
                         <option value="GeneralPhysician">
                           General Physician
                         </option>
@@ -407,6 +439,24 @@ const DoctorProfile = () => {
                         placeholder="Enter your Previous workplace (if any)"
                         value={previousCompany}
                         onChange={(e) => setpreviousCompany(e.target.value)}
+                      />
+                    </div>
+                    <div className="col-md-12">
+                      <Select
+                        options={optionsDay}
+                        isMulti
+                        placeholder="Please Select your available days"
+                        className="react-select-container form-control doc-inp"
+                        // classNamePrefix="react-select"
+                      />
+                    </div>
+                    <div className="col-md-12">
+                      <Select
+                        options={optionsTimeSlot}
+                        isMulti
+                        placeholder="Please Select your available time slots"
+                        className="react-select-container form-control doc-inp"
+                        // classNamePrefix="react-select"
                       />
                     </div>
                     <div className="col-md-12">

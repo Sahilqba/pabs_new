@@ -866,3 +866,68 @@ button.menu-item.btn.btn-sm.btn-link.text-start {
     transform: translateY(-20px);
   }
 } */
+
+/* doctor dashboard */
+/* .app-stats {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 0;
+} */
+.apntmnt-stats {
+  background-color: #f1f2f3;
+  padding: 45px 0;
+  margin: 20px 0;
+}
+
+.sec-contain {
+  display: flex;
+  justify-content: space-between;
+  color: #000000;
+}
+.sec-contain p {
+  /* margin-left: 5px; */
+  color: #000000;
+}
+.sec-contain h2 {
+  color: #000000;
+}
+.tracksec {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  max-width: 30%;
+}
+.tracksec h2,
+.tracksec p {
+  margin-bottom: 0.5px;
+}
+.react-select-container.form-control.doc-inp.css-b62m3t-container {
+  border: none;
+  padding: 0;
+  height: 60px !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+}
+/* toast */
+.toast {
+  width: 350px; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+  margin-bottom: 10px; 
+  font-size: 25px !important; 
+  padding: 20px; 
+  border-radius: 8px; 
+}
+.toast-success {
+  background-color: #359c4d !important; 
+  color: white !important;
+}
+
+.toast-error {
+  background-color: #de4857 !important; 
+  color: white !important;
+}
+
+.toast-warning {
+  background-color: #ffc107 !important; 
+  color: black;
+}

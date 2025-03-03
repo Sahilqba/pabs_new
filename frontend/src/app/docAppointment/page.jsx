@@ -4,8 +4,9 @@ import Sidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
 import { useState, useEffect } from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// import { ToastContainer, toast } from "react-toastify";
+// import "react-toastify/dist/ReactToastify.css";
+import { Toast, ToastContainer } from "react-bootstrap";
 import Cookies from "js-cookie";
 const docApp = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -22,20 +23,21 @@ const docApp = () => {
   const [userData, setUserData] = useState({});
   const jwtToken = localStorage.getItem("jwtToken");
   const jwtCookie = Cookies.get("jwtCookie");
+  const [toastMessage, setToastMessage] = useState("");
+  const [showToast, setShowToast] = useState(false);
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen);
+  };
+  const showToastMessage = (message) => {
+    setToastMessage(message);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
   };
   useEffect(() => {
     const storedRole = localStorage.getItem("role");
     const storedUserName = localStorage.getItem("userName");
     const nameFromGoogle = Cookies.get("nameFromGoogle");
     const userRoleGoogle = Cookies.get("userRoleGoogle");
-
-    // console.log("storedRole:", storedRole);
-    // console.log("storedUserName:", storedUserName);
-    // console.log("nameFromGoogle:", nameFromGoogle);
-    // console.log("userRoleGoogle:", userRoleGoogle);
-
     setRole(storedRole || userRoleGoogle);
     setUserName(storedUserName || nameFromGoogle);
   }, []);
@@ -172,7 +174,7 @@ const docApp = () => {
     );
     if (!appointment) {
       console.error("Appointment not found:", appointmentIdmodal);
-      toast.error("Appointment not found");
+      showToastMessage("Appointment not found");
       setIsModalOpen(false);
       return;
     }
@@ -189,7 +191,7 @@ const docApp = () => {
   const handleEditAppointment = async () => {
     console.log("Edit appointment");
     if (!modalAppointmentDate || !modalAppointmentTime) {
-      toast.error("Please select a valid appointment date & time.");
+      showToastMessage("Please select a valid appointment date & time.");
       return;
     }
     const currentDateTime = new Date(); // Current date and time
@@ -199,7 +201,7 @@ const docApp = () => {
 
     // Check if the selected appointment is in the past
     if (selectedDateTime <= currentDateTime) {
-      toast.error("You cannot schedule an appointment in the past.");
+      showToastMessage("You cannot schedule an appointment in the past.");
       return;
     }
 
@@ -216,7 +218,7 @@ const docApp = () => {
     });
 
     if (hasConflict) {
-      toast.error("There must be at least a 2-hour gap between appointments.");
+      showToastMessage("There must be at least a 2-hour gap between appointments.");
       return;
     }
     //  console.log("New date:", appointmentDate);
@@ -240,7 +242,7 @@ const docApp = () => {
       if (response.ok) {
         const data = await response.json();
         console.log("Appointment date updated successfully", data);
-        toast.success("Appointment date & time updated successfully");
+        showToastMessage("Appointment date & time updated successfully");
         setAppointments((prevAppointments) =>
           prevAppointments.map((appointment) =>
             appointment._id === modalAppointmentId
@@ -259,7 +261,7 @@ const docApp = () => {
         // fetchAppointments(userIdfetched);
         // handle success (e.g., update state, close modal, show notification)
       } else if (response.status === 401) {
-        toast.warning(
+        showToastMessage(
           "Token has expired. Please log in again and try rescheduling."
         );
         Cookies.remove("jwtCookie", { path: "/" });
@@ -270,7 +272,7 @@ const docApp = () => {
           router.push(`/userlogin`);
         }, 4000);
       } else if (response.status === 400) {
-        toast.warning("Appointment date is required.");
+        showToastMessage("Appointment date is required.");
       } else {
         const errorData = await response.json();
         console.error("Error updating appointment date", errorData);
@@ -310,14 +312,14 @@ const docApp = () => {
           )
         );
         console.log("Appointment deleted successfully");
-        toast.success("Appointment deleted successfully");
+        showToastMessage("Appointment deleted successfully");
         setTimeout(() => {
           window.location.reload();
           }, 3000);
       } else if (response.status === 404) {
-        toast.error("Appointment not found");
+        showToastMessage("Appointment not found");
       } else if (response.status === 401) {
-        toast.warning(
+        showToastMessage(
           "Token has expired. Please log in again and try deleting."
         );
         Cookies.remove("jwtCookie", { path: "/" });
@@ -329,11 +331,11 @@ const docApp = () => {
       } else {
         const errorMessage = await response.text();
         console.error("Failed to delete appointment:", errorMessage);
-        toast.error(errorMessage);
+        showToastMessage(errorMessage);
       }
     } catch (error) {
       console.error("Failed to delete appointment:", error);
-      toast.error("An error occurred while deleting the appointment");
+      showToastMessage("An error occurred while deleting the appointment");
     }
   };
 
@@ -393,27 +395,6 @@ const docApp = () => {
                         <p>
                           <span>Disease Symptoms:</span> {appointment.disease}
                         </p>
-                        {/* <div className="action-symbol">
-                          <button
-                            onClick={() => handleModal(appointment._id)}
-                            className="btn btn-outline-primary"
-                            data-bs-toggle="tooltip"
-                            data-bs-placement="bottom"
-                            title="Reschedule Appointment"
-                          >
-                            <i className="fa-solid fa-calendar-days"></i>
-                          </button>
-                          <button
-                            onClick={() => openConfirmModal(appointment._id)}
-                            className="btn btn-outline-danger"
-                            data-bs-toggle="tooltip"
-                            data-bs-placement="bottom"
-                            title="Delete Appointment"
-                          >
-                            <i className="fa-solid fa-trash"></i>
-                          </button>
-                         
-                        </div> */}
                       </div>
                     ))}
                   </div>
@@ -454,27 +435,7 @@ const docApp = () => {
                             setModalAppointmentTime(e.target.value);
                           }}
                         />
-                        {/* <input
-                          type="text"
-                          className="form-control"
-                          placeholder="HH:MM (24-hour format)"
-                          value={modalAppointmentTime}
-                          onChange={(e) => {
-                            setModalAppointmentTime(e.target.value);
-                          }}
-                          onBlur={(e) => {
-                            const isValidTime =
-                              /^([01]\d|2[0-3]):([0-5]\d)$/.test(
-                                modalAppointmentTime
-                              );
-                            if (!isValidTime && modalAppointmentTime !== "") {
-                              toast.error(
-                                "Please enter a valid time in HH:MM format (24-hour clock)."
-                              );
-                            }
-                          }}
-                          required
-                        /> */}
+                
                       </div>
                     </div>
                     <div className="modal-footer">
@@ -534,7 +495,11 @@ const docApp = () => {
         </main>
       </div>
       <Footer />
-      <ToastContainer />
+      <ToastContainer position="top-end" className="p-3">
+        <Toast show={showToast} onClose={() => setShowToast(false)} delay={3000} autohide>
+          <Toast.Body>{toastMessage}</Toast.Body>
+        </Toast>
+      </ToastContainer>
     </>
   );
 };

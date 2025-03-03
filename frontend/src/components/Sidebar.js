@@ -149,6 +149,12 @@ const Sidebar = ({ isOpen }) => {
                 Past Appointments
               </Link>
             </li>
+            <li className="nav-item">
+              <Link href="/myProfile" className="nav-link sd-link">
+                <i className="bi bi-person-badge"></i>
+                My Profile
+              </Link> 
+            </li> 
           </>
         )}
 
