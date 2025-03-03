@@ -6,7 +6,7 @@ import Cookies from "js-cookie";
 import Sidebar from "./Sidebar";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-// import Select from "react-select";
+import Select from "react-select";
 import Multiselect from 'multiselect-react-dropdown';
 const DoctorProfile = () => {
   useEffect(() => {
