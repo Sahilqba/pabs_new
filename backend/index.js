@@ -496,6 +496,7 @@ app.get("/logout", (req, res) => {
       res.clearCookie("isDoctor", { path: "/" });
       res.clearCookie("googleEmail", { path: "/" });
       res.clearCookie("contactNumber", { path: "/" });
+      res.clearCookie("userName", {path: "/"})
       res.status(200).json({ message: "Logged out successfully" });
     });
   });

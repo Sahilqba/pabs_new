@@ -15,9 +15,11 @@ const page = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState({});
+  const userNameFetched = Cookies.get("userName");
   const [role, setRole] = useState(null);
   const jwtToken = localStorage.getItem("jwtToken");
   const jwtCookie = Cookies.get("jwtCookie");
+  const [totalAppointments, setTotalAppointments] = useState(0)
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen);
   };
@@ -141,6 +143,42 @@ const page = () => {
   //   }, {});
   // };
 
+  const fetchAllAppointments = async (userNameFetched) => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/getAppointmentsByDoctorUserName/${userNameFetched}`,
+        {
+          method: "GET",
+          headers: {
+            // Authorization: `Bearer ${jwtToken}`,
+            // Authorization: `Bearer ${jwtToken ? jwtToken : jwtCookie}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      setTotalAppointments(data.length)
+      console.log('dddddd', data)
+    } catch (error) {
+      console.error("Failed to fetch appointments:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const userNameFetched = Cookies.get("userName");
+    if (userNameFetched) {
+      fetchAllAppointments(userNameFetched);
+    }
+  }, [userNameFetched]);
+
   const viewAppointments = async () => {
     setLoading(true);
     try {
@@ -190,14 +228,14 @@ const page = () => {
       console.log("Grouped Appointments Before Slicing:", groupedAppointments);
       // Keep only the latest 2 upcoming appointments per user
       const latestAppointments = appointmentsData
-      .sort(
-        (a, b) =>
-          new Date(`${a.appointmentDate}T${a.appointmentTime}`) -
-          new Date(`${b.appointmentDate}T${b.appointmentTime}`)
-      )
-      .slice(0, 2);
+        .sort(
+          (a, b) =>
+            new Date(`${a.appointmentDate}T${a.appointmentTime}`) -
+            new Date(`${b.appointmentDate}T${b.appointmentTime}`)
+        )
+        .slice(0, 2);
 
-        console.log("Latest 2 Per User:", latestAppointments);
+      console.log("Latest 2 Per User:", latestAppointments);
       // Sort the final list based on appointment date
       latestAppointments.sort(
         (a, b) =>
@@ -295,7 +333,7 @@ const page = () => {
           <div className="container">
             <div className="sec-contain">
               <div className="tracksec">
-                <h2>225</h2>
+                <h2>{totalAppointments}</h2>
                 <div className="right-cont">
                   <p>Total Appointments</p>
                 </div>
@@ -330,54 +368,56 @@ const page = () => {
             )}
             {!loading && appointments?.length > 0 && (
               <>
-              <table className="table table-striped table-bordered">
-                <thead className="table-dark">
-                  <tr>
-                    <th>#</th>
-                    <th>Patient Name</th>
-                    <th>Appointment Date & Time</th>
-                    <th>Disease Symptoms</th>
-                    {/* <th>Actions</th> */}
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.entries(groupedAppointments).map(
-                    ([userId, userAppointments], index) =>
-                      userAppointments.map((appointment, appointmentIndex) => (
-                        <tr key={appointment._id}>
-                          {appointmentIndex === 0 && (
-                            <td rowSpan={userAppointments.length}>
-                              {index + 1}
-                            </td>
-                          )}
-                          {appointmentIndex === 0 && (
-                            <td rowSpan={userAppointments.length}>
-                              {userData[userId]?.name || "Unknown"}
-                            </td>
-                          )}
-                          <td>
-                            {formatDateTime(appointment.appointmentDate)},{" "}
-                            {appointment.appointmentTime}
-                          </td>
-                          <td>{appointment.disease}</td>
-                        </tr>
-                      ))
+                <table className="table table-striped table-bordered">
+                  <thead className="table-dark">
+                    <tr>
+                      <th>#</th>
+                      <th>Patient Name</th>
+                      <th>Appointment Date & Time</th>
+                      <th>Disease Symptoms</th>
+                      {/* <th>Actions</th> */}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Object.entries(groupedAppointments).map(
+                      ([userId, userAppointments], index) =>
+                        userAppointments.map(
+                          (appointment, appointmentIndex) => (
+                            <tr key={appointment._id}>
+                              {appointmentIndex === 0 && (
+                                <td rowSpan={userAppointments.length}>
+                                  {index + 1}
+                                </td>
+                              )}
+                              {appointmentIndex === 0 && (
+                                <td rowSpan={userAppointments.length}>
+                                  {userData[userId]?.name || "Unknown"}
+                                </td>
+                              )}
+                              <td>
+                                {formatDateTime(appointment.appointmentDate)},{" "}
+                                {appointment.appointmentTime}
+                              </td>
+                              <td>{appointment.disease}</td>
+                            </tr>
+                          )
+                        )
+                    )}
+                  </tbody>
+                </table>
+                <div className="register-link">
+                  {loading ? (
+                    <span className="loader">Loading...</span>
+                  ) : (
+                    <Link
+                      href="/docAppointment"
+                      className="sign-up-link upcmng-apt-link"
+                      onClick={handleUpcmngAppntmntClick}
+                    >
+                      Edit Appointments / View More Appointments
+                    </Link>
                   )}
-                </tbody>
-              </table>
-              <div className="register-link">
-            {loading ? (
-              <span className="loader">Loading...</span>
-            ) : (
-              <Link
-                href="/docAppointment"
-                className="sign-up-link upcmng-apt-link"
-                onClick={handleUpcmngAppntmntClick}
-              >
-                Edit Appointments / View More Appointments
-              </Link>
-            )}
-          </div>
+                </div>
               </>
             )}
           </div>

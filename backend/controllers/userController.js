@@ -659,3 +659,17 @@ exports.addRolenIsdoctornContactinGmailAccount = async (req, res) => {
     res.status(400).send(error);
   }
 };
+
+
+exports.getAppointmentsByDoctorUserName = async (req, res) => {
+  try {
+    const userName = req.params.userName;
+    const appointments = await Appointment.find({ userName: userName });
+    if (!appointments) {
+      return res.status(404).send("No appointments found for this user");
+    }
+    res.status(200).json(appointments);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};

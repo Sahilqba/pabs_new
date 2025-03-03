@@ -406,4 +406,6 @@ router.post('/addContactNumbertoGoogleDb', userController.addContactNumbertoGoog
 
 router.post("/addRolenIsdoctornContactinGmailAccount", userController.addRolenIsdoctornContactinGmailAccount);
 
+router.get('/getAppointmentsByDoctorUserName/:userId', userController.getAppointmentsByDoctorUserName);
+
 module.exports = router;

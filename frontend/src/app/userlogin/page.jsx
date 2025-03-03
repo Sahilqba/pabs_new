@@ -120,6 +120,7 @@ function page() {
         Cookies.set("jwtCookie", data.token, { expires: 1, path: "/" });
         Cookies.set("userIdinDb", data.user._id, { expires: 1, path: "/" });
         Cookies.set("userId", data.user._id, { expires: 1, path: "/" });
+        Cookies.set("userName", data.user.name, { expires: 1, path: "/" });
         setTimeout(() => {
           router.push(`/userProfile`);
         }, 2000);
