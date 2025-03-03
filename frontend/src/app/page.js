@@ -2,6 +2,7 @@
 import Image from "next/image";
 import styles from "./page.module.css";
 import "bootstrap/dist/css/bootstrap.css";
+import "mdb-react-ui-kit/dist/css/mdb.min.css";
 import { useEffect } from "react";
 import landng_img from "../../public/user_side_images/landingPg.png";
 import { useRouter } from "next/navigation";
